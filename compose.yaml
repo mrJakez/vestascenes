@@ -1,0 +1,22 @@
+services:
+  restapi: 
+    environment:
+      # required to directly print() towards stdout - activates flush always
+      PYTHONUNBUFFERED: 1
+    build:
+      context: restapi
+      target: builder
+    # flask requires SIGINT to stop gracefully
+    # (default stop signal from Compose is SIGTERM)
+    stop_signal: SIGINT
+    ports:
+      - '8000:8000'
+  runner:
+    environment:
+      # required to directly print() towards stdout - activates flush always
+      PYTHONUNBUFFERED: 1
+    image: python:latest
+    working_dir: /app  # Arbeitsverzeichnis im Container
+    volumes:
+      - ./runner:/app     # Mounten des lokalen Verzeichnisses in das Arbeitsverzeichnis im Container
+    command: ["python", "app.py"]  # Befehl zum Starten der Python-Anwendung
