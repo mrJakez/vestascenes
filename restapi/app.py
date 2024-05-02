@@ -4,13 +4,41 @@ import sys
 from flask import Flask
 import datetime
 import sched, time
+import sqlite3
+import os
+
+import debugpy
+debugpy.listen(9000)
+
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def hello():
+	# con = sqlite3.connect("/database/vbcontrol.db")
+	# cur = con.cursor()
+	# cur.execute("""
+    # INSERT INTO movie VALUES
+    #     ('Monty Python and the Holy Grail', 1975, 8.2),
+    #     ('And Now for Something Completely Different', 1971, 7.5)
+	# """)
+
 	print("example how to log towards stdOut")
-	return "Hello World!"
+	return "Hello World!2" + debugpy.__version__
+
+
+
+@app.route('/init')
+def init():
+	if os.path.exists("/database/vbcontrol.db"):
+		print("old database existed - removed right now")
+		os.remove("/database/vbcontrol.db")
+
+	con = sqlite3.connect("/database/vbcontrol.db")
+	cur = con.cursor()
+	cur.execute("CREATE TABLE movie(title, year, score)")
+	return "init done"
 
 
 @app.route('/board')

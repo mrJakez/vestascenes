@@ -1,0 +1,34 @@
+services:
+
+  restapi: 
+    environment:
+      # required to directly print() towards stdout - activates flush always
+      PYTHONUNBUFFERED: 1
+    build:
+      context: restapi
+      target: builder
+    # flask requires SIGINT to stop gracefully
+    # (default stop signal from Compose is SIGTERM)
+    stop_signal: SIGINT
+    expose:
+      - 8000
+    ports:
+      - '8000:8000'
+      - '9000:9000'
+    volumes:
+      - ./database:/database
+    #command: ["sh", "-c", "pip install debugpy -t /tmp && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:9000 -m flask run --no-debugger --no-reload --host 0.0.0.0 --port 5000"]
+    # develop:
+    #   watch:
+    #     - action: rebuild
+    #       path: .
+
+  runner:
+    environment:
+      # required to directly print() towards stdout - activates flush always
+      PYTHONUNBUFFERED: 1
+    build:
+      context: runner
+      target: builder
+    links:
+      - restapi

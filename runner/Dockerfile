@@ -19,6 +19,7 @@ FROM builder as dev-envs
 # apk add git
 # EOF
 
+
 RUN <<EOF
 addgroup -S docker
 adduser -S --shell /bin/bash --ingroup docker vscode
