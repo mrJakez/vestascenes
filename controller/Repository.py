@@ -34,17 +34,17 @@ class Repository(metaclass=SingletonMeta):
             self._connection = sqlite3.connect("/database/vbcontrol.db", check_same_thread=False)
 
         return self._connection
-    def get_scenes(self):
+    def get_snapshots(self):
         con = self.get_connection()
         cursor = con.cursor()
 
-        sqlite_select_query = 'SELECT * from scenes'
+        sqlite_select_query = 'SELECT * from snapshots'
         cursor.execute(sqlite_select_query)
         records = cursor.fetchall()
         print("Total rows are:  ", len(records))
         return records
 
-    def get_scene_object(self, record):
+    def get_snapshot_object(self, record):
 
         raw = record[1]
         print("raw: " + raw)

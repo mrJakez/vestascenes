@@ -12,7 +12,7 @@ from vestaboard.formatter import Formatter
 from flask import request, Response
 
 from Scenes.Demo import DemoScene, DemoScene2
-from Scenes.History import HistoryScene
+from Scenes.SnapshotScene import SnapshotScene
 
 app = Flask(__name__)
 
@@ -44,7 +44,7 @@ def init():
 
     Repository._connection = None
     cur = Repository().get_connection().cursor()
-    cur.execute("CREATE TABLE scenes(title, raw)")
+    cur.execute("CREATE TABLE snapshots(title, raw)")
     return "init done"
 
 
@@ -63,7 +63,7 @@ def update():
 
 #    ScenesArray.append(DemoScene())
 #    ScenesArray.append(DemoScene2())
-    ScenesArray.append(HistoryScene())
+    ScenesArray.append(SnapshotScene())
 
     current_scene = random.choice(ScenesArray)
     raw_text = current_scene.get_raw()
@@ -73,7 +73,7 @@ def update():
     return "updated from " + current_scene.__class__.__name__
 
 
-@app.route('/store', methods=['POST'])
+@app.route('/snapshot', methods=['POST'])
 def store():
     if not "title" in request.json:
         return Response(response=json.dumps({"message": "missing 'title' parameter in request"}), status=400)
@@ -84,7 +84,7 @@ def store():
     print("raw:" + str(raw))
     print("raw string:" + str(raw['currentMessage']['layout']))
 
-    sql = 'INSERT INTO scenes(title, raw) VALUES(?,?)'
+    sql = 'INSERT INTO snapshots(title, raw) VALUES(?,?)'
     Repository().get_connection().cursor().execute(sql, (title, str(raw['currentMessage']['layout'])))
     Repository().get_connection().commit()
 
