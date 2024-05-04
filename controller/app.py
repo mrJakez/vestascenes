@@ -10,30 +10,20 @@ import os
 from Repository import Repository
 from vestaboard.formatter import Formatter
 from flask import request, Response
-
-from Scenes.Demo import DemoScene, DemoScene2
+from Scenes.AbstractScene import DemoAbstractScene
 from Scenes.SnapshotScene import SnapshotScene
+from Scenes.ChatGPTScene import ChatGPTScene
 
 app = Flask(__name__)
 
-installable = vestaboard.Installable('55cea46a-493f-4636-95fe-857094034fca',
-                                     'YzFhMTdmOGUtMDhjMS00ZTNhLWFiOTktYjMxYTU4ZjEyYWQ1')
+installable = vestaboard.Installable('55cea46a-493f-4636-95fe-857094034fca','YzFhMTdmOGUtMDhjMS00ZTNhLWFiOTktYjMxYTU4ZjEyYWQ1')
 vboard = vestaboard.Board(installable)
-vboardRead = vestaboard.Board(apiKey='6a27cdd6+cc6f+4ad9+9631+5910d42102ce', readWrite=True)
 
+vboardRead = vestaboard.Board(apiKey='6a27cdd6+cc6f+4ad9+9631+5910d42102ce', readWrite=True)
 
 @app.route('/')
 def hello():
-    # con = sqlite3.connect("/database/vbcontrol.db")
-    # cur = con.cursor()
-    # cur.execute("""
-    # INSERT INTO movie VALUES
-    #     ('Monty Python and the Holy Grail', 1975, 8.2),
-    #     ('And Now for Something Completely Different', 1971, 7.5)
-    # """)
-
-    print("example how to log towards stdOut")
-    return "Neuer test Hello World!2"
+    return "welcome to vestaboard_control"
 
 
 @app.route('/init')
@@ -45,35 +35,28 @@ def init():
     Repository._connection = None
     cur = Repository().get_connection().cursor()
     cur.execute("CREATE TABLE snapshots(title, raw)")
-    return "init done"
-
-
-@app.route('/board')
-def board():
-    vboard.post('Everything you can imagine is real.')
-    return "board connector - will come for sure :)"
+    return Response(response=json.dumps({"status": "initalization done successfully"}))
 
 
 @app.route('/update')
 def update():
     # check if some event was triggered meanwhile. If yes display them, otherwise random content
+    # TODO
 
     # random content
     ScenesArray = []  # empty array
 
 #    ScenesArray.append(DemoScene())
-#    ScenesArray.append(DemoScene2())
-    ScenesArray.append(SnapshotScene())
+#    ScenesArray.append(SnapshotScene())
+    ScenesArray.append(ChatGPTScene())
 
     current_scene = random.choice(ScenesArray)
-    raw_text = current_scene.get_raw()
+    current_scene.execute(vboard)
 
-    print(raw_text)
-    vboard.raw(raw_text, pad='center')
-    return "updated from " + current_scene.__class__.__name__
+    return Response(response=json.dumps({"status": "updated from " + current_scene.__class__.__name__}))
 
 
-@app.route('/snapshot', methods=['POST'])
+@app.route('/storeSnapshot', methods=['POST'])
 def store():
     if not "title" in request.json:
         return Response(response=json.dumps({"message": "missing 'title' parameter in request"}), status=400)
