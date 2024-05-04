@@ -1,11 +1,11 @@
 services:
 
-  restapi: 
+  controller:
     environment:
       # required to directly print() towards stdout - activates flush always
       PYTHONUNBUFFERED: 1
     build:
-      context: restapi
+      context: controller
       target: builder
     # flask requires SIGINT to stop gracefully
     # (default stop signal from Compose is SIGTERM)
@@ -29,4 +29,4 @@ services:
       context: runner
       target: builder
     links:
-      - restapi
+      - controller
