@@ -47,7 +47,6 @@ class Repository(metaclass=SingletonMeta):
     def get_snapshot_object(self, record):
 
         raw = record[1]
-        print("raw: " + raw)
 
         list = []
         # raw is a list of 6 lists as string. We have to convert this one towards a List(List(Int)) object
