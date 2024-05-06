@@ -32,8 +32,10 @@ def init():
     Repository._connection = None
     cur = Repository().get_connection().cursor()
     cur.execute("CREATE TABLE snapshots(title, raw)")
-    return Response(response=json.dumps({"status": "initalization done successfully"}))
+    cur.execute("CREATE TABLE chatgpt_history(id, created_at TEXT DEFAULT CURRENT_TIMESTAMP, role, content)")
+    Repository().get_connection().commit()
 
+    return Response(response=json.dumps({"status": "initalization done successfully"}))
 
 @app.route('/update')
 def update():
@@ -44,8 +46,8 @@ def update():
     ScenesArray = []  # empty array
 
     #ScenesArray.append(DemoScene())
-    ScenesArray.append(SnapshotScene())
-    #ScenesArray.append(ChatGPTScene())
+    #cenesArray.append(SnapshotScene())
+    ScenesArray.append(ChatGPTScene())
 
     current_scene = random.choice(ScenesArray)
     current_scene.execute(vboard)

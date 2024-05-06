@@ -1,4 +1,6 @@
 import sqlite3
+import uuid
+import datetime
 
 
 class SingletonMeta(type):
@@ -57,4 +59,35 @@ class Repository(metaclass=SingletonMeta):
             list.append(item)
 
         return {"title": record[0], "raw":list}
+
+
+    def get_chatgpt_history(self):
+        con = self.get_connection()
+        cursor = con.cursor()
+
+        sqlite_select_query = 'SELECT * from chatgpt_history'
+        cursor.execute(sqlite_select_query)
+        records = cursor.fetchall()
+        print("Total rows are:  ", len(records))
+
+
+        list = []
+        for record in records:
+            list.append({
+                'id': record[0],
+                'created_at': record[1],
+                'role': record[2],
+                'content': record[3]
+            })
+
+        return list
+
+
+    def save_chatgpt_history(self, obj):
+        con = self.get_connection()
+        cursor = con.cursor()
+        sql = 'INSERT INTO chatgpt_history(id, created_at, role, content) VALUES(?,?,?,?)'
+        cursor.execute(sql, (str(uuid.uuid4()), datetime.datetime.now(), obj['role'], obj['content']))
+        con.commit()
+
 
