@@ -12,7 +12,9 @@ from flask import request, Response
 from Scenes.AbstractScene import DemoScene
 from Scenes.SnapshotScene import SnapshotScene
 from Scenes.ChatGPTScene import ChatGPTScene
+from Scenes.WasteCalendarScene import WasteCalendarScene
 import vesta
+from Scenes.Director import Director
 
 vboard = vesta.ReadWriteClient("3e5dc670+a418+43f0+acd5+4ff8cc5fb2fd")
 app = Flask(__name__)
@@ -39,17 +41,8 @@ def init():
 
 @app.route('/update')
 def update():
-    # check if some event was triggered meanwhile. If yes display them, otherwise random content
-    # TODO
 
-    # random content
-    ScenesArray = []  # empty array
-
-    #ScenesArray.append(DemoScene())
-    #cenesArray.append(SnapshotScene())
-    ScenesArray.append(ChatGPTScene())
-
-    current_scene = random.choice(ScenesArray)
+    current_scene = Director().find_best_scene()
     current_scene.execute(vboard)
 
     return Response(response=json.dumps({
