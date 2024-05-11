@@ -15,9 +15,7 @@ class Director:
 
             execute_res = timed_scene.execute()
 
-            print(f"timed scene already exists check: {Repository().scene_instances_with_id_exists(execute_res.id)} for ID: {execute_res.id}")
-            if (execute_res.should_execute is True and
-                    Repository().scene_instances_with_id_exists(execute_res.id)) is False:
+            if execute_res.should_execute is True and Repository().scene_instances_with_id_exists(execute_res.id) is False:
                 returns.append(execute_res)
 
         # order SceneExecuteReturn objects based on priority

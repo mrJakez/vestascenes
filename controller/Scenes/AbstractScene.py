@@ -23,7 +23,7 @@ class SceneExecuteReturn:
         self.raw = raw
 
     id: string
-    should_execute: int
+    should_execute: bool
     priority: int
     scene_object: object
     message: string
