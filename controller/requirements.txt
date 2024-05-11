@@ -3,3 +3,4 @@ openai
 vesta
 icalendar
 requests
+httpx

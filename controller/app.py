@@ -3,16 +3,16 @@ import random
 import sys
 
 from flask import Flask, json
-import datetime
+
+from datetime import datetime
 import sched, time
 import sqlite3
 import os
 from Repository import Repository
 from flask import request, Response
-from Scenes.AbstractScene import DemoScene
-from Scenes.SnapshotScene import SnapshotScene
-from Scenes.ChatGPTScene import ChatGPTScene
-from Scenes.WasteCalendarScene import WasteCalendarScene
+from Scenes.AbstractScene import AbstractScene
+from Helper.RawHelper import RawHelper
+
 import vesta
 from Scenes.Director import Director
 
@@ -35,19 +35,64 @@ def init():
     cur = Repository().get_connection().cursor()
     cur.execute("CREATE TABLE snapshots(title, raw)")
     cur.execute("CREATE TABLE chatgpt_history(id, created_at TEXT DEFAULT CURRENT_TIMESTAMP, role, content)")
+    cur.execute("CREATE TABLE scene_instances(id, raw, class_string, start_date, end_date, priority, is_active)")
     Repository().get_connection().commit()
 
     return Response(response=json.dumps({"status": "initalization done successfully"}))
 
-@app.route('/update')
-def update():
+@app.route('/execute')
+def execute():
+    candidate = Director().get_next_scene()
+    print(f"candidate ID: {candidate.id}")
+    current = Repository().get_active_scene_instance()
+    now = datetime.now()
 
-    current_scene = Director().find_best_scene()
-    current_scene.execute(vboard)
+    # debug
+    if current is not None:
+        end_date = datetime.strptime(current['end_date'], "%Y-%m-%d %H:%M:%S.%f")
+        print(f"now: {now} - end date: {end_date}")
+    #-
+
+    if current is None:
+        print("current is none -> candidate will be executed")
+    elif datetime.strptime(current['end_date'], "%Y-%m-%d %H:%M:%S.%f") >= now:
+        print("current is still valid (end_date not reached yet)")
+        if candidate.priority > current['priority']:
+            print("candidate has higher priority than current. Current will be replaced")
+            Repository().unmark_active_scene_instance()
+        else:
+            return Response(response=json.dumps({
+                "identifier": candidate.id,
+                "scene": candidate.scene_object.__class__.__name__,
+                "message": "candidate has lower or equal priority than current -> do nothing",
+            }))
+    elif datetime.strptime(current['end_date'], "%Y-%m-%d %H:%M:%S.%f") < now:
+        print("current is not valid any longer - is_active will be set to false")
+        Repository().unmark_active_scene_instance()
+
+
+    print(f"candidate.message: {candidate.message}")
+    vesta.pprint(candidate.raw)
+
+    try:
+        vboard.write_message(candidate.raw)
+    except Exception as exc:
+        print(f"HTTP Exception catched")
+
+    Repository().save_scene_instance({
+                'id': candidate.id,
+                'raw': RawHelper.get_raw_string(candidate.raw),
+                'class_string': candidate.scene_object.__class__.__name__,
+                'start_date': candidate.start_date,
+                'end_date': candidate.end_date,
+                'priority': candidate.priority,
+                'is_active': True
+            })
 
     return Response(response=json.dumps({
-        "scene": current_scene.__class__.__name__,
-        "message": current_scene.lastGeneratedMessage
+        "identifier": candidate.id,
+        "scene": candidate.scene_object.__class__.__name__,
+        "message": candidate.message
     }))
 
 

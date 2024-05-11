@@ -18,11 +18,13 @@ services:
       - ./database:/database
 
   runner:
+    depends_on:
+      - controller
+    links:
+      - controller
     environment:
       # required to directly print() towards stdout - activates flush always
       PYTHONUNBUFFERED: 1
     build:
       context: runner
       target: builder
-    links:
-      - controller

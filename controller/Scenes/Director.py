@@ -3,30 +3,43 @@ from Scenes.AbstractScene import AbstractScene
 from Scenes.SnapshotScene import SnapshotScene
 from Scenes.ChatGPTScene import ChatGPTScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
-
+from Scenes.AbstractScene import SceneType
+from Repository import Repository
 
 class Director:
-    def find_best_scene(self) -> AbstractScene:
-        scenes = self.__all_scenes()
 
-        scene = self.__pick_scene(scenes)
+    def get_next_scene(self) -> AbstractScene:
 
-        print(f"scene found {scene.scene_enabled}")
+        returns = []
+        for timed_scene in self.__all_scenes(SceneType.TIMED):
 
-        while scene.scene_enabled is False:
-            print("scene enabled = FALSE")
-            scene = self.__pick_scene(scenes.remove(scene))
+            execute_res = timed_scene.execute()
 
-        print("scene found")
-        return scene
+            print(f"timed scene already exists check: {Repository().scene_instances_with_id_exists(execute_res.id)} for ID: {execute_res.id}")
+            if (execute_res.should_execute is True and
+                    Repository().scene_instances_with_id_exists(execute_res.id)) is False:
+                returns.append(execute_res)
 
-    def __pick_scene(self, scenes_array) -> AbstractScene:
-        current_scene = random.choice(scenes_array)
-        return current_scene
+        # order SceneExecuteReturn objects based on priority
+        returns.sort(key=lambda x: x.priority, reverse=True)
 
-    def __all_scenes(self):
+        if len(returns) > 0:
+            print("Director: found a TIMED scene")
+            return returns[0]
+        else:
+            artwork_scene = random.choice(self.__all_scenes(SceneType.ARTWORK))
+            return artwork_scene.execute()
+
+
+    def __all_scenes(self, scene_type = None) -> AbstractScene:
+
         scenes = []  # empty array
-        scenes.append(WasteCalendarScene())
-        scenes.append(SnapshotScene())
-        scenes.append(ChatGPTScene())
+
+        if scene_type is None or scene_type is SceneType.TIMED:
+            scenes.append(WasteCalendarScene())
+
+        if scene_type is None or scene_type is SceneType.ARTWORK:
+            scenes.append(SnapshotScene())
+            scenes.append(ChatGPTScene())
+
         return scenes

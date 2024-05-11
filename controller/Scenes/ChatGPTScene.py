@@ -1,9 +1,12 @@
 import random
-
-from Scenes.AbstractScene import AbstractScene
-from openai import OpenAI
+import uuid
 import vesta
+from openai import OpenAI
+
+from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 from Repository import Repository
+
+import datetime
 
 client = OpenAI(
     api_key="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"
@@ -23,7 +26,10 @@ client = OpenAI(
 # Spiderman
 
 class ChatGPTScene(AbstractScene):
-    def execute(self, vboard):
+
+    priority: int = 50
+
+    def execute(self):
         messages = Repository().get_chatgpt_history()
 
         current_question = self.get_new_question()
@@ -37,29 +43,26 @@ class ChatGPTScene(AbstractScene):
 
         completion = client.chat.completions.create(
             model="gpt-4-turbo",
-            messages= messages
+            messages=messages
         )
 
-        self.lastGeneratedMessage = completion.choices[0].message.content.replace('"', '')
-        self.lastGeneratedMessage = self.lastGeneratedMessage.replace("Ö", 'oe').replace("ö", 'oe').replace("Ü", 'ue').replace("ü", 'ue').replace("Ä", 'Ae').replace("ä", 'ae')
-
+        message = completion.choices[0].message.content.replace('"', '')
+        message = message.replace("Ö", 'oe').replace("ö", 'oe').replace("Ü", 'ue').replace("ü", 'ue').replace("Ä", 'Ae').replace("ä", 'ae')
 
         Repository().save_chatgpt_history({
             "role": "assistant",
-            "content": self.lastGeneratedMessage
+            "content": message
         })
 
-        print("done: " + self.lastGeneratedMessage)
-
-        #message = vesta.encode_text(self.lastGeneratedMessage)
-
-
         chars = vesta.encode_text(
-            self.lastGeneratedMessage + "\n" + current_question["author"],
+            message + "\n" + current_question["author"],
             valign="middle",
         )
+        start_date = datetime.datetime.now()
+        end_date = start_date + datetime.timedelta(minutes=1)
 
-        vboard.write_message(chars)
+        return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", True, self.priority, self, start_date, end_date, f"{message} - {current_question["author"]}", chars)
+
 
     def get_new_question(self):
         questions = [
