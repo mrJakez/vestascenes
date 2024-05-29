@@ -38,34 +38,46 @@ def init():
     cur.execute("CREATE TABLE scene_instances(id, raw, class_string, start_date, end_date, priority, is_active)")
     Repository().get_connection().commit()
 
-    return Response(response=json.dumps({"status": "initalization done successfully"}))
+    return Response(response=json.dumps({"status": "initalization done successfully"}), mimetype="application/json")
+
+
+@app.route('/reset-instances')
+def reset_instances():
+
+    cur = Repository().get_connection().cursor()
+    cur.execute("delete from scene_instances")
+    Repository().get_connection().commit()
+
+    return Response(response=json.dumps({"status": "scene_instances cleared successfully"}), mimetype="application/json")
 
 @app.route('/execute')
 def execute():
     candidate = Director().get_next_scene()
-    print(f"candidate ID: {candidate.id}")
+    print(f"candidate: {candidate.scene_object.__class__.__name__} (ID: {candidate.id})")
     current = Repository().get_active_scene_instance()
     now = datetime.now()
 
     # debug
     if current is not None:
         end_date = datetime.strptime(current['end_date'], "%Y-%m-%d %H:%M:%S.%f")
-        print(f"now: {now} - end date: {end_date}")
+        print(f"now: {now} - end date: {end_date} (Difference: {(end_date-now).total_seconds()})")
     #-
 
     if current is None:
         print("current is none -> candidate will be executed")
     elif datetime.strptime(current['end_date'], "%Y-%m-%d %H:%M:%S.%f") >= now:
-        print("current is still valid (end_date not reached yet)")
+        print(f"current ({current['class_string']}) is still valid (end_date not reached yet)")
         if candidate.priority > current['priority']:
             print("candidate has higher priority than current. Current will be replaced")
             Repository().unmark_active_scene_instance()
         else:
             return Response(response=json.dumps({
-                "identifier": candidate.id,
-                "scene": candidate.scene_object.__class__.__name__,
-                "message": "candidate has lower or equal priority than current -> do nothing",
-            }))
+                "identifier": current['id'],
+                "scene": current['class_string'],
+                "message": "candidate has lower or equal priority than current -> keep current",
+            }), mimetype="application/json")
+
+
     elif datetime.strptime(current['end_date'], "%Y-%m-%d %H:%M:%S.%f") < now:
         print("current is not valid any longer - is_active will be set to false")
         Repository().unmark_active_scene_instance()
@@ -93,13 +105,13 @@ def execute():
         "identifier": candidate.id,
         "scene": candidate.scene_object.__class__.__name__,
         "message": candidate.message
-    }))
+    }), mimetype="application/json")
 
 
 @app.route('/storeSnapshot', methods=['POST'])
 def store():
     if not "title" in request.json:
-        return Response(response=json.dumps({"message": "missing 'title' parameter in request"}), status=400)
+        return Response(response=json.dumps({"message": "missing 'title' parameter in request"}), status=400, mimetype="application/json")
 
     title = request.json['title']
     current_message = vboard.read_message()
@@ -112,7 +124,7 @@ def store():
     Repository().get_connection().cursor().execute(sql, (title, current_message_string))
     Repository().get_connection().commit()
 
-    return Response(response=json.dumps({"status": "stored '" + title + "' in database"}))
+    return Response(response=json.dumps({"status": "stored '" + title + "' in database"}), mimetype="application/json")
 
 
 if __name__ == '__main__':

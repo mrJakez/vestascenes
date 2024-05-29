@@ -20,15 +20,12 @@ class WasteCalendarScene(AbstractScene):
 
 
     def execute(self):
-        print("WasteCalendarScene execute")
-
         url = "https://gelsendienste.abisapp.de/abfuhrkalender?format=ical&street=0E1F25F8&number=21"
         file = requests.get(url).text
         gcal = Calendar.from_ical(file)
 
         today = datetime.date.today()
         identifier = f"{self.__class__.__name__}_{(today + datetime.timedelta(weeks=5)).strftime("%Y-cw%V")}"
-
 
         if today.weekday() != 6:
             return SceneExecuteReturn(identifier, False, self.priority, self, None, None, "Es ist nicht Sonntags", None)
