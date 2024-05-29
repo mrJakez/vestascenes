@@ -11,11 +11,13 @@ import os
 from Repository import Repository
 from flask import request, Response
 from Scenes.AbstractScene import AbstractScene
+from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Helper.RawHelper import RawHelper
+from stravalib import Client
 
 import vesta
 from Scenes.Director import Director
-
+import configparser
 vboard = vesta.ReadWriteClient("3e5dc670+a418+43f0+acd5+4ff8cc5fb2fd")
 app = Flask(__name__)
 
@@ -50,6 +52,40 @@ def reset_instances():
 
     return Response(response=json.dumps({"status": "scene_instances cleared successfully"}), mimetype="application/json")
 
+@app.route('/authorize-strava')
+def authorize_strava():
+    client = Client()
+    url = client.authorization_url(client_id=StravaLastActivityScene.client_id,
+                                   redirect_uri='http://127.0.0.1:8000/authorize-strava-callback')
+
+    return Response(response=json.dumps({"status": f"URL: {url}"}), mimetype="application/json")
+
+
+@app.route('/authorize-strava-callback')
+def authorize_strava_callback():
+
+    client = Client()
+    code = request.args.get('code')
+    token_response = client.exchange_code_for_token(client_id=StravaLastActivityScene.client_id,
+                                                    client_secret=StravaLastActivityScene.client_secret,
+                                                    code=code)
+
+    access_token = token_response['access_token']
+    refresh_token = token_response['refresh_token']  # You'll need this in 6 hours
+    expires_at = token_response['expires_at']
+
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+
+    config['strava']['access_token'] = access_token
+    config['strava']['refresh_token'] = refresh_token
+    config['strava']['expires_at'] = str(expires_at)
+
+    with open('config.ini', 'w') as configfile:
+        config.write(configfile)
+
+    return Response(response=json.dumps({"status": f"access_token: {access_token} refresh_token: {refresh_token} expires_at: {expires_at}"}), mimetype="application/json")
+
 @app.route('/execute')
 def execute():
     candidate = Director().get_next_scene()
@@ -82,6 +118,11 @@ def execute():
         print("current is not valid any longer - is_active will be set to false")
         Repository().unmark_active_scene_instance()
 
+
+    post_execution_candidate = candidate.scene_object.post_execute()
+    if post_execution_candidate is not None:
+        print("-----------------------------------------> execute post execution candidate!")
+        candidate = post_execution_candidate
 
     print(f"candidate.message: {candidate.message}")
     vesta.pprint(candidate.raw)

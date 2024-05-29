@@ -2,6 +2,7 @@ import random
 from Scenes.AbstractScene import AbstractScene
 from Scenes.SnapshotScene import SnapshotScene
 from Scenes.ChatGPTScene import ChatGPTScene
+from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
 from Scenes.AbstractScene import SceneType
 from Repository import Repository
@@ -35,6 +36,7 @@ class Director:
 
         if scene_type is None or scene_type is SceneType.TIMED:
             scenes.append(WasteCalendarScene())
+            scenes.append(StravaLastActivityScene())
 
         if scene_type is None or scene_type is SceneType.ARTWORK:
             scenes.append(SnapshotScene())

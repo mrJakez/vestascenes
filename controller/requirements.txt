@@ -4,3 +4,4 @@ vesta
 icalendar
 requests
 httpx
+stravalib

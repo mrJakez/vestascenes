@@ -52,6 +52,10 @@ class AbstractScene:
     def execute(self) -> SceneExecuteReturn:
         raise Exception(f"Sorry, execute() not implemented within class {self.__class__.__name__}")
 
+    # invented to save money for the chatgpt execution. Thanks to this the chatgpt scene (when choosen as candidate)
+    # will NOT be triggered if this will not be displayed.
+    def post_execute(self) -> SceneExecuteReturn:
+        return None
 
 
 class DemoScene(AbstractScene):

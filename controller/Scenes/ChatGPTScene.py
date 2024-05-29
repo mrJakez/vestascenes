@@ -29,8 +29,16 @@ class ChatGPTScene(AbstractScene):
 
     priority: int = 50
 
-    def execute(self):
+    post_execution:bool = False
+
+    def execute(self) -> SceneExecuteReturn:
         messages = Repository().get_chatgpt_history()
+        start_date = datetime.datetime.now()
+        end_date = start_date + datetime.timedelta(minutes=60)
+
+        if not self.post_execution:
+            return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", True, self.priority, self,
+                                      start_date, end_date, "not executed yet", None)
 
         current_question = self.get_new_question()
         new_question = {
@@ -42,7 +50,7 @@ class ChatGPTScene(AbstractScene):
         messages.append(new_question)
 
         completion = client.chat.completions.create(
-            model="gpt-4-turbo",
+            model="gpt-4o",
             messages=messages
         )
 
@@ -58,10 +66,14 @@ class ChatGPTScene(AbstractScene):
             message + "\n" + current_question["author"],
             valign="middle",
         )
-        start_date = datetime.datetime.now()
-        end_date = start_date + datetime.timedelta(minutes=60)
 
         return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", True, self.priority, self, start_date, end_date, f"{message} - {current_question["author"]}", chars)
+
+    def post_execute(self) -> SceneExecuteReturn:
+        self.post_execution = True
+        res = self.execute()
+        self.post_execution = False
+        return res
 
 
     def get_new_question(self):

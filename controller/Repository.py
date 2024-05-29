@@ -105,7 +105,6 @@ class Repository(metaclass=SingletonMeta):
         con = self.get_connection()
         cursor = con.cursor()
         sql = f"SELECT * FROM scene_instances WHERE id = '{id}'"
-        print(sql)
         cursor.execute(sql)
         records = cursor.fetchall()
 
