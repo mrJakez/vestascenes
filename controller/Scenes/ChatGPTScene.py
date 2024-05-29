@@ -59,7 +59,7 @@ class ChatGPTScene(AbstractScene):
             valign="middle",
         )
         start_date = datetime.datetime.now()
-        end_date = start_date + datetime.timedelta(minutes=1)
+        end_date = start_date + datetime.timedelta(minutes=60)
 
         return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", True, self.priority, self, start_date, end_date, f"{message} - {current_question["author"]}", chars)
 
