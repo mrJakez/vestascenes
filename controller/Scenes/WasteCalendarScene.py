@@ -10,15 +10,6 @@ class WasteCalendarScene(AbstractScene):
 
     priority: int = 200
 
-    def __init__(self):
-        super().__init__()
-        today = datetime.date.today()
-
-        if today.weekday() != 6:
-            self.lastGeneratedMessage = "current day is not Sunday"
-            self.scene_enabled = False
-
-
     def execute(self):
         url = "https://gelsendienste.abisapp.de/abfuhrkalender?format=ical&street=0E1F25F8&number=21"
         file = requests.get(url).text
