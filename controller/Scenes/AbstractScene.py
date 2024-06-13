@@ -5,9 +5,11 @@ import datetime
 
 from enum import Enum
 
-# class syntax
+# SceneType specifies if the scene is something which is time relative or just a "random" artwork
 class SceneType(Enum):
+    # Artwork Scenes are "filling scenes" to provide some nice content which is not in relation to any time event
     ARTWORK = 1
+    # timed scenes are scenes which are just relevant for a specific time. Like strava last activity, waste calendar etc.
     TIMED = 2
 
 

@@ -26,7 +26,7 @@ app = Flask(__name__)
 def hello():
     return "welcome to vestaboard_control"
 
-
+# /init is resetting the whole app (database + config)
 @app.route('/init')
 def init():
     if os.path.exists("/database/vbcontrol.db"):
@@ -74,16 +74,7 @@ def authorize_strava_callback():
     refresh_token = token_response['refresh_token']  # You'll need this in 6 hours
     expires_at = token_response['expires_at']
 
-    config = configparser.ConfigParser()
-    config.read('config.ini')
-
-    config['strava']['access_token'] = access_token
-    config['strava']['refresh_token'] = refresh_token
-    config['strava']['expires_at'] = str(expires_at)
-
-    with open('config.ini', 'w') as configfile:
-        config.write(configfile)
-
+    StravaLastActivityScene.store_tokens(access_token, refresh_token, expires_at)
     return Response(response=json.dumps({"status": f"access_token: {access_token} refresh_token: {refresh_token} expires_at: {expires_at}"}), mimetype="application/json")
 
 @app.route('/execute')
@@ -149,8 +140,9 @@ def execute():
     }), mimetype="application/json")
 
 
+# /storeSnapshot is storing the current vestaboard message within the snappshots database table
 @app.route('/storeSnapshot', methods=['POST'])
-def store():
+def store_snapshot():
     if not "title" in request.json:
         return Response(response=json.dumps({"message": "missing 'title' parameter in request"}), status=400, mimetype="application/json")
 
