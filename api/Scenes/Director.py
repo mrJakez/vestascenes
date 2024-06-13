@@ -43,3 +43,11 @@ class Director:
             scenes.append(ChatGPTScene())
 
         return scenes
+
+
+    def get_priorities(self):
+        scenes = self.__all_scenes()
+        res = []
+        for scene in scenes:
+            res.append({"scene":scene.__class__.__name__, "priority": scene.priority})
+        return res

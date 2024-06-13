@@ -8,6 +8,7 @@ from stravalib import Client
 
 from Scenes.Director import Director
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
+from Scenes.WasteCalendarScene import WasteCalendarScene
 from Helper.RawHelper import RawHelper
 
 
@@ -134,6 +135,20 @@ async def authorize_strava_callback(code: str):
     return {"status": f"access_token: {access_token} refresh_token: {refresh_token} expires_at: {expires_at}"}
 
 
-@app.get("/hellofuck/{name}")
+@app.get("/hello/{name}")
 async def say_hello(name: str):
     return {"message": f"Hello {name}"}
+
+
+@app.get("/test-scene")
+async def test_scene():
+    scene = StravaLastActivityScene()
+    #scene = WasteCalendarScene()
+    res = scene.execute()
+    return {"message":res.message}
+
+
+
+@app.get("/priorities")
+async def priorities():
+    return Director().get_priorities()
