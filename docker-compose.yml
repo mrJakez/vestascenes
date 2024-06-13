@@ -1,5 +1,4 @@
 services:
-
   api:
     environment:
       # required to directly print() towards stdout - activates flush always
@@ -16,7 +15,6 @@ services:
       - '8000:8000'
     volumes:
       - ./database:/database
-
 
   runner:
     depends_on:

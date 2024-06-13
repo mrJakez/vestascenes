@@ -21,7 +21,6 @@ vboard = vesta.ReadWriteClient("3e5dc670+a418+43f0+acd5+4ff8cc5fb2fd")
 
 @app.get("/")
 async def root():
-    foo = 666
     return {"message": "welcome to vesta_control"}
 
 
@@ -42,7 +41,6 @@ async def init():
 
 @app.get("/execute")
 async def execute():
-    #return {"disabled":"true"}
     candidate = Director().get_next_scene()
     print(f"candidate: {candidate.scene_object.__class__.__name__} (ID: {candidate.id})")
     current = Repository().get_active_scene_instance()
