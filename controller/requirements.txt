@@ -1,7 +1,0 @@
-flask
-openai
-vesta
-icalendar
-requests
-httpx
-stravalib

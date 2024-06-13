@@ -1,12 +1,12 @@
 services:
 
-  controller:
+  api:
     environment:
       # required to directly print() towards stdout - activates flush always
       PYTHONUNBUFFERED: 1
     build:
-      context: controller
-      target: builder
+      context: api
+      dockerfile: Dockerfile
     # flask requires SIGINT to stop gracefully
     # (default stop signal from Compose is SIGTERM)
     stop_signal: SIGINT
@@ -17,14 +17,15 @@ services:
     volumes:
       - ./database:/database
 
+
   runner:
     depends_on:
-      - controller
+      - api
     links:
-      - controller
+      - api
     environment:
       # required to directly print() towards stdout - activates flush always
       PYTHONUNBUFFERED: 1
     build:
       context: runner
-      target: builder
+      dockerfile: Dockerfile

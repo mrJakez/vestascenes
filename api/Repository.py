@@ -23,16 +23,16 @@ class SingletonMeta(type):
         return cls._instances[cls]
 
 
-
-
 class Repository(metaclass=SingletonMeta):
     _connection = None
+
     def get_connection(self):
         if self._connection is None:
             print("connection will be initialized")
             self._connection = sqlite3.connect("/database/vbcontrol.db", check_same_thread=False)
 
         return self._connection
+
     def get_snapshots(self):
         con = self.get_connection()
         cursor = con.cursor()
@@ -61,14 +61,12 @@ class Repository(metaclass=SingletonMeta):
 
         return list
 
-
     def save_chatgpt_history(self, obj):
         con = self.get_connection()
         cursor = con.cursor()
         sql = 'INSERT INTO chatgpt_history(id, created_at, role, content) VALUES(?,?,?,?)'
         cursor.execute(sql, (str(uuid.uuid4()), datetime.datetime.now(), obj['role'], obj['content']))
         con.commit()
-
 
     def get_scene_instances(self):
         con = self.get_connection()
@@ -97,9 +95,10 @@ class Repository(metaclass=SingletonMeta):
         con = self.get_connection()
         cursor = con.cursor()
         sql = 'INSERT INTO scene_instances(id, raw, class_string, start_date, end_date, priority, is_active) VALUES(?,?,?,?,?,?,?)'
-        cursor.execute(sql, (obj['id'], obj['raw'], obj['class_string'], obj['start_date'], obj['end_date'], obj['priority'], obj['is_active']))
+        cursor.execute(sql, (
+        obj['id'], obj['raw'], obj['class_string'], obj['start_date'], obj['end_date'], obj['priority'],
+        obj['is_active']))
         con.commit()
-
 
     def scene_instances_with_id_exists(self, id) -> bool:
         con = self.get_connection()
@@ -113,7 +112,6 @@ class Repository(metaclass=SingletonMeta):
         else:
             return True
 
-
     def get_active_scene_instance(self):
         con = self.get_connection()
         cursor = con.cursor()
@@ -126,22 +124,17 @@ class Repository(metaclass=SingletonMeta):
 
         record = records[0]
         return {
-                'id': record[0],
-                'raw': record[1],
-                'class_string': record[2],
-                'start_date': record[3],
-                'end_date': record[4],
-                'priority': record[5],
-                'is_active': record[6]
-            }
+            'id': record[0],
+            'raw': record[1],
+            'class_string': record[2],
+            'start_date': record[3],
+            'end_date': record[4],
+            'priority': record[5],
+            'is_active': record[6]
+        }
 
     def unmark_active_scene_instance(self):
         con = self.get_connection()
         cursor = con.cursor()
         sql = 'UPDATE scene_instances SET is_active = 0 WHERE is_active = 1'
         cursor.execute(sql)
-
-
-
-
-

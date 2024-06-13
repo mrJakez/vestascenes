@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/vestaboard_control.iml" filepath="$PROJECT_DIR$/.idea/vestaboard_control.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/vesta-control.iml" filepath="$PROJECT_DIR$/.idea/vesta-control.iml" />
     </modules>
   </component>
 </project>
