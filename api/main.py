@@ -11,36 +11,27 @@ from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
 from Helper.RawHelper import RawHelper
 
+description = """
+This is a vestaboard server implementation which organizes the vestaboard related content within scenes. 🚀
+This helps to priotize the content which you are interested in. The implementation contans scenes for ChatGPT
+requests, Strava-Stats and some other random content generating scenes.
 
-#test
-from openai import OpenAI
+## Current Scenes
+* ChatGPTScene
+* SnapshotScene
+* StravaLastActivityScene
+* WasteCalendarScene
+"""
 
-
-app = FastAPI()
+app = FastAPI(
+    title="vestaboard-control",
+    description=description)
 vboard = vesta.ReadWriteClient("3e5dc670+a418+43f0+acd5+4ff8cc5fb2fd")
 
 
-@app.get("/")
-async def root():
-    return {"message": "welcome to vesta_control"}
-
-
-@app.get("/init/")
-async def init():
-    if os.path.exists("/database/vbcontrol.db"):
-        print("old database existed - removed right now")
-        os.remove("/database/vbcontrol.db")
-
-    Repository._connection = None
-    cur = Repository().get_connection().cursor()
-    cur.execute("CREATE TABLE snapshots(title, raw)")
-    cur.execute("CREATE TABLE chatgpt_history(id, created_at TEXT DEFAULT CURRENT_TIMESTAMP, role, content)")
-    cur.execute("CREATE TABLE scene_instances(id, raw, class_string, start_date, end_date, priority, is_active)")
-    Repository().get_connection().commit()
-    return {"status": "initalization done successfully"}
-
-
-@app.get("/execute")
+@app.get("/execute", tags=["main"],
+         description="This service is the real worker process. It determines the next candidate and"
+                     "validates the ")
 async def execute():
     candidate = Director().get_next_scene()
     print(f"candidate: {candidate.scene_object.__class__.__name__} (ID: {candidate.id})")
@@ -66,7 +57,6 @@ async def execute():
                 "scene": current['class_string'],
                 "message": "candidate has lower or equal priority than current -> keep current",
             }
-
 
     elif datetime.strptime(current['end_date'], "%Y-%m-%d %H:%M:%S.%f") < now:
         print("current is not valid any longer - is_active will be set to false")
@@ -102,24 +92,18 @@ async def execute():
     }
 
 
-@app.get("/reset-instances")
-async def reset_instances():
-    cur = Repository().get_connection().cursor()
-    cur.execute("delete from scene_instances")
-    Repository().get_connection().commit()
-    return {"message": "scene_instances cleared successfully"}
-
-
-@app.get("/authorize-strava")
+@app.get("/authorize-strava", tags=["strava-oauth"], description="Initilaizes the strava connection. Returns an "
+                                                                 "authorization link which will trigger the callback url afterwards.")
 async def authorize_strava():
     client = Client()
     url = client.authorization_url(client_id=StravaLastActivityScene.client_id,
                                    redirect_uri='http://127.0.0.1:8000/authorize-strava-callback')
 
-    return {"status": f"URL: {url}"}
+    return {"status": "ok", "url": url}
 
 
-@app.get("/authorize-strava-callback")
+@app.get("/authorize-strava-callback", tags=["strava-oauth"], description="Callback which is triggered by the "
+                                                                          "strava authorization process. Within a success case the access and refresh tokens are provided and stored in a local configuration.")
 async def authorize_strava_callback(code: str):
     client = Client()
 
@@ -135,20 +119,37 @@ async def authorize_strava_callback(code: str):
     return {"status": f"access_token: {access_token} refresh_token: {refresh_token} expires_at: {expires_at}"}
 
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+@app.get("/init/", tags=["developer support"], description="Initilaizes the vestaboard config and database")
+async def init():
+    if os.path.exists("/database/vbcontrol.db"):
+        print("old database existed - removed right now")
+        os.remove("/database/vbcontrol.db")
+
+    Repository._connection = None
+    cur = Repository().get_connection().cursor()
+    cur.execute("CREATE TABLE snapshots(title, raw)")
+    cur.execute("CREATE TABLE chatgpt_history(id, created_at TEXT DEFAULT CURRENT_TIMESTAMP, role, content)")
+    cur.execute("CREATE TABLE scene_instances(id, raw, class_string, start_date, end_date, priority, is_active)")
+    Repository().get_connection().commit()
+    return {"status": "initalization done successfully"}
 
 
-@app.get("/test-scene")
+@app.get("/reset-instances", tags=["developer support"])
+async def reset_instances():
+    cur = Repository().get_connection().cursor()
+    cur.execute("delete from scene_instances")
+    Repository().get_connection().commit()
+    return {"message": "scene_instances cleared successfully"}
+
+
+@app.get("/test-scene", tags=["developer support"])
 async def test_scene():
     scene = StravaLastActivityScene()
     #scene = WasteCalendarScene()
     res = scene.execute()
-    return {"message":res.message}
+    return {"message": res.message}
 
 
-
-@app.get("/priorities")
+@app.get("/priorities", tags=["developer support"])
 async def priorities():
     return Director().get_priorities()
