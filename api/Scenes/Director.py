@@ -9,7 +9,7 @@ from Repository import Repository
 
 class Director:
 
-    def get_next_scene(self) -> AbstractScene:
+    def  get_next_scene(self) -> AbstractScene:
 
         returns = []
         for timed_scene in self.__all_scenes(SceneType.TIMED):

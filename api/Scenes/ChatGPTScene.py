@@ -1,11 +1,14 @@
 import random
 import uuid
+from typing import List
+
 import vesta
 from openai import OpenAI
 
 from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 from Repository import Repository
-
+from Models.ChatGPTHistoryModel import ChatGPTHistoryModel
+from Helper.RawHelper import RawHelper
 import datetime
 
 client = OpenAI(
@@ -26,48 +29,39 @@ client = OpenAI(
 # Spiderman
 
 class ChatGPTScene(AbstractScene):
-
     priority: int = 50
-
-    post_execution:bool = False
+    post_execution: bool = False
 
     def execute(self) -> SceneExecuteReturn:
-        messages = Repository().get_chatgpt_history()
         start_date = datetime.datetime.now()
-        end_date = start_date + datetime.timedelta(minutes=60)
+        end_date = start_date + datetime.timedelta(minutes=1)
 
         if not self.post_execution:
             return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", True, self.priority, self,
                                       start_date, end_date, "not executed yet", None)
 
-        current_question = self.get_new_question()
-        new_question = {
-            "role": "user",
-            "content": current_question["question"]
-        }
+        question_model = self.get_new_question_model()
+        Repository().save_chatgpt_history(question_model)
 
-        Repository().save_chatgpt_history(new_question)
-        messages.append(new_question)
+        message_history = Repository().get_chatgpt_history()
+        formatted_messages = self.get_messages_in_chatgpt_format(message_history)
 
         completion = client.chat.completions.create(
             model="gpt-4o",
-            messages=messages
+            messages=formatted_messages
         )
 
-        message = completion.choices[0].message.content.replace('"', '')
-        message = message.replace("Ö", 'oe').replace("ö", 'oe').replace("Ü", 'ue').replace("ü", 'ue').replace("Ä", 'Ae').replace("ä", 'ae')
-
-        Repository().save_chatgpt_history({
-            "role": "assistant",
-            "content": message
-        })
+        message = RawHelper.replace_umlaute(completion.choices[0].message.content)
+        answer_model = ChatGPTHistoryModel(role="assistant", content=message, author=question_model.author)
+        Repository().save_chatgpt_history(answer_model)
 
         chars = vesta.encode_text(
-            message + "\n" + current_question["author"],
+            message + "\n" + answer_model.author,
             valign="middle",
         )
 
-        return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", True, self.priority, self, start_date, end_date, f"{message} - {current_question["author"]}", chars)
+        return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", True, self.priority, self,
+                                  start_date, end_date, f"{message} - {answer_model.author}", chars)
 
     def post_execute(self) -> SceneExecuteReturn:
         self.post_execution = True
@@ -75,24 +69,34 @@ class ChatGPTScene(AbstractScene):
         self.post_execution = False
         return res
 
-
-    def get_new_question(self):
+    def get_new_question_model(self) -> ChatGPTHistoryModel:
         questions = [
             {
                 "type": "quote",
-                "question": "Erzähle mir ein zufälliges Batman Zitat ohne erklärung.",
-                "author":   "Batman"
+                "question": "Erzähle mir ein zufälliges Batman Zitat ohne Erklärung.",
+                "author": "Batman"
             },
             {
                 "type": "quote",
-                "question": "Erzähle mir ein zufälliges Bart Simpson Zitat ohne erklärung.",
+                "question": "Erzähle mir ein zufälliges Bart Simpson Zitat ohne Erklärung.",
                 "author": "Bart Simpson"
             },
             {
                 "type": "joke",
-                "question": "Erzähle mir ein zufälligen Dad Joke ohne erklärung.",
+                "question": "Erzähle mir ein zufälligen Dad Joke ohne Erklärung.",
                 "author": "Dad"
             }
         ]
 
-        return random.choice(questions)
+        chosen = random.choice(questions)
+        return ChatGPTHistoryModel(role="user", content=chosen["question"], author=chosen["author"])
+
+    def get_messages_in_chatgpt_format(self, models: List[ChatGPTHistoryModel]) -> List:
+        messages = []
+        for model in models:
+            messages.append({
+                "role": model.role,
+                "content": model.content
+            })
+
+        return messages

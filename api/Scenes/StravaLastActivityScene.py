@@ -40,9 +40,9 @@ class StravaLastActivityScene(AbstractScene):
             config.read('config.ini')
 
         client = Client(access_token=config['strava']['access_token'])
-        #last_activity = client.get_activities(limit=1).next()
+        last_activity = client.get_activities(limit=1).next()
 
-        last_activity = client.get_activity(8132100578)
+        #last_activity = client.get_activity(8132100578)
         #ruhrtour2024 11371875821
         #kurze tour 11638289067
         #geisterclam 11621150796
@@ -52,10 +52,11 @@ class StravaLastActivityScene(AbstractScene):
         print(
             f"{last_activity.id} - {last_activity.name} - {last_activity.type} - {last_activity.start_date} - {last_activity.start_date_local}")
 
-        #if ((datetime.now() - timedelta(hours=1)) < last_activity.start_date_local) is False:
-        #    print("last strava activity is too old")
-        #    return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", False, self.priority, self,
-        #                              None, None, "last activity is too old", None)
+        if ((datetime.now() - timedelta(hours=4)) < last_activity.start_date_local) is False:
+            msg = f"last strava activity '{last_activity.name}' is to old (start_date: {last_activity.start_date_local})"
+            print(msg)
+            return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", False, self.priority, self,
+                                      None, None, msg, None)
 
         start_date = datetime.now()
         end_date = start_date + timedelta(minutes=120)
@@ -73,7 +74,6 @@ class StravaLastActivityScene(AbstractScene):
             "time": f"{hours}h{minutes}m",
             "max": f"{int(unithelper.kilometers_per_hour(last_activity.max_speed))}kmh",
             "elev": f"{int(unithelper.meter(last_activity.total_elevation_gain))}m",
-            "cal":  f"{int(last_activity.calories)}"
         }
 
         if last_activity.average_heartrate is not None:
@@ -85,6 +85,11 @@ class StravaLastActivityScene(AbstractScene):
             props["watt"] = f"{int(last_activity.average_watts)}w"
         else:
             props["watt"] = "-"
+
+        if last_activity.calories is not None:
+            props["cal"] = f"{int(last_activity.calories)}"
+        else:
+            props["cal"] = "-"
 
 
         top_row = Component(
@@ -238,9 +243,7 @@ class StravaLastActivityScene(AbstractScene):
         chars = vbml_client.compose(components, props)
         vesta.pprint(chars)
 
-        #return SceneExecuteReturn(f"{self.__class__.__name__}_{last_activity.id}", True, self.priority, self, start_date, end_date, message, chars)
-        return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", True, self.priority, self,
-                                  start_date, end_date, message, chars)
+        return SceneExecuteReturn(f"{self.__class__.__name__}_{last_activity.id}", True, self.priority, self, start_date, end_date, message, chars)
 
     @staticmethod
     def store_tokens(access_token: str, refresh_token: str, expires_at: int):

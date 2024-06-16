@@ -1,6 +1,14 @@
 import sqlite3
+import typing
 import uuid
 import datetime
+
+from Models.SnapshotModel import SnapshotModel
+from Models.SceneInstanceModel import SceneInstanceModel
+from Models.ChatGPTHistoryModel import ChatGPTHistoryModel
+
+from typing import Optional
+from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 
 class SingletonMeta(type):
@@ -24,117 +32,99 @@ class SingletonMeta(type):
 
 
 class Repository(metaclass=SingletonMeta):
-    _connection = None
+    _engine = None
 
-    def get_connection(self):
-        if self._connection is None:
-            print("connection will be initialized")
-            self._connection = sqlite3.connect("/database/vbcontrol.db", check_same_thread=False)
+    def create_tables(self):
+        SQLModel.metadata.create_all(self.get_engine())
 
-        return self._connection
+    def get_engine(self):
+        if self._engine is None:
+            print("engine will be initialized")
+            sqlite_file_name = "/database/vbcontrol.db"
+            sqlite_url = f"sqlite:///{sqlite_file_name}"
+            self._engine = create_engine(sqlite_url, echo=False)
 
-    def get_snapshots(self):
-        con = self.get_connection()
-        cursor = con.cursor()
+        return self._engine
 
-        sqlite_select_query = 'SELECT * from snapshots'
-        cursor.execute(sqlite_select_query)
-        records = cursor.fetchall()
-        return records
+    def get_snapshots(self) -> typing.List[SnapshotModel]:
+        with Session(self.get_engine()) as session:
+            statement = select(SnapshotModel)
+            results = session.exec(statement)
+            snapshots = []
+
+            for snapshot in results:
+                snapshots.append(snapshot)
+
+        return snapshots
+
+    def store_snapshot(self, snapshot: SnapshotModel):
+        with Session(self.get_engine()) as session:
+            session.add(snapshot)
+            session.commit()
 
     def get_chatgpt_history(self):
-        con = self.get_connection()
-        cursor = con.cursor()
+        with Session(self.get_engine()) as session:
+            statement = select(ChatGPTHistoryModel)
+            results = session.exec(statement)
+            models = []
 
-        sqlite_select_query = 'SELECT * from chatgpt_history'
-        cursor.execute(sqlite_select_query)
-        records = cursor.fetchall()
+            for model in results:
+                models.append(model)
 
-        list = []
-        for record in records:
-            list.append({
-                'id': record[0],
-                'created_at': record[1],
-                'role': record[2],
-                'content': record[3]
-            })
+        return models
 
-        return list
-
-    def save_chatgpt_history(self, obj):
-        con = self.get_connection()
-        cursor = con.cursor()
-        sql = 'INSERT INTO chatgpt_history(id, created_at, role, content) VALUES(?,?,?,?)'
-        cursor.execute(sql, (str(uuid.uuid4()), datetime.datetime.now(), obj['role'], obj['content']))
-        con.commit()
+    def save_chatgpt_history(self, model: ChatGPTHistoryModel):
+        with Session(self.get_engine()) as session:
+            session.add(model)
+            session.commit()
+            session.refresh(model)
 
     def get_scene_instances(self):
-        con = self.get_connection()
-        cursor = con.cursor()
+        with Session(self.get_engine()) as session:
+            statement = select(SceneInstanceModel)
+            results = session.exec(statement)
+            scene_instances = []
 
-        sqlite_select_query = 'SELECT * from scene_instances'
-        cursor.execute(sqlite_select_query)
-        records = cursor.fetchall()
-        print("get_scene_instances -> total rows are:  ", len(records))
+            for scene_instance in results:
+                scene_instances.append(scene_instance)
 
-        list = []
-        for record in records:
-            list.append({
-                'id': record[0],
-                'raw': record[1],
-                'class_string': record[2],
-                'start_date': record[3],
-                'end_date': record[4],
-                'priority': record[5],
-                'is_active': record[6]
-            })
+        return scene_instance
 
-        return list
-
-    def save_scene_instance(self, obj):
-        con = self.get_connection()
-        cursor = con.cursor()
-        sql = 'INSERT INTO scene_instances(id, raw, class_string, start_date, end_date, priority, is_active) VALUES(?,?,?,?,?,?,?)'
-        cursor.execute(sql, (
-        obj['id'], obj['raw'], obj['class_string'], obj['start_date'], obj['end_date'], obj['priority'],
-        obj['is_active']))
-        con.commit()
+    def save_scene_instance(self, model: SceneInstanceModel):
+        with Session(self.get_engine()) as session:
+            session.add(model)
+            session.commit()
 
     def scene_instances_with_id_exists(self, id) -> bool:
-        con = self.get_connection()
-        cursor = con.cursor()
-        sql = f"SELECT * FROM scene_instances WHERE id = '{id}'"
-        cursor.execute(sql)
-        records = cursor.fetchall()
 
-        if len(records) == 0:
-            return False
-        else:
-            return True
+        with Session(self.get_engine()) as session:
+            statement = select(SceneInstanceModel).where(SceneInstanceModel.id == id)
+            results = session.exec(statement)
 
-    def get_active_scene_instance(self):
-        con = self.get_connection()
-        cursor = con.cursor()
-        sql = 'SELECT * FROM scene_instances WHERE is_active = 1'
-        cursor.execute(sql)
-        records = cursor.fetchall()
+            if len(results.all()) > 0:
+                return True
 
-        if len(records) == 0:
-            return None
+        return False
 
-        record = records[0]
-        return {
-            'id': record[0],
-            'raw': record[1],
-            'class_string': record[2],
-            'start_date': record[3],
-            'end_date': record[4],
-            'priority': record[5],
-            'is_active': record[6]
-        }
+    def get_active_scene_instance(self) -> SceneInstanceModel:
+        with Session(self.get_engine()) as session:
+            statement = select(SceneInstanceModel).where(SceneInstanceModel.is_active == True)
+            results = session.exec(statement).all()
+            count = len(results)
+
+            if count == 0:
+                return None
+
+            for model in results:
+                return model
 
     def unmark_active_scene_instance(self):
-        con = self.get_connection()
-        cursor = con.cursor()
-        sql = 'UPDATE scene_instances SET is_active = 0 WHERE is_active = 1'
-        cursor.execute(sql)
+        with Session(self.get_engine()) as session:
+            statement = select(SceneInstanceModel).where(SceneInstanceModel.is_active == True)
+            results = session.exec(statement)
+
+            for model in results.all():
+                model.is_active = False
+                session.add(model)
+                session.commit()
+                session.refresh(model)

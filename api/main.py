@@ -11,6 +11,13 @@ from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
 from Helper.RawHelper import RawHelper
 
+from Models.SnapshotModel import SnapshotModel
+from Models.ChatGPTHistoryModel import ChatGPTHistoryModel
+from Models.SceneInstanceModel import SceneInstanceModel
+from fastapi.encoders import jsonable_encoder
+
+from sqlmodel import Field, Session, SQLModel, create_engine, select, delete
+
 description = """
 This is a vestaboard server implementation which organizes the vestaboard related content within scenes. 🚀
 This helps to priotize the content which you are interested in. The implementation contans scenes for ChatGPT
@@ -31,7 +38,8 @@ vboard = vesta.ReadWriteClient("3e5dc670+a418+43f0+acd5+4ff8cc5fb2fd")
 
 @app.get("/execute", tags=["main"],
          description="This service is the real worker process. It determines the next candidate and"
-                     "validates the ")
+                     "validates the current state. If a higher priority is given by the candidate scene the vestabaord "
+                     "will be updated. Gets executed all 15 min. by dedicated runner container.")
 async def execute():
     candidate = Director().get_next_scene()
     print(f"candidate: {candidate.scene_object.__class__.__name__} (ID: {candidate.id})")
@@ -40,25 +48,25 @@ async def execute():
 
     # debug
     if current is not None:
-        end_date = datetime.strptime(current['end_date'], "%Y-%m-%d %H:%M:%S.%f")
+        end_date = datetime.strptime(current.end_date, "%Y-%m-%d %H:%M:%S.%f")
         print(f"now: {now} - end date: {end_date} (Difference: {(end_date - now).total_seconds()})")
     #-
 
     if current is None:
         print("current is none -> candidate will be executed")
-    elif datetime.strptime(current['end_date'], "%Y-%m-%d %H:%M:%S.%f") >= now:
-        print(f"current ({current['class_string']}) is still valid (end_date not reached yet)")
-        if candidate.priority > current['priority']:
+    elif datetime.strptime(current.end_date, "%Y-%m-%d %H:%M:%S.%f") >= now:
+        print(f"current ({current.class_string}) is still valid (end_date not reached yet)")
+        if candidate.priority > current.priority:
             print("candidate has higher priority than current. Current will be replaced")
             Repository().unmark_active_scene_instance()
         else:
             return {
-                "identifier": current['id'],
-                "scene": current['class_string'],
-                "message": "candidate has lower or equal priority than current -> keep current",
+                "identifier": current.id,
+                "scene": current.class_string,
+                "message": f"candidate has lower or equal priority than current -> keep current (seconds left:{int((end_date - now).total_seconds())})",
             }
 
-    elif datetime.strptime(current['end_date'], "%Y-%m-%d %H:%M:%S.%f") < now:
+    elif datetime.strptime(current.end_date, "%Y-%m-%d %H:%M:%S.%f") < now:
         print("current is not valid any longer - is_active will be set to false")
         Repository().unmark_active_scene_instance()
 
@@ -67,7 +75,7 @@ async def execute():
         print("-----------------------------------------> execute post execution candidate!")
         candidate = post_execution_candidate
 
-    print(f"candidate.message: {candidate.message}")
+    print(f"candidate.message: {candidate.message} - {candidate.raw}")
     vesta.pprint(candidate.raw)
 
     try:
@@ -75,21 +83,38 @@ async def execute():
     except Exception as exc:
         print(f"HTTP Exception catched")
 
-    Repository().save_scene_instance({
-        'id': candidate.id,
-        'raw': RawHelper.get_raw_string(candidate.raw),
-        'class_string': candidate.scene_object.__class__.__name__,
-        'start_date': candidate.start_date,
-        'end_date': candidate.end_date,
-        'priority': candidate.priority,
-        'is_active': True
-    })
+    model = SceneInstanceModel(scene=candidate)
+    Repository().save_scene_instance(model)
 
     return {
         "identifier": candidate.id,
         "scene": candidate.scene_object.__class__.__name__,
         "message": candidate.message
     }
+
+
+# /storeSnapshot is storing the current vestaboard message within the snappshots database table
+@app.get("/storeSnapshot/{title}", tags=["main"])
+async def store_snapshot(title: str):
+    current_message = vboard.read_message()
+    current_message_string = str(current_message).replace(' ', '')
+
+    print("current_message:")
+    vesta.pprint(current_message)
+
+    snapshot = SnapshotModel(title=title, raw=current_message_string)
+    json_snapshot = jsonable_encoder(snapshot)
+    Repository().store_snapshot(snapshot)
+
+    return {
+        "status": "created",
+        "snapshot": json_snapshot
+    }
+
+
+@app.get("/snapshots", tags=["main"])
+async def snapshots():
+    return {"snapshots": Repository().get_snapshots()}
 
 
 @app.get("/authorize-strava", tags=["strava-oauth"], description="Initilaizes the strava connection. Returns an "
@@ -125,20 +150,17 @@ async def init():
         print("old database existed - removed right now")
         os.remove("/database/vbcontrol.db")
 
-    Repository._connection = None
-    cur = Repository().get_connection().cursor()
-    cur.execute("CREATE TABLE snapshots(title, raw)")
-    cur.execute("CREATE TABLE chatgpt_history(id, created_at TEXT DEFAULT CURRENT_TIMESTAMP, role, content)")
-    cur.execute("CREATE TABLE scene_instances(id, raw, class_string, start_date, end_date, priority, is_active)")
-    Repository().get_connection().commit()
+    Repository()._engine = None
+    Repository().create_tables()
     return {"status": "initalization done successfully"}
 
 
 @app.get("/reset-instances", tags=["developer support"])
 async def reset_instances():
-    cur = Repository().get_connection().cursor()
-    cur.execute("delete from scene_instances")
-    Repository().get_connection().commit()
+    with Session(Repository().get_engine()) as session:
+        statement = delete(SceneInstanceModel)
+        result = session.exec(statement)
+        session.commit()
     return {"message": "scene_instances cleared successfully"}
 
 

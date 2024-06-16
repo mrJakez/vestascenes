@@ -37,7 +37,7 @@ class WasteCalendarScene(AbstractScene):
 
                 #print(f"{dstart} : {summary}")
 
-        message = "|| ".join(todos)
+        message = "- ".join(todos)
 
         chars = vesta.encode_text(
             message,
