@@ -3,6 +3,8 @@ import uuid
 from typing import List
 
 import vesta
+from vesta.vbml import Component, Props
+
 from openai import OpenAI
 
 from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
@@ -10,6 +12,8 @@ from Repository import Repository
 from Models.ChatGPTHistoryModel import ChatGPTHistoryModel
 from Helper.RawHelper import RawHelper
 import datetime
+
+from vesta.chars import Rows
 
 client = OpenAI(
     api_key="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"
@@ -34,7 +38,7 @@ class ChatGPTScene(AbstractScene):
 
     def execute(self) -> SceneExecuteReturn:
         start_date = datetime.datetime.now()
-        end_date = start_date + datetime.timedelta(minutes=1)
+        end_date = start_date + datetime.timedelta(minutes=60)
 
         if not self.post_execution:
             return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", True, self.priority, self,
@@ -55,10 +59,7 @@ class ChatGPTScene(AbstractScene):
         answer_model = ChatGPTHistoryModel(role="assistant", content=message, author=question_model.author)
         Repository().save_chatgpt_history(answer_model)
 
-        chars = vesta.encode_text(
-            message + "\n" + answer_model.author,
-            valign="middle",
-        )
+        chars = self.get_vbml(message, answer_model.author)
 
         return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", True, self.priority, self,
                                   start_date, end_date, f"{message} - {answer_model.author}", chars)
@@ -100,3 +101,29 @@ class ChatGPTScene(AbstractScene):
             })
 
         return messages
+
+    def get_vbml(self, message, author) -> Rows:
+        props = {
+            "message": message,
+            "author": author,
+        }
+
+        message_component = Component(
+            template="{{message}}",
+            justify="left",
+            align="center",
+            height=5,
+            width=22
+        )
+
+        author_component = Component(
+            template="{{author}}",
+            justify="right",
+            align="top",
+            height=1,
+            width=22
+        )
+
+        vbml_client = vesta.VBMLClient()
+        chars = vbml_client.compose([message_component, author_component], props)
+        return chars

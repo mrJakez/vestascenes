@@ -39,7 +39,7 @@ class Director:
             scenes.append(StravaLastActivityScene())
 
         if scene_type is None or scene_type is SceneType.ARTWORK:
-            scenes.append(SnapshotScene())
+        #    scenes.append(SnapshotScene())
             scenes.append(ChatGPTScene())
 
         return scenes

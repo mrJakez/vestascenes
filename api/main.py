@@ -8,6 +8,7 @@ from stravalib import Client
 
 from Scenes.Director import Director
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
+from Scenes.ChatGPTScene import ChatGPTScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
 from Helper.RawHelper import RawHelper
 
@@ -166,9 +167,13 @@ async def reset_instances():
 
 @app.get("/test-scene", tags=["developer support"])
 async def test_scene():
-    scene = StravaLastActivityScene()
+    scene = ChatGPTScene()
+    #scene = StravaLastActivityScene()
     #scene = WasteCalendarScene()
+    scene.post_execution = True
     res = scene.execute()
+    vesta.pprint(res.raw)
+
     return {"message": res.message}
 
 

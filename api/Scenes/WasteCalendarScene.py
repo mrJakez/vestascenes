@@ -46,6 +46,6 @@ class WasteCalendarScene(AbstractScene):
 
         # todo: muss ab Sonntag 17:00 uhr angepinnt werden
         start_date = datetime.datetime.now()
-        end_date = start_date + datetime.timedelta(minutes=2)
+        end_date = start_date + datetime.timedelta(minutes=60)
         print(f"gebe eine WasteCalendarScene mit prio {self.priority} zurück")
         return SceneExecuteReturn(identifier, True, self.priority, self, start_date, end_date, f"{message}", chars)
