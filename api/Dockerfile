@@ -8,6 +8,7 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY Helper/* Helper/
+COPY Models/* Models/
 COPY Scenes/* Scenes/
 COPY *.py ./
 COPY *.ini ./
