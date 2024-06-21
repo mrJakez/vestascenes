@@ -167,12 +167,14 @@ async def reset_instances():
 
 @app.get("/test-scene", tags=["developer support"])
 async def test_scene():
-    scene = ChatGPTScene()
+    #scene = ChatGPTScene()
     #scene = StravaLastActivityScene()
-    #scene = WasteCalendarScene()
+    scene = WasteCalendarScene()
     scene.post_execution = True
     res = scene.execute()
-    vesta.pprint(res.raw)
+
+    if res.raw is not None:
+        vesta.pprint(res.raw)
 
     return {"message": res.message}
 
