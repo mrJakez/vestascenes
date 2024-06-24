@@ -8,16 +8,13 @@ from stravalib import Client
 
 from Scenes.Director import Director
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
-from Scenes.ChatGPTScene import ChatGPTScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
-from Helper.RawHelper import RawHelper
 
 from Models.SnapshotModel import SnapshotModel
-from Models.ChatGPTHistoryModel import ChatGPTHistoryModel
 from Models.SceneInstanceModel import SceneInstanceModel
 from fastapi.encoders import jsonable_encoder
 
-from sqlmodel import Field, Session, SQLModel, create_engine, select, delete
+from sqlmodel import Session, delete
 
 description = """
 This is a vestaboard server implementation which organizes the vestaboard related content within scenes. 🚀

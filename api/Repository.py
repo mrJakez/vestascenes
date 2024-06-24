@@ -1,14 +1,10 @@
-import sqlite3
 import typing
-import uuid
-import datetime
 
-from Models.SnapshotModel import SnapshotModel
-from Models.SceneInstanceModel import SceneInstanceModel
+from sqlmodel import Session, SQLModel, create_engine, select
+
 from Models.ChatGPTHistoryModel import ChatGPTHistoryModel
-
-from typing import Optional
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from Models.SceneInstanceModel import SceneInstanceModel
+from Models.SnapshotModel import SnapshotModel
 
 
 class SingletonMeta(type):

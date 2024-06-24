@@ -1,6 +1,5 @@
 import sys
 import time
-import requests
 
 print("runner started. Python version: " + sys.version)
 time.sleep(5)  # pause for 5 seconds - to provide time for the controller to boot up

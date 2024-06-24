@@ -1,14 +1,11 @@
-import random
-import string
-import uuid
-import vesta
-from vesta.vbml import Component, Props
-from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
-from Repository import Repository
-from Helper.RawHelper import RawHelper
-from datetime import datetime, timedelta
 import configparser
+import uuid
+from datetime import datetime, timedelta
+
+import vesta
+from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 from stravalib import Client, unithelper
+from vesta.vbml import Component
 
 
 class StravaLastActivityScene(AbstractScene):

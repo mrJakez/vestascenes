@@ -1,11 +1,12 @@
 import random
+
+from Repository import Repository
 from Scenes.AbstractScene import AbstractScene
-from Scenes.SnapshotScene import SnapshotScene
+from Scenes.AbstractScene import SceneType
 from Scenes.ChatGPTScene import ChatGPTScene
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
-from Scenes.AbstractScene import SceneType
-from Repository import Repository
+
 
 class Director:
 

@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from typing import List
 
-from Models.UUIDSQLModel import UUIDSQLModel
 from Helper.RawHelper import RawHelper
+from Models.UUIDSQLModel import UUIDSQLModel
+
 
 class SnapshotModel(UUIDSQLModel, table=True):
     __tablename__ = "snapshots"

@@ -1,9 +1,10 @@
-import string
-import vesta
-import uuid
 import datetime
-
+import string
+import uuid
 from enum import Enum
+
+import vesta
+
 
 # SceneType specifies if the scene is something which is time relative or just a "random" artwork
 class SceneType(Enum):

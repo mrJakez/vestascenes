@@ -1,5 +1,7 @@
 import uuid as uuid_pkg
+
 from sqlmodel import Field, SQLModel
+
 
 class UUIDSQLModel(SQLModel):
     """

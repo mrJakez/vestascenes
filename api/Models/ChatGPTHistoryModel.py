@@ -1,7 +1,9 @@
 from __future__ import annotations
-from Models.UUIDSQLModel import UUIDSQLModel
-from sqlmodel import SQLModel, Field
+
 import datetime
+
+from Models.UUIDSQLModel import UUIDSQLModel
+from sqlmodel import Field
 
 
 class ChatGPTHistoryModel(UUIDSQLModel, table=True):
