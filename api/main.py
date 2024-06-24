@@ -1,3 +1,7 @@
+import sys
+# this is required to work within the docker container
+sys.path.append('/app/api/')
+
 import os
 from fastapi import FastAPI
 import vesta
