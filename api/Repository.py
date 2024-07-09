@@ -1,7 +1,7 @@
 import typing
 
 from sqlmodel import Session, SQLModel, create_engine, select
-
+from sqlalchemy import Engine
 from Models.ChatGPTHistoryModel import ChatGPTHistoryModel
 from Models.SceneInstanceModel import SceneInstanceModel
 from Models.SnapshotModel import SnapshotModel
@@ -28,7 +28,7 @@ class SingletonMeta(type):
 
 
 class Repository(metaclass=SingletonMeta):
-    _engine = None
+    _engine: Engine = None
 
     def create_tables(self):
         SQLModel.metadata.create_all(self.get_engine())

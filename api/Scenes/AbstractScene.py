@@ -15,7 +15,7 @@ class SceneType(Enum):
 
 
 class SceneExecuteReturn:
-    def __init__(self, id, should_execute, priority, scene_object, start_date, end_date, message, raw):
+    def __init__(self, id, should_execute, priority, scene_object, start_date = None, end_date = None, message = None, raw = None):
         self.id = id
         self.should_execute = should_execute
         self.priority = priority
@@ -25,15 +25,23 @@ class SceneExecuteReturn:
         self.message = message
         self.raw = raw
 
+
+    # a unique ID which is used to identify if the content of this scene instance was already displayed.
     id: string
+
+    # a scene can also specify if it has content or not
     should_execute: bool
     priority: int
     scene_object: object
+
+    # a message which is mainly used for debug reasons.
     message: string
 
     start_date: datetime
     end_date: datetime
 
+    # the raw content of a scene. If should_execute=True the raw content is mandatory => it will be displayed towards
+    # vestaboard when the director identifies the current scene instance as best next scene
     raw: list
 
 
