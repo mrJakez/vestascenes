@@ -3,7 +3,7 @@ import sys
 sys.path.append('/app/api/')
 
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 import vesta
 from datetime import datetime
 
@@ -13,6 +13,7 @@ from stravalib import Client
 from Scenes.Director import Director
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
+from Scenes.SnapshotScene import SnapshotScene
 
 from Models.SnapshotModel import SnapshotModel
 from Models.SceneInstanceModel import SceneInstanceModel
@@ -123,12 +124,12 @@ async def snapshots():
 
 @app.get("/authorize-strava", tags=["strava-oauth"], description="Initilaizes the strava connection. Returns an "
                                                                  "authorization link which will trigger the callback url afterwards.")
-async def authorize_strava():
+async def authorize_strava(request: Request):
     client = Client()
     url = client.authorization_url(client_id=StravaLastActivityScene.client_id,
-                                   redirect_uri='http://127.0.0.1:8000/authorize-strava-callback')
+                                   redirect_uri=f"http://{request.url.hostname}:{request.url.port}/authorize-strava-callback")
 
-    return {"status": "ok", "url": url}
+    return {"initialized": f"{StravaLastActivityScene.is_initialized()}", "url": url}
 
 
 @app.get("/authorize-strava-callback", tags=["strava-oauth"], description="Callback which is triggered by the "
@@ -204,8 +205,8 @@ async def reset_instances():
 
 @app.get("/test-scene", tags=["developer support"])
 async def test_scene():
-    #scene = ChatGPTScene()
-    scene = StravaLastActivityScene()
+    scene = SnapshotScene()
+    #scene = StravaLastActivityScene()
     #scene = WasteCalendarScene()
     scene.post_execution = True
     res = scene.execute()

@@ -1,4 +1,5 @@
 import configparser
+import os
 import uuid
 from datetime import datetime, timedelta
 
@@ -15,13 +16,14 @@ class StravaLastActivityScene(AbstractScene):
     priority: int = 150
 
     def execute(self):
-        config = configparser.ConfigParser()
-        config.read('config.ini')
 
-        if config['strava']['access_token'] == "none":
+        if StravaLastActivityScene.is_initialized() is False:
             print("strava not initialized")
             return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", False, self.priority, self,
                                       None, None, "strava not initialized", None)
+
+        config = configparser.ConfigParser()
+        config.read('strava.ini')
 
         expire_at = datetime.fromtimestamp(int(config['strava']['expires_at']))
 
@@ -34,7 +36,7 @@ class StravaLastActivityScene(AbstractScene):
             print(f"token_response: {token_response}")
             StravaLastActivityScene.store_tokens(token_response['access_token'], token_response['refresh_token'],
                                                  token_response['expires_at'])
-            config.read('config.ini')
+            config.read('strava.ini')
 
         client = Client(access_token=config['strava']['access_token'])
         last_activity = client.get_activities(limit=1).next()
@@ -245,11 +247,23 @@ class StravaLastActivityScene(AbstractScene):
     @staticmethod
     def store_tokens(access_token: str, refresh_token: str, expires_at: int):
         config = configparser.ConfigParser()
-        config.read('config.ini')
 
+        # delete and read
+        config.write(open('strava.ini', 'w'))
+        config.read('strava.ini')
+
+        config.add_section("strava")
         config['strava']['access_token'] = access_token
         config['strava']['refresh_token'] = refresh_token
         config['strava']['expires_at'] = str(expires_at)
 
-        with open('config.ini', 'w') as configfile:
+        with open('strava.ini', 'w') as configfile:
             config.write(configfile)
+
+
+    @staticmethod
+    def is_initialized() -> bool:
+        if not os.path.exists('strava.ini'):
+            return False
+
+        return True

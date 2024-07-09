@@ -1,3 +1,4 @@
 #pycharm cache files
 __pycache__/
 *.py[cod]
+/api/strava.ini
