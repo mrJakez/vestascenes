@@ -12,5 +12,6 @@ COPY Models/* Models/
 COPY Scenes/* Scenes/
 COPY *.py ./
 COPY *.ini ./
+COPY Initial-snapshots/* Initial-snapshots/
 
 CMD uvicorn main:app --host 0.0.0.0 --port 8000

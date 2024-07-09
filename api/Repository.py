@@ -53,10 +53,18 @@ class Repository(metaclass=SingletonMeta):
 
         return snapshots
 
-    def store_snapshot(self, snapshot: SnapshotModel):
+    def store_snapshot(self, snapshot: SnapshotModel) -> bool:
         with Session(self.get_engine()) as session:
-            session.add(snapshot)
-            session.commit()
+            statement = select(SnapshotModel).where(SnapshotModel.raw == snapshot.raw)
+            results = session.exec(statement)
+
+            if len(results.all()) > 0:
+                print(f"snapshot '{snapshot.title}' already exists")
+                return False
+            else:
+                session.add(snapshot)
+                session.commit()
+                return True
 
     def get_chatgpt_history(self):
         with Session(self.get_engine()) as session:

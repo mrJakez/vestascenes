@@ -19,6 +19,8 @@ from Models.SceneInstanceModel import SceneInstanceModel
 from fastapi.encoders import jsonable_encoder
 
 from sqlmodel import Session, delete
+import json
+from pprint import pprint
 
 description = """
 This is a vestaboard server implementation which organizes the vestaboard related content within scenes. 🚀
@@ -156,6 +158,40 @@ async def init():
     Repository().create_tables()
     return {"status": "initalization done successfully"}
 
+@app.get("/init-snapshots/", tags=["developer support"], description="Adds all snapshots which are stored within the Initial-Snapshots/ folder into the database")
+async def init_snapshots():
+    directory = os.fsencode("Initial-snapshots/")
+    addedScreenshotsCount = 0
+
+
+    for file in os.listdir(directory):
+        filename = os.fsdecode(file)
+        print(filename)
+        if filename.endswith(".raw"):
+            file = open(f"Initial-snapshots/{filename}", 'r')
+            lines = file.readlines()
+
+            for line in lines:
+                if len(line) < 2:
+                    continue
+
+                title = filename.replace(".raw", "")
+
+                if "#" in line:
+                    title += " - " + line.split("#")[0]
+                    raw = line.split("#")[1]
+                else:
+                    raw = line
+
+                snapshot = SnapshotModel(title=title, raw=raw)
+                if Repository().store_snapshot(snapshot) == True:
+                    addedScreenshotsCount += 1
+
+                print(f"title: {title}, raw: {raw}")
+
+    return {"status": f"added {addedScreenshotsCount} snapshots"}
+
+
 
 @app.get("/reset-instances", tags=["developer support"])
 async def reset_instances():
@@ -169,8 +205,8 @@ async def reset_instances():
 @app.get("/test-scene", tags=["developer support"])
 async def test_scene():
     #scene = ChatGPTScene()
-    #scene = StravaLastActivityScene()
-    scene = WasteCalendarScene()
+    scene = StravaLastActivityScene()
+    #scene = WasteCalendarScene()
     scene.post_execution = True
     res = scene.execute()
 

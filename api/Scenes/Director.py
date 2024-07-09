@@ -4,6 +4,7 @@ from Repository import Repository
 from Scenes.AbstractScene import AbstractScene
 from Scenes.AbstractScene import SceneType
 from Scenes.ChatGPTScene import ChatGPTScene
+from Scenes.SnapshotScene import SnapshotScene
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
 
@@ -40,7 +41,7 @@ class Director:
             scenes.append(StravaLastActivityScene())
 
         if scene_type is None or scene_type is SceneType.ARTWORK:
-        #    scenes.append(SnapshotScene())
+            scenes.append(SnapshotScene())
             scenes.append(ChatGPTScene())
 
         return scenes
