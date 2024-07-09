@@ -190,7 +190,7 @@ async def init_snapshots():
 
                 print(f"title: {title}, raw: {raw}")
 
-    return {"status": f"added {addedScreenshotsCount} snapshots"}
+    return {"status": f"added {addedScreenshotsCount} snapshots", "foo":"bar"}
 
 
 
