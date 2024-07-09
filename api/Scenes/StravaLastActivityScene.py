@@ -10,8 +10,8 @@ from vesta.vbml import Component
 
 
 class StravaLastActivityScene(AbstractScene):
-    client_id: int = 45087
-    client_secret: str = '41b89124d848bd73c143b0300fbae4ed4af6fe21'
+    client_id: int = 130077
+    client_secret: str = '6f06db47b8ba9f95ec33a68b42dcb4db32cad8e5'
 
     priority: int = 150
 
