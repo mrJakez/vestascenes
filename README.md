@@ -35,7 +35,14 @@ docker-compose logs -f
 sudo docker-compose watch
 
 # log interactively into container
-docker exec -ti vestaboard_control-api-1 /bin/sh
+docker exec -ti vesta-control-api-1 /bin/sh
+
+########## fetch new sources from git and rebuild ##########
+# stop current project in container manager!
+cd /volume1/docker/vestaboardControl/
+git pull origin main
+sudo docker-compose up --build --force-recreate --no-start
+# start in container manager :)
 ```
 
 ### Vestaboard Markup Language Example
