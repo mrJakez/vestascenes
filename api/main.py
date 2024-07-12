@@ -101,8 +101,8 @@ async def execute():
     vesta.pprint(candidate.raw)
 
     try:
-        #vboard.write_message(candidate.raw)
-        print("lala")
+        vboard.write_message(candidate.raw)
+        #print("lala")
     except Exception as exc:
         print(f"HTTP Exception catched")
 
@@ -177,6 +177,8 @@ async def init():
 
     Repository()._engine = None
     Repository().create_tables()
+
+    init_snapshots()
     return {"status": "initalization done successfully"}
 
 @app.get("/init-snapshots/", tags=["developer support"], description="Adds all snapshots which are stored within the Initial-Snapshots/ folder into the database")

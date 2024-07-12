@@ -1,4 +1,5 @@
 import random
+from typing import List
 
 from Repository import Repository
 from Scenes.AbstractScene import AbstractScene
@@ -11,14 +12,15 @@ from Scenes.WasteCalendarScene import WasteCalendarScene
 
 class Director:
 
-    def  get_next_scene(self) -> AbstractScene:
+    def get_next_scene(self) -> AbstractScene:
 
         returns = []
         for timed_scene in self.__all_scenes(SceneType.TIMED):
 
             execute_res = timed_scene.execute()
 
-            if execute_res.should_execute is True and Repository().scene_instances_with_id_exists(execute_res.id) is False:
+            if execute_res.should_execute is True and Repository().scene_instances_with_id_exists(
+                    execute_res.id) is False:
                 returns.append(execute_res)
 
         # order SceneExecuteReturn objects based on priority
@@ -31,8 +33,7 @@ class Director:
             artwork_scene = random.choice(self.__all_scenes(SceneType.ARTWORK))
             return artwork_scene.execute()
 
-
-    def __all_scenes(self, scene_type = None) -> AbstractScene:
+    def __all_scenes(self, scene_type=None) -> List[AbstractScene]:
 
         scenes = []  # empty array
 
@@ -46,10 +47,9 @@ class Director:
 
         return scenes
 
-
     def get_priorities(self):
         scenes = self.__all_scenes()
         res = []
         for scene in scenes:
-            res.append({"scene":scene.__class__.__name__, "priority": scene.priority})
+            res.append({"scene": scene.__class__.__name__, "priority": scene.priority})
         return res

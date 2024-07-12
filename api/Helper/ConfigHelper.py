@@ -12,7 +12,7 @@ class ConfigHelper:
         start_hour = int(config['operation-hours']['start'])
         end_hour = int(config['operation-hours']['end'])
 
-        if now.hour <= start_hour:
+        if now.hour < start_hour:
             return {"message": "Not excuted - to early"}
 
         if now.hour >= end_hour:
