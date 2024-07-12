@@ -58,7 +58,7 @@ class StravaLastActivityScene(AbstractScene):
                                       None, None, msg, None)
 
         start_date = datetime.now()
-        end_date = start_date + timedelta(minutes=120)
+        end_date = start_date + timedelta(minutes=120).replace(minute=0, second=0, microsecond=0)
 
         message = f"Strava: {last_activity.name} - {last_activity.type}"
         print(message)

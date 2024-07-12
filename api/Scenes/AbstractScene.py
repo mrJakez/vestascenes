@@ -4,7 +4,7 @@ import uuid
 from enum import Enum
 
 import vesta
-
+import datetime
 
 # SceneType specifies if the scene is something which is time relative or just a "random" artwork
 class SceneType(Enum):
@@ -59,6 +59,12 @@ class AbstractScene:
     # will NOT be triggered if this will not be displayed.
     def post_execute(self) -> SceneExecuteReturn:
         return None
+
+    def get_next_full_hour(self) -> datetime:
+        start_date = datetime.datetime.now()
+        end_date = start_date + datetime.timedelta(minutes=60)
+        end_date = end_date.replace(minute=0, second=0, microsecond=1)
+        return end_date
 
 
 class DemoScene(AbstractScene):

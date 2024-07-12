@@ -35,7 +35,7 @@ class ChatGPTScene(AbstractScene):
 
     def execute(self) -> SceneExecuteReturn:
         start_date = datetime.datetime.now()
-        end_date = start_date + datetime.timedelta(minutes=60)
+        end_date = self.get_next_full_hour()
 
         if not self.post_execution:
             return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", True, self.priority, self,

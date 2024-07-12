@@ -11,6 +11,7 @@ from Repository import Repository
 from stravalib import Client
 
 from Scenes.Director import Director
+from Scenes.AbstractScene import AbstractScene
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
 from Scenes.SnapshotScene import SnapshotScene
@@ -22,6 +23,9 @@ from fastapi.encoders import jsonable_encoder
 from sqlmodel import Session, delete
 import json
 from pprint import pprint
+
+os.environ['TZ'] = 'Europe/Berlin'
+
 
 description = """
 This is a vestaboard server implementation which organizes the vestaboard related content within scenes. 🚀
@@ -46,7 +50,7 @@ vboard = vesta.ReadWriteClient("3e5dc670+a418+43f0+acd5+4ff8cc5fb2fd")
                      "validates the current state. If a higher priority is given by the candidate scene the vestabaord "
                      "will be updated. Gets executed all 15 min. by dedicated runner container.")
 async def execute():
-    candidate = Director().get_next_scene()
+    candidate:AbstractScene = Director().get_next_scene()
     print(f"candidate: {candidate.scene_object.__class__.__name__} (ID: {candidate.id})")
     current = Repository().get_active_scene_instance()
     now = datetime.now()
@@ -69,6 +73,7 @@ async def execute():
                 "identifier": current.id,
                 "scene": current.class_string,
                 "message": f"candidate has lower or equal priority than current -> keep current (seconds left:{int((end_date - now).total_seconds())})",
+                "end_date": end_date
             }
 
     elif datetime.strptime(current.end_date, "%Y-%m-%d %H:%M:%S.%f") < now:
@@ -84,7 +89,8 @@ async def execute():
     vesta.pprint(candidate.raw)
 
     try:
-        vboard.write_message(candidate.raw)
+        #vboard.write_message(candidate.raw)
+        print("lala")
     except Exception as exc:
         print(f"HTTP Exception catched")
 
@@ -94,7 +100,9 @@ async def execute():
     return {
         "identifier": candidate.id,
         "scene": candidate.scene_object.__class__.__name__,
-        "message": candidate.message
+        "message": candidate.message,
+        "start_date": candidate.start_date,
+        "end_date": candidate.end_date
     }
 
 
