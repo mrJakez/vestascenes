@@ -2,10 +2,11 @@ import sys
 # this is required to work within the docker container
 sys.path.append('/app/api/')
 
-import os
+import os, time
 from fastapi import FastAPI, Request
 import vesta
 from datetime import datetime
+import configparser
 
 from Repository import Repository
 from stravalib import Client
@@ -16,6 +17,9 @@ from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
 from Scenes.SnapshotScene import SnapshotScene
 
+
+from Helper.ConfigHelper import ConfigHelper
+
 from Models.SnapshotModel import SnapshotModel
 from Models.SceneInstanceModel import SceneInstanceModel
 from fastapi.encoders import jsonable_encoder
@@ -25,7 +29,7 @@ import json
 from pprint import pprint
 
 os.environ['TZ'] = 'Europe/Berlin'
-
+time.tzset()
 
 description = """
 This is a vestaboard server implementation which organizes the vestaboard related content within scenes. 🚀
@@ -50,10 +54,18 @@ vboard = vesta.ReadWriteClient("3e5dc670+a418+43f0+acd5+4ff8cc5fb2fd")
                      "validates the current state. If a higher priority is given by the candidate scene the vestabaord "
                      "will be updated. Gets executed all 15 min. by dedicated runner container.")
 async def execute():
+    if ConfigHelper.is_disabled() is True:
+        return {"message" : "disabled"}
+
+    now = datetime.now()
+
+    operation_hour_error = ConfigHelper.is_in_operation_hours(now)
+    if not operation_hour_error is None:
+        return operation_hour_error
+
     candidate:AbstractScene = Director().get_next_scene()
     print(f"candidate: {candidate.scene_object.__class__.__name__} (ID: {candidate.id})")
     current = Repository().get_active_scene_instance()
-    now = datetime.now()
 
     # debug
     if current is not None:
@@ -228,3 +240,9 @@ async def test_scene():
 @app.get("/priorities", tags=["developer support"])
 async def priorities():
     return Director().get_priorities()
+
+
+@app.get("/disable/{status}", tags=["developer support"])
+async def enable_status(status):
+    ConfigHelper.set_disabled(status)
+    return {"message": f"set to {status}"}
