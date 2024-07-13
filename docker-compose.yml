@@ -28,3 +28,7 @@ services:
     build:
       context: runner
       dockerfile: Dockerfile
+
+networks:
+  default:
+    driver: bridge
