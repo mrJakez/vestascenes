@@ -30,7 +30,7 @@ client = OpenAI(
 # Spiderman
 
 class ChatGPTScene(AbstractScene):
-    priority: int = 50
+    priority: int = 100
     post_execution: bool = False
 
     def execute(self) -> SceneExecuteReturn:
