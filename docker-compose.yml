@@ -28,6 +28,7 @@ services:
     build:
       context: runner
       dockerfile: Dockerfile
+    restart: on-failure
 
 networks:
   default:
