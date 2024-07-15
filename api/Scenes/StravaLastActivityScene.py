@@ -25,7 +25,9 @@ class StravaLastActivityScene(AbstractScene):
         last_executed = self.get_last_executed()
         if last_executed is not None and last_executed + timedelta(minutes=2) > datetime.now():
             return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", False, self.priority, self,
-                                     None, None, f"strava not executed to protect rate limit (last_executed:{last_executed})", None)
+                                      None, None,
+                                      f"strava not executed to protect rate limit (last_executed:{last_executed})",
+                                      None)
 
         config = configparser.ConfigParser()
         config.read('strava.ini')
@@ -56,15 +58,14 @@ class StravaLastActivityScene(AbstractScene):
             f"{last_activity.id} - {last_activity.name} - {last_activity.type} - {last_activity.start_date} - {last_activity.start_date_local}")
 
         if ((datetime.now() - timedelta(hours=4)) < last_activity.start_date_local) is False:
+            self.store_last_executed(datetime.now())
             msg = f"last strava activity '{last_activity.name}' is to old (start_date: {last_activity.start_date_local})"
-            print(msg)
             return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", False, self.priority, self,
                                       None, None, msg, None)
 
         start_date = datetime.now()
         end_date = start_date + timedelta(minutes=120)
         end_date = end_date.replace(minute=0, second=0, microsecond=1)
-
 
         message = f"Strava: {last_activity.name} - {last_activity.type}"
         print(message)
@@ -247,7 +248,6 @@ class StravaLastActivityScene(AbstractScene):
         chars = vbml_client.compose(components, props)
         vesta.pprint(chars)
 
-
         self.store_last_executed(datetime.now())
         return SceneExecuteReturn(f"{self.__class__.__name__}_{last_activity.id}", True, self.priority, self,
                                   start_date, end_date, message, chars)
@@ -275,7 +275,6 @@ class StravaLastActivityScene(AbstractScene):
 
         return True
 
-
     def get_last_executed(self) -> datetime:
         config = configparser.ConfigParser()
         config.read('strava.ini')
@@ -294,4 +293,3 @@ class StravaLastActivityScene(AbstractScene):
 
         with open('strava.ini', 'w') as configfile:
             config.write(configfile)
-
