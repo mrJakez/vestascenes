@@ -1,13 +1,13 @@
 import configparser
 import os
-import time
 import uuid
 from datetime import datetime, timedelta
 
 import vesta
-from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 from stravalib import Client, unithelper
 from vesta.vbml import Component
+
+from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 
 
 class StravaLastActivityScene(AbstractScene):

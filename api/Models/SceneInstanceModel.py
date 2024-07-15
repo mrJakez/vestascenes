@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from typing import List
+
+from sqlmodel import Field, SQLModel
+
 from Helper.RawHelper import RawHelper
 # from api.Scenes import AbstractScene
 from Scenes import AbstractScene
-from sqlmodel import Field, SQLModel
 
 
 class SceneInstanceModel(SQLModel, table=True):

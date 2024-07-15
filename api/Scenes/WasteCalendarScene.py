@@ -5,9 +5,10 @@ from typing import TypedDict, List
 
 import requests
 import vesta
-from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 from icalendar import Calendar
 from vesta.vbml import Component
+
+from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 
 
 # class syntax

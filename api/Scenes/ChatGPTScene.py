@@ -4,13 +4,14 @@ import uuid
 from typing import List
 
 import vesta
+from openai import OpenAI
+from vesta.chars import Rows
+from vesta.vbml import Component
+
 from Helper.RawHelper import RawHelper
 from Models.ChatGPTHistoryModel import ChatGPTHistoryModel
 from Repository import Repository
 from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
-from openai import OpenAI
-from vesta.chars import Rows
-from vesta.vbml import Component
 
 client = OpenAI(
     api_key="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"
