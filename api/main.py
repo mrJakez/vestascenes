@@ -6,7 +6,7 @@ import os, time
 from fastapi import FastAPI
 import vesta
 
-from routers import strava, developer, lifecycle, snapshots, execute
+from Routers import strava, developer, lifecycle, snapshots, execute
 
 os.environ['TZ'] = 'Europe/Berlin'
 time.tzset()
