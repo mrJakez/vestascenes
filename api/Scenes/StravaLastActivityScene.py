@@ -1,5 +1,6 @@
 import configparser
 import os
+import time
 import uuid
 from datetime import datetime, timedelta
 
@@ -16,15 +17,18 @@ class StravaLastActivityScene(AbstractScene):
     priority: int = 150
 
     def execute(self):
-
         if StravaLastActivityScene.is_initialized() is False:
             print("strava not initialized")
             return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", False, self.priority, self,
                                       None, None, "strava not initialized", None)
 
+        last_executed = self.get_last_executed()
+        if last_executed is not None and last_executed + timedelta(minutes=2) > datetime.now():
+            return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", False, self.priority, self,
+                                     None, None, f"strava not executed to protect rate limit (last_executed:{last_executed})", None)
+
         config = configparser.ConfigParser()
         config.read('strava.ini')
-
         expire_at = datetime.fromtimestamp(int(config['strava']['expires_at']))
 
         if expire_at < datetime.now():
@@ -58,7 +62,9 @@ class StravaLastActivityScene(AbstractScene):
                                       None, None, msg, None)
 
         start_date = datetime.now()
-        end_date = start_date + timedelta(minutes=120).replace(minute=0, second=0, microsecond=0)
+        end_date = start_date + timedelta(minutes=120)
+        end_date = end_date.replace(minute=0, second=0, microsecond=1)
+
 
         message = f"Strava: {last_activity.name} - {last_activity.type}"
         print(message)
@@ -89,7 +95,6 @@ class StravaLastActivityScene(AbstractScene):
             props["cal"] = f"{int(last_activity.calories)}"
         else:
             props["cal"] = "-"
-
 
         top_row = Component(
             "{63}{63}      Strava      {63}{63}",
@@ -242,7 +247,10 @@ class StravaLastActivityScene(AbstractScene):
         chars = vbml_client.compose(components, props)
         vesta.pprint(chars)
 
-        return SceneExecuteReturn(f"{self.__class__.__name__}_{last_activity.id}", True, self.priority, self, start_date, end_date, message, chars)
+
+        self.store_last_executed(datetime.now())
+        return SceneExecuteReturn(f"{self.__class__.__name__}_{last_activity.id}", True, self.priority, self,
+                                  start_date, end_date, message, chars)
 
     @staticmethod
     def store_tokens(access_token: str, refresh_token: str, expires_at: int):
@@ -260,10 +268,30 @@ class StravaLastActivityScene(AbstractScene):
         with open('strava.ini', 'w') as configfile:
             config.write(configfile)
 
-
     @staticmethod
     def is_initialized() -> bool:
         if not os.path.exists('strava.ini'):
             return False
 
         return True
+
+
+    def get_last_executed(self) -> datetime:
+        config = configparser.ConfigParser()
+        config.read('strava.ini')
+
+        if config.has_option('strava', 'last_executed') is False:
+            return None
+
+        stringvalue = config.get('strava', 'last_executed')
+        datetimevalue = datetime.fromisoformat(stringvalue)
+        return datetimevalue
+
+    def store_last_executed(self, last_executed: datetime):
+        config = configparser.ConfigParser()
+        config.read('strava.ini')
+        config.set('strava', 'last_executed', last_executed.now().isoformat())
+
+        with open('strava.ini', 'w') as configfile:
+            config.write(configfile)
+

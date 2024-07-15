@@ -175,6 +175,10 @@ async def init():
         print("old database existed - removed right now")
         os.remove("/database/vbcontrol.db")
 
+    if os.path.exists("strava.ini"):
+        print("old strava config existed - removed right now")
+        os.remove("strava.ini")
+
     Repository()._engine = None
     Repository().create_tables()
 
@@ -227,8 +231,8 @@ async def reset_instances():
 
 @app.get("/test-scene", tags=["developer support"])
 async def test_scene():
-    scene = SnapshotScene()
-    #scene = StravaLastActivityScene()
+    #scene = SnapshotScene()
+    scene = StravaLastActivityScene()
     #scene = WasteCalendarScene()
     scene.post_execution = True
     res = scene.execute()
