@@ -1,6 +1,7 @@
 import vesta
 from fastapi import APIRouter
 
+from Helper.ConfigHelper import ConfigHelper
 from Scenes.Director import Director
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
 
@@ -39,6 +40,7 @@ async def priorities():
         print(f"error {e}")
 
     return {
+        "enabled": f"{(not ConfigHelper.is_disabled())}",
         "git-hash": gitHash,
         "strava-initialized": f"{StravaLastActivityScene.is_initialized()}"
     }
