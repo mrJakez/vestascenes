@@ -54,6 +54,7 @@ class ChatGPTScene(AbstractScene):
         )
 
         message = RawHelper.replace_umlaute(completion.choices[0].message.content)
+        message = RawHelper.replace_characters_with_codes(message) # otherwise ' will be replaced with "&#39; etc"
         answer_model = ChatGPTHistoryModel(role="assistant", content=message, author=question_model.author)
         Repository().save_chatgpt_history(answer_model)
 

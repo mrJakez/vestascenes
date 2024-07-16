@@ -2,12 +2,15 @@ import vesta
 from fastapi import APIRouter
 
 from Helper.ConfigHelper import ConfigHelper
+from Helper.RawHelper import RawHelper
 from Scenes.Director import Director
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
+from Scenes.ChatGPTScene import ChatGPTScene
 
 import subprocess
+from vesta.chars import Rows
+from vesta.vbml import Component
 
-# from fastapi import FastAPI, Request
 
 router = APIRouter()
 
@@ -16,6 +19,7 @@ router = APIRouter()
 async def test_scene():
     #scene = SnapshotScene()
     scene = StravaLastActivityScene()
+    scene = ChatGPTScene()
     #scene = WasteCalendarScene()
     scene.post_execution = True
     res = scene.execute()

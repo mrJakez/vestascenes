@@ -29,3 +29,10 @@ class RawHelper:
         res = res.replace("Ä", 'Ae')
         res = res.replace("ä", 'ae')
         return res
+
+
+    @classmethod
+    def replace_characters_with_codes(cls, raw_string):
+        res = raw_string.replace("'", '{52}')
+        res = res.replace('"', '{53}')
+        return res
