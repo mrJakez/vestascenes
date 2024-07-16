@@ -30,7 +30,7 @@ class StravaLastActivityScene(AbstractScene):
                                       None)
 
         config = configparser.ConfigParser()
-        config.read('strava.ini')
+        config.read('/config/strava.ini')
         expire_at = datetime.fromtimestamp(int(config['strava']['expires_at']))
 
         if expire_at < datetime.now():
@@ -42,7 +42,7 @@ class StravaLastActivityScene(AbstractScene):
             print(f"token_response: {token_response}")
             StravaLastActivityScene.store_tokens(token_response['access_token'], token_response['refresh_token'],
                                                  token_response['expires_at'])
-            config.read('strava.ini')
+            config.read('/config/strava.ini')
 
         client = Client(access_token=config['strava']['access_token'])
         last_activity = client.get_activities(limit=1).next()
@@ -257,27 +257,27 @@ class StravaLastActivityScene(AbstractScene):
         config = configparser.ConfigParser()
 
         # delete and read
-        config.write(open('strava.ini', 'w'))
-        config.read('strava.ini')
+        config.write(open('/config/strava.ini', 'w'))
+        config.read('/config/strava.ini')
 
         config.add_section("strava")
         config['strava']['access_token'] = access_token
         config['strava']['refresh_token'] = refresh_token
         config['strava']['expires_at'] = str(expires_at)
 
-        with open('strava.ini', 'w') as configfile:
+        with open('/config/strava.ini', 'w') as configfile:
             config.write(configfile)
 
     @staticmethod
     def is_initialized() -> bool:
-        if not os.path.exists('strava.ini'):
+        if not os.path.exists('/config/strava.ini'):
             return False
 
         return True
 
     def get_last_executed(self) -> datetime:
         config = configparser.ConfigParser()
-        config.read('strava.ini')
+        config.read('/config/strava.ini')
 
         if config.has_option('strava', 'last_executed') is False:
             return None
@@ -288,8 +288,8 @@ class StravaLastActivityScene(AbstractScene):
 
     def store_last_executed(self, last_executed: datetime):
         config = configparser.ConfigParser()
-        config.read('strava.ini')
+        config.read('/config/strava.ini')
         config.set('strava', 'last_executed', last_executed.now().isoformat())
 
-        with open('strava.ini', 'w') as configfile:
+        with open('/config/strava.ini', 'w') as configfile:
             config.write(configfile)

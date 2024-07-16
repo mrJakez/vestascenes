@@ -16,9 +16,9 @@ async def init():
         print("old database existed - removed right now")
         os.remove("/database/vbcontrol.db")
 
-    if os.path.exists("strava.ini"):
+    if os.path.exists("/config/strava.ini"):
         print("old strava config existed - removed right now")
-        os.remove("strava.ini")
+        os.remove("/config/strava.ini")
 
     Repository()._engine = None
     Repository().create_tables()

@@ -16,6 +16,7 @@ services:
       - '8000:8000'
     volumes:
       - ./database:/database
+      - ./config:/config
 
   runner:
     depends_on:
