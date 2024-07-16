@@ -10,8 +10,14 @@ router = APIRouter()
                                                                     "authorization link which will trigger the callback url afterwards.")
 async def authorize_strava(request: Request):
     client = Client()
+
+    redirect_url = f"http://{request.url.hostname}:{request.url.port}/authorize-strava-callback"
+
+    if request.url.port is None or request.url.port == 80:
+        redirect_url = f"http://{request.url.hostname}/authorize-strava-callback"
+
     url = client.authorization_url(client_id=StravaLastActivityScene.client_id,
-                                   redirect_uri=f"http://{request.url.hostname}:{request.url.port}/authorize-strava-callback")
+                                   redirect_uri=redirect_url)
 
     return {"initialized": f"{StravaLastActivityScene.is_initialized()}", "url": url}
 
