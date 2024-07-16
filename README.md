@@ -47,10 +47,7 @@ git restore .
 # refresh rom git
 git pull origin main
 
-# rebuild (will detect changed python files automatically and copy them into the container:
-sudo docker-compose build api
-
-# fully rebuild (takes longer)
+# rebuild the container:
 sudo docker-compose build --no-cache api
 
 # start in container manager :)
