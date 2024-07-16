@@ -35,7 +35,7 @@ async def priorities():
     gitHash = '-'
     try:
         gitHash = subprocess.check_output(["git", "describe", "--always"]).strip().decode()
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         print(f"error {e}")
 
     return {

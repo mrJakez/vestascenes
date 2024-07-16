@@ -35,13 +35,24 @@ docker-compose logs -f
 sudo docker-compose watch
 
 # log interactively into container
-docker exec -ti vesta-control-api-1 /bin/sh
+docker exec -ti vestaboard-api-1 /bin/sh
 
 ########## fetch new sources from git and rebuild ##########
 # stop current project in container manager!
-cd /volume1/docker/vestaboardControl/
+cd /volume1/docker/vestaboard/
+
+# remove local git changes (if required)
+git restore .
+
+# refresh rom git
 git pull origin main
-sudo docker-compose up --build --force-recreate --no-start
+
+# rebuild (will detect changed python files automatically and copy them into the container:
+sudo docker-compose build api
+
+# fully rebuild (takes longer)
+sudo docker-compose build --no-cache api
+
 # start in container manager :)
 ```
 
