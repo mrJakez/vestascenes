@@ -4,9 +4,13 @@ from fastapi import APIRouter
 from Scenes.Director import Director
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
 
+import subprocess
+
 # from fastapi import FastAPI, Request
 
 router = APIRouter()
+
+
 @router.get("/test-scene", tags=["developer support"])
 async def test_scene():
     #scene = SnapshotScene()
@@ -24,3 +28,8 @@ async def test_scene():
 @router.get("/priorities", tags=["developer support"])
 async def priorities():
     return Director().get_priorities()
+
+
+@router.get("/version", tags=["developer support"])
+async def priorities():
+    return {"git-hash": subprocess.check_output(["git", "describe", "--always"]).strip().decode()}
