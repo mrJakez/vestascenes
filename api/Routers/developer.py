@@ -30,6 +30,15 @@ async def priorities():
     return Director().get_priorities()
 
 
-@router.get("/version", tags=["developer support"])
+@router.get("/status", tags=["developer support"])
 async def priorities():
-    return {"git-hash": subprocess.check_output(["git", "describe", "--always"]).strip().decode()}
+    gitHash = '-'
+    try:
+        gitHash = subprocess.check_output(["git", "describe", "--always"]).strip().decode()
+    except subprocess.CalledProcessError as e:
+        print(f"error {e}")
+
+    return {
+        "git-hash": gitHash,
+        "strava-initialized": f"{StravaLastActivityScene.is_initialized()}"
+    }
