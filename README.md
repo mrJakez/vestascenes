@@ -22,7 +22,6 @@ The runner is a container with one python application which is triggering the ht
 
 
 ## Cheat Sheet
-
 ### Debugging / deploy tips:
 ```bash
 # Manual start on Mac:
@@ -52,6 +51,9 @@ sudo docker-compose build --no-cache api
 
 # start in container manager :)
 ```
+
+### Character Codes
+https://docs.vestaboard.com/docs/characterCodes
 
 ### Vestaboard Markup Language Example
 ```json
