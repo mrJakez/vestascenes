@@ -46,5 +46,6 @@ async def priorities():
     return {
         "enabled": f"{(not ConfigHelper.is_disabled())}",
         "git-hash": gitHash,
-        "strava-initialized": f"{StravaLastActivityScene.is_initialized()}"
+        "strava-initialized": f"{StravaLastActivityScene.is_initialized()}",
+        "version-check" : "123"
     }
