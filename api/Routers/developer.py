@@ -18,7 +18,7 @@ router = APIRouter()
 @router.get("/test-scene", tags=["developer support"])
 async def test_scene():
     #scene = SnapshotScene()
-    scene = StravaLastActivityScene()
+    #scene = StravaLastActivityScene()
     scene = ChatGPTScene()
     #scene = WasteCalendarScene()
     scene.post_execution = True
@@ -47,5 +47,5 @@ async def priorities():
         "enabled": f"{(not ConfigHelper.is_disabled())}",
         "git-hash": gitHash,
         "strava-initialized": f"{StravaLastActivityScene.is_initialized()}",
-        "version-check" : "123"
+        "version-check" : "2"
     }
