@@ -49,7 +49,8 @@ git pull origin main
 # rebuild the container:
 sudo docker-compose build --no-cache api
 
-# start in container manager :)
+# trigger "Aktion -> Bereinigen" of the project
+# trigger "Aktion -> Erstellen" of the project
 ```
 
 ### Character Codes
