@@ -45,7 +45,8 @@ class StravaLastActivityScene(AbstractScene):
             config.read('/config/strava.ini')
 
         client = Client(access_token=config['strava']['access_token'])
-        last_activity = client.get_activities(limit=1).next()
+        last_activity_summary = client.get_activities(limit=1).next()
+        last_activity = client.get_activity(last_activity_summary.id)
 
         #last_activity = client.get_activity(8132100578)
         #ruhrtour2024 11371875821
