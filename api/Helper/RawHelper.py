@@ -28,6 +28,7 @@ class RawHelper:
         res = res.replace("ü", 'ue')
         res = res.replace("Ä", 'Ae')
         res = res.replace("ä", 'ae')
+        res = res.replace("ß", 'ss')
         return res
 
 
