@@ -55,6 +55,12 @@ class ChatGPTScene(AbstractScene):
 
         message = RawHelper.replace_umlaute(completion.choices[0].message.content)
         message = RawHelper.replace_characters_with_codes(message) # otherwise ' will be replaced with "&#39; etc"
+
+        if question_model.author == "replace_twohashmarks":
+            orig_message = message.split("##")
+            message = orig_message[0]
+            question_model.author =orig_message[1]
+
         answer_model = ChatGPTHistoryModel(role="assistant", content=message, author=question_model.author)
         Repository().save_chatgpt_history(answer_model)
 
@@ -78,6 +84,11 @@ class ChatGPTScene(AbstractScene):
             },
             {
                 "type": "quote",
+                "question": "Erzähle mir ein zufälliges Ironman Zitat ohne Erklärung.",
+                "author": "Tony Stark"
+            },
+            {
+                "type": "quote",
                 "question": "Erzähle mir ein zufälliges Bart Simpson Zitat ohne Erklärung.",
                 "author": "Bart Simpson"
             },
@@ -85,6 +96,16 @@ class ChatGPTScene(AbstractScene):
                 "type": "joke",
                 "question": "Erzähle mir ein zufälligen Dad Joke ohne Erklärung.",
                 "author": "Dad"
+            },
+            {
+                "type": "joke",
+                "question": "Erzähle mir ein zufälligen kurzen Lego Witz ohne Erklärung.",
+                "author": "Minifigur"
+            },
+            {
+                "type": "quote",
+                "question": "Erzähle mir ein zufälliges marvel Zitat ohne Erklärung. Schreib den Autor nach zwei Rautenzeichen als Trennzeichen dahinter",
+                "author": "replace_twohashmarks"
             }
         ]
 
