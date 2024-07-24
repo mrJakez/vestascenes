@@ -5,6 +5,7 @@ from Helper.ConfigHelper import ConfigHelper
 from Helper.RawHelper import RawHelper
 from Scenes.Director import Director
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
+from Scenes.WasteCalendarScene import WasteCalendarScene
 from Scenes.ChatGPTScene import ChatGPTScene
 
 import subprocess
@@ -19,8 +20,8 @@ router = APIRouter()
 async def test_scene():
     #scene = SnapshotScene()
     #scene = StravaLastActivityScene()
-    scene = ChatGPTScene()
-    #scene = WasteCalendarScene()
+    #scene = ChatGPTScene()
+    scene = WasteCalendarScene()
     scene.post_execution = True
     res = scene.execute()
 
