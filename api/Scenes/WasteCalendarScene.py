@@ -67,7 +67,7 @@ class WasteCalendarScene(AbstractScene):
     def execute(self):
         today = datetime.datetime.now()
         calendarweek = (today + datetime.timedelta(weeks=5)).strftime("%V")
-        identifier = f"{self.__class__.__name__}_{(today + datetime.timedelta(weeks=5)).strftime("%Y-cw%V")}"
+        identifier = f"{self.__class__.__name__}_{(today + datetime.timedelta(weeks=5)).strftime('%Y-cw%V')}"
 
         if today.weekday() != 6:
             return SceneExecuteReturn(identifier, should_execute=False, priority=self.priority, scene_object=self, message="Will just check waste calendar on Sunday")
