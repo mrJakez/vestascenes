@@ -70,13 +70,10 @@ class WasteCalendarScene(AbstractScene):
         identifier = f"{self.__class__.__name__}_{(today + datetime.timedelta(weeks=5)).strftime('%Y-cw%V')}"
 
         if today.weekday() != 6:
-            return SceneExecuteReturn(identifier, should_execute=False, priority=self.priority, scene_object=self, message="Will just check waste calendar on Sunday")
+            return SceneExecuteReturn.error(self, "Will just check waste calendar on Sunday")
 
         if today.hour < 15:
-            return SceneExecuteReturn(identifier, should_execute=False, priority=self.priority, scene_object=self, message="Will just check waste calendar on Sunday after 15:00 datetime")
-
-        #g = open('/config/cal.ics', 'rb')
-        #gcal = Calendar.from_ical(g.read())
+            return SceneExecuteReturn.error(self, "Will just check waste calendar on Sunday after 15:00 datetime")
 
         url = "https://gelsendienste.abisapp.de/abfuhrkalender?format=ical&street=0E1F25F8&number=21"
         file = requests.get(url).text

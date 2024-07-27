@@ -15,8 +15,8 @@ class SnapshotScene(AbstractScene):
         entries = Repository().get_snapshots()
 
         if len(entries) is 0:
-            return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", False, self.priority, self,
-                                      None, None, "no snapshots found", None)
+            return SceneExecuteReturn.error(self, "no snapshots found")
+
 
         #todo: final über die scene_isntances "is_active" finden
         vboard = vesta.ReadWriteClient("3e5dc670+a418+43f0+acd5+4ff8cc5fb2fd")

@@ -18,28 +18,22 @@ class StravaLastActivityScene(AbstractScene):
 
     def execute(self):
         if StravaLastActivityScene.is_initialized() is False:
-            print("strava not initialized")
-            return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", False, self.priority, self,
-                                      None, None, "strava not initialized", None)
+            return SceneExecuteReturn.error(self, "strava not initialized")
 
         last_executed = self.get_last_executed()
         if last_executed is not None and last_executed + timedelta(minutes=2) > datetime.now():
-            return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", False, self.priority, self,
-                                      None, None,
-                                      f"strava not executed to protect rate limit (last_executed:{last_executed})",
-                                      None)
+            return SceneExecuteReturn.error(self, f"strava not executed to protect rate limit ({last_executed})")
 
         config = configparser.ConfigParser()
         config.read('/config/strava.ini')
         expire_at = datetime.fromtimestamp(int(config['strava']['expires_at']))
 
         if expire_at < datetime.now():
-            print("strava expire => refresh right now")
             refresh_client = Client()
             token_response = refresh_client.refresh_access_token(client_id=self.client_id,
                                                                  client_secret=self.client_secret,
                                                                  refresh_token=config['strava']['refresh_token'])
-            print(f"token_response: {token_response}")
+
             StravaLastActivityScene.store_tokens(token_response['access_token'], token_response['refresh_token'],
                                                  token_response['expires_at'])
             config.read('/config/strava.ini')

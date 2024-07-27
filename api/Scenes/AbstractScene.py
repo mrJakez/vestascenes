@@ -45,6 +45,11 @@ class SceneExecuteReturn:
     # vestaboard when the director identifies the current scene instance as best next scene
     raw: list
 
+    @classmethod
+    def error(cls, scene:object, message: string):
+        res = SceneExecuteReturn(f"error_{str(uuid.uuid4())}", False, 0, scene_object=scene, message=message)
+        return res
+
 
 class AbstractScene:
 
