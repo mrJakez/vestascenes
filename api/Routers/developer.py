@@ -1,5 +1,6 @@
 import vesta
 from fastapi import APIRouter
+from starlette.responses import RedirectResponse
 
 import Scenes.BirthdayScene
 from Helper.ConfigHelper import ConfigHelper
@@ -13,6 +14,10 @@ from vesta.vbml import Component
 
 router = APIRouter()
 vboard = vesta.ReadWriteClient("3e5dc670+a418+43f0+acd5+4ff8cc5fb2fd")
+
+@router.get("/", tags=["developer support"])
+async def root_path():
+    return RedirectResponse("/status")
 
 @router.get("/test-scene/{scene_class_sring}/{send_to_board}", tags=["developer support"])
 async def test_scene(scene_class_sring: str = None, send_to_board: bool = False):
@@ -55,6 +60,6 @@ async def priorities():
     return {
         "enabled": f"{(not ConfigHelper.is_disabled())}",
         "git-hash": gitHash,
-        "strava-initialized": f"{Scenes.StravaLastActivityScene.is_initialized()}",
+        "strava-initialized": f"{Scenes.StravaLastActivityScene.StravaLastActivityScene.is_initialized()}",
         "version-check" : "3"
     }
