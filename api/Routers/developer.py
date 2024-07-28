@@ -46,7 +46,7 @@ async def test_scene(scene_class_sring: str = None, send_to_board: bool = False)
 
 @router.get("/priorities", tags=["developer support"])
 async def priorities():
-    return Scenes.Director().get_priorities()
+    return Scenes.Director.Director().get_priorities()
 
 
 @router.get("/status", tags=["developer support"])
