@@ -1,19 +1,17 @@
 import random
 from typing import List
 
-from Repository import Repository
-from Scenes.AbstractScene import AbstractScene
-from Scenes.AbstractScene import SceneType
+from Scenes.AbstractScene import AbstractScene, SceneType
+from Scenes.BirthdayScene import BirthdayScene
 from Scenes.ChatGPTScene import ChatGPTScene
 from Scenes.SnapshotScene import SnapshotScene
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
-
+from Repository import Repository
 
 class Director:
 
     def get_next_scene(self) -> AbstractScene:
-
         returns = []
         for timed_scene in self.__all_scenes(SceneType.TIMED):
 
@@ -40,6 +38,7 @@ class Director:
         if scene_type is None or scene_type is SceneType.TIMED:
             scenes.append(WasteCalendarScene())
             scenes.append(StravaLastActivityScene())
+            scenes.append(BirthdayScene())
 
         if scene_type is None or scene_type is SceneType.ARTWORK:
             scenes.append(SnapshotScene())
