@@ -1,4 +1,5 @@
 import random
+from datetime import datetime
 from typing import List
 
 from vesta import ReadWriteClient
@@ -21,12 +22,18 @@ class Director:
     def get_next_scene(self) -> SceneExecuteReturn:
         returns = []
         for timed_scene in self.__all_scenes(SceneType.TIMED):
-
             execute_res = timed_scene.execute(self.vboard)
 
-            if execute_res.should_execute is True and Repository().scene_instances_with_id_exists(
-                    execute_res.id) is False:
-                returns.append(execute_res)
+            if execute_res.should_execute is not True:
+                continue
+
+            if Repository().scene_instances_with_id_exists(execute_res.id):
+                continue
+
+            if execute_res.start_date > datetime.now():
+                continue
+
+            returns.append(execute_res)
 
         # order SceneExecuteReturn objects based on priority
         returns.sort(key=lambda x: x.priority, reverse=True)

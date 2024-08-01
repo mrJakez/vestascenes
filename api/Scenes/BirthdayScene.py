@@ -109,8 +109,8 @@ class BirthdayScene(AbstractScene):
         vbml_client = vesta.VBMLClient()
         chars = vbml_client.compose(self.get_vbml(), props)
 
-        start_date = datetime.datetime.now()
-        end_date = self.get_next_full_hour() + datetime.timedelta(hours=12)  # should be visible the whole day
+        start_date = datetime.datetime.now().replace(hour=9, minute=0, second=0, microsecond=0)
+        end_date = start_date + datetime.timedelta(hours=12)  # should be visible the whole day
 
         return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", False, self.priority, self,
                                   start_date, end_date, ", ".join(message), chars)

@@ -73,9 +73,6 @@ class WasteCalendarScene(AbstractScene):
         if today.weekday() != 6:
             return SceneExecuteReturn.error(self, "Will just check waste calendar on Sunday")
 
-        if today.hour < 15:
-            return SceneExecuteReturn.error(self, "Will just check waste calendar on Sunday after 15:00 datetime")
-
         url = "https://gelsendienste.abisapp.de/abfuhrkalender?format=ical&street=0E1F25F8&number=21"
         file = requests.get(url).text
         gcal = Calendar.from_ical(file)
@@ -108,8 +105,8 @@ class WasteCalendarScene(AbstractScene):
         vbml_client = vesta.VBMLClient()
         chars = vbml_client.compose(all_components)
 
-        start_date = datetime.datetime.now()
-        end_date = self.get_next_full_hour() + datetime.timedelta(hours=6)  # starts 15:00. will be present till 21:00
+        start_date = datetime.datetime.now().replace(hour=15, minute=0, second=0, microsecond=0)
+        end_date = start_date + datetime.timedelta(hours=6)  # starts 15:00. will be present till 21:00
 
         return SceneExecuteReturn(identifier, True, self.priority, self, start_date, end_date, f"{message}", chars)
 
