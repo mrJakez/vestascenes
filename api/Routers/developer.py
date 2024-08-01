@@ -39,7 +39,13 @@ async def test_scene(scene_class_string: str = None, send_to_board: bool = False
             except Exception as exc:
                 print(f"HTTP Exception catched {exc}")
 
-    return {"message": res.message}
+    return {
+        "should_execute": res.should_execute,
+        "message": res.message,
+        "start_date": res.start_date,
+        "end_date": res.end_date,
+        "priority": res.priority
+    }
 
 
 @router.get("/priorities", tags=["developer support"])
