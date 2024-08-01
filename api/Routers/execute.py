@@ -4,13 +4,14 @@ import vesta
 from fastapi import APIRouter
 
 from Helper.ConfigHelper import ConfigHelper
+from Helper.VboardHelper import VboardHelper
 from Models.SceneInstanceModel import SceneInstanceModel
 from Repository import Repository
 from Scenes.AbstractScene import SceneExecuteReturn
 from Scenes.Director import Director
 
 router = APIRouter()
-vboard = vesta.ReadWriteClient("3e5dc670+a418+43f0+acd5+4ff8cc5fb2fd")
+vboard = VboardHelper().get_client()
 
 
 @router.get("/execute", tags=["main"],

@@ -6,13 +6,13 @@ import Scenes.BirthdayScene
 import Scenes.StravaLastActivityScene
 import Scenes.Director
 from Helper.ConfigHelper import ConfigHelper
+from Helper.VboardHelper import  VboardHelper
 import importlib
 
 import subprocess
 
 router = APIRouter()
-vboard = vesta.ReadWriteClient("3e5dc670+a418+43f0+acd5+4ff8cc5fb2fd")
-
+vboard = VboardHelper().get_client()
 
 @router.get("/", tags=["developer support"])
 async def root_path():
@@ -55,9 +55,14 @@ async def priorities():
     except Exception as e:
         print(f"error {e}")
 
+    vboard_initialized = False
+    if VboardHelper().get_client() is not None:
+        vboard_initialized = True
+
     return {
         "enabled": f"{(not ConfigHelper.is_disabled())}",
         "git-hash": git_hash,
         "strava-initialized": f"{Scenes.StravaLastActivityScene.StravaLastActivityScene.is_initialized()}",
+        "vboard-initialized": vboard_initialized,
         "version-check": "4"
     }

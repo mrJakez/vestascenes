@@ -4,9 +4,10 @@ from fastapi.encoders import jsonable_encoder
 
 from Models.SnapshotModel import SnapshotModel
 from Repository import Repository
+from Helper.VboardHelper import VboardHelper
 
 router = APIRouter()
-vboard = vesta.ReadWriteClient("3e5dc670+a418+43f0+acd5+4ff8cc5fb2fd")
+vboard = VboardHelper().get_client()
 
 
 # /storeSnapshot is storing the current vestaboard message within the snapshots database table
