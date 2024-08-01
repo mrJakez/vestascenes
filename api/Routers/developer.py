@@ -60,9 +60,9 @@ async def priorities():
         vboard_initialized = True
 
     return {
-        "enabled": f"{(not ConfigHelper.is_disabled())}",
+        "version-check": "4",
+        "enabled": (not ConfigHelper.is_disabled()),
         "git-hash": git_hash,
-        "strava-initialized": f"{Scenes.StravaLastActivityScene.StravaLastActivityScene.is_initialized()}",
-        "vboard-initialized": vboard_initialized,
-        "version-check": "4"
+        "strava-initialized": Scenes.StravaLastActivityScene.StravaLastActivityScene.is_initialized(),
+        "vboard-initialized": vboard_initialized
     }
