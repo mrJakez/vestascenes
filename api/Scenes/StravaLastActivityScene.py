@@ -1,7 +1,7 @@
 import configparser
 import os
-import uuid
 from datetime import datetime, timedelta
+from typing import Optional
 
 import vesta
 from stravalib import Client, unithelper
@@ -270,17 +270,19 @@ class StravaLastActivityScene(AbstractScene):
 
         return True
 
-    def get_last_executed(self) -> datetime:
+    # noinspection PyMethodMayBeStatic
+    def get_last_executed(self) -> Optional[datetime]:
         config = configparser.ConfigParser()
         config.read('/config/strava.ini')
 
         if config.has_option('strava', 'last_executed') is False:
             return None
 
-        stringvalue = config.get('strava', 'last_executed')
-        datetimevalue = datetime.fromisoformat(stringvalue)
-        return datetimevalue
+        string_value = config.get('strava', 'last_executed')
+        datetime_value = datetime.fromisoformat(string_value)
+        return datetime_value
 
+    # noinspection PyMethodMayBeStatic
     def store_last_executed(self, last_executed: datetime):
         config = configparser.ConfigParser()
         config.read('/config/strava.ini')

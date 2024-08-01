@@ -6,7 +6,7 @@ from fastapi import APIRouter
 from Helper.ConfigHelper import ConfigHelper
 from Models.SceneInstanceModel import SceneInstanceModel
 from Repository import Repository
-from Scenes.AbstractScene import AbstractScene
+from Scenes.AbstractScene import SceneExecuteReturn
 from Scenes.Director import Director
 
 router = APIRouter()
@@ -24,10 +24,10 @@ async def execute():
     now = datetime.now()
 
     operation_hour_error = ConfigHelper.is_in_operation_hours(now)
-    if not operation_hour_error is None:
+    if operation_hour_error is not None:
         return operation_hour_error
 
-    candidate: AbstractScene = Director(vboard).get_next_scene()
+    candidate: SceneExecuteReturn = Director(vboard).get_next_scene()
     print(f"candidate: {candidate.scene_object.__class__.__name__} (ID: {candidate.id})")
     current = Repository().get_active_scene_instance()
 
@@ -35,7 +35,7 @@ async def execute():
     if current is not None:
         end_date = datetime.strptime(current.end_date, "%Y-%m-%d %H:%M:%S.%f")
         print(f"now: {now} - end date: {end_date} (Difference: {(end_date - now).total_seconds()})")
-    #-
+    # -
 
     if current is None:
         print("current is none -> candidate will be executed")
@@ -45,6 +45,7 @@ async def execute():
             print("candidate has higher priority than current. Current will be replaced")
             Repository().unmark_active_scene_instance()
         else:
+            # noinspection PyUnboundLocalVariable
             return {
                 "identifier": current.id,
                 "scene": current.class_string,
@@ -66,9 +67,9 @@ async def execute():
 
     try:
         vboard.write_message(candidate.raw)
-        #print("lala")
-    except Exception as exc:
-        print(f"HTTP Exception catched")
+        # print("lala")
+    except TypeError as exc:
+        print(f"HTTP Exception catched {exc}")
 
     model = SceneInstanceModel(scene=candidate)
     Repository().save_scene_instance(model)

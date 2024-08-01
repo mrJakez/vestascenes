@@ -2,8 +2,6 @@ import datetime
 import random
 import uuid
 
-import vesta
-
 from Repository import Repository
 from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 
@@ -22,7 +20,7 @@ class SnapshotScene(AbstractScene):
 
         if vboard.read_message() == snapshot_model.get_raw_list() and len(entries) > 1:
             print(f">>>>>>>>>>>>>>>>> Already displaying {snapshot_model.title} -> Iterate once more <<<<<<<<<<<<<<<<<<<<<<")
-            return self.execute()
+            return self.execute(vboard)
 
         start_date = datetime.datetime.now()
         end_date = self.get_next_full_hour()

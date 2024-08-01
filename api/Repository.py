@@ -113,6 +113,7 @@ class Repository(metaclass=SingletonMeta):
 
     def get_active_scene_instance(self) -> typing.Optional[SceneInstanceModel]:
         with Session(self.get_engine()) as session:
+            # noinspection PyPep8
             statement = select(SceneInstanceModel).where(SceneInstanceModel.is_active == True)
             results = session.exec(statement).all()
             count = len(results)
@@ -125,6 +126,7 @@ class Repository(metaclass=SingletonMeta):
 
     def unmark_active_scene_instance(self):
         with Session(self.get_engine()) as session:
+            # noinspection PyPep8
             statement = select(SceneInstanceModel).where(SceneInstanceModel.is_active == True)
             results = session.exec(statement)
 

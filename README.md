@@ -2,12 +2,12 @@
 
 This is a vestaboard server implementation which organizes the vestaboard (http://vestaboard.com) related content within scenes.
 
-This helps to priotize the content which you are interested in. The implementation contains scenes for ChatGPT
+This helps to prioritize the content which you are interested in. The implementation contains scenes for ChatGPT
 requests, Strava-Stats and some other random content generating scenes.
 
 
 ### Key concept
-The key concept behind the app are scenes which are executed by a Director on a regular basis. Each scene anounces with its priority response how importent the current scene content is.
+The key concept behind the app are scenes which are executed by a Director on a regular basis. Each scene announces with its priority response how important the current scene content is.
 This information will be taken by the Director into account to calculate which scene is next.
 
 

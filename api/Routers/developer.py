@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from starlette.responses import RedirectResponse
 
 import Scenes.BirthdayScene
+import Scenes.StravaLastActivityScene
 import Scenes.Director
 from Helper.ConfigHelper import ConfigHelper
 import importlib

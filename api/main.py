@@ -1,11 +1,12 @@
 import sys
+import os
+import time
+from fastapi import FastAPI
+
 # this is required to work within the docker container
 sys.path.append('/app/api/')
 
-import os, time
-from fastapi import FastAPI
-import vesta
-
+# noinspection PyPep8
 from Routers import strava, developer, lifecycle, snapshots, execute
 
 os.environ['TZ'] = 'Europe/Berlin'
@@ -13,7 +14,7 @@ time.tzset()
 
 description = """
 This is a vestaboard server implementation which organizes the vestaboard related content within scenes. 🚀
-This helps to priotize the content which you are interested in. The implementation contans scenes for ChatGPT
+This helps to prioritize the content which you are interested in. The implementation contains scenes for ChatGPT
 requests, Strava-Stats and some other random content generating scenes.
 
 ## Current Scenes
