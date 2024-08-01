@@ -10,16 +10,12 @@ from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 
 class SnapshotScene(AbstractScene):
 
-    def execute(self):
+    def execute(self, vboard) -> SceneExecuteReturn:
 
         entries = Repository().get_snapshots()
 
         if len(entries) is 0:
             return SceneExecuteReturn.error(self, "no snapshots found")
-
-
-        #todo: final über die scene_isntances "is_active" finden
-        vboard = vesta.ReadWriteClient("3e5dc670+a418+43f0+acd5+4ff8cc5fb2fd")
 
         random_index = random.randint(0, len(entries) - 1)
         snapshot_model = entries[random_index]

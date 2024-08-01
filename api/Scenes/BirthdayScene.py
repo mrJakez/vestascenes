@@ -1,5 +1,4 @@
 import datetime
-import random
 import string
 import uuid
 import os.path
@@ -42,7 +41,7 @@ class BirthdayEntry:
 class BirthdayScene(AbstractScene):
     priority: int = 130
 
-    def execute(self):
+    def execute(self, vboard) -> SceneExecuteReturn:
         if not os.path.isfile("/config/birthdays.ics"):
             return SceneExecuteReturn.error(self, "/config/birthdays.ics does not exist")
 
@@ -50,8 +49,8 @@ class BirthdayScene(AbstractScene):
         gcal = Calendar.from_ical(g.read())
         today = datetime.date.today()
 
-        #today = datetime.date.today().replace(month=7, day=21)
-        #22.2 => two person,  4.3 => three person, 3.2 => four person
+        # today = datetime.date.today().replace(month=7, day=21)
+        # 22.2 => two person,  4.3 => three person, 3.2 => four person
 
         message = []
         entries = []
@@ -72,6 +71,7 @@ class BirthdayScene(AbstractScene):
             entries.append(entry)
             message.append(str(entry))
 
+        props = None
         if len(entries) == 0:
             return SceneExecuteReturn.error(self, "No birthdays present today")
         elif len(entries) == 1:
@@ -115,6 +115,7 @@ class BirthdayScene(AbstractScene):
         return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", False, self.priority, self,
                                   start_date, end_date, ", ".join(message), chars)
 
+    # noinspection PyMethodMayBeStatic
     def get_vbml(self):
         return [
             Component(

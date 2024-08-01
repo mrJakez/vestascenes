@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List
+from typing import List, Any
 
 from sqlmodel import Field, SQLModel
 
@@ -20,7 +20,8 @@ class SceneInstanceModel(SQLModel, table=True):
     priority: int
     is_active: bool
 
-    def __init__(self, scene: AbstractScene):
+    def __init__(self, scene: AbstractScene, **data: Any):
+        super().__init__(**data)
         self.id = scene.id
         self.class_string = scene.scene_object.__class__.__name__
         self.raw = RawHelper.get_raw_string(scene.raw)

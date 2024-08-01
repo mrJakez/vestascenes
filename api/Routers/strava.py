@@ -6,12 +6,13 @@ from Scenes.StravaLastActivityScene import StravaLastActivityScene
 
 router = APIRouter()
 
-@router.get("/authorize-strava", tags=["strava-oauth"], description="Initilaizes the strava connection. Returns an "
+
+@router.get("/authorize-strava", tags=["strava-oauth"], description="Initializes the strava connection. Returns an "
                                                                     "authorization link which will trigger the callback url afterwards.")
 async def authorize_strava(request: Request):
     client = Client()
 
-    redirect_url = f"http://{request.url.hostname}:{request.url.port}/authorize-strava-callback"
+    redirect_url = f'http://{request.url.hostname}:{request.url.port}/authorize-strava-callback'
 
     if request.url.port is None or request.url.port == 80:
         redirect_url = f"http://{request.url.hostname}/authorize-strava-callback"

@@ -10,7 +10,8 @@ from Repository import Repository
 
 router = APIRouter()
 
-@router.get("/init/", tags=["lifecycle"], description="Initilaizes the vestaboard config and database")
+
+@router.get("/init/", tags=["lifecycle"], description="Initializes the vestaboard config and database")
 async def init():
     if os.path.exists("/database/vbcontrol.db"):
         print("old database existed - removed right now")
@@ -24,12 +25,14 @@ async def init():
     Repository().create_tables()
 
     await init_snapshots()
-    return {"status": "initalization done successfully"}
+    return {"status": "initialization done successfully"}
 
-@router.get("/init-snapshots/", tags=["lifecycle"], description="Adds all snapshots which are stored within the Initial-Snapshots/ folder into the database")
+
+@router.get("/init-snapshots/", tags=["lifecycle"],
+            description="Adds all snapshots which are stored within the Initial-Snapshots/ folder into the database")
 async def init_snapshots():
     directory = os.fsencode("Initial-snapshots/")
-    addedScreenshotsCount = 0
+    added_screenshots_count = 0
 
     for file in os.listdir(directory):
         filename = os.fsdecode(file)
@@ -51,22 +54,21 @@ async def init_snapshots():
                     raw = line
 
                 snapshot = SnapshotModel(title=title, raw=raw)
-                if Repository().store_snapshot(snapshot) == True:
-                    addedScreenshotsCount += 1
+                if Repository().store_snapshot(snapshot):
+                    added_screenshots_count += 1
 
                 print(f"title: {title}, raw: {raw}")
 
-    return {"status": f"added {addedScreenshotsCount} snapshots"}
+    return {"status": f"added {added_screenshots_count} snapshots"}
 
 
 @router.get("/reset-instances/", tags=["lifecycle"])
 async def reset_instances():
     with Session(Repository().get_engine()) as session:
         statement = delete(SceneInstanceModel)
-        result = session.exec(statement)
+        session.exec(statement)
         session.commit()
     return {"message": "scene_instances cleared successfully"}
-
 
 
 @router.get("/disable/{status}", tags=["lifecycle"])

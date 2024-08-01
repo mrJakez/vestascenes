@@ -5,21 +5,20 @@ from typing import Union
 
 class ConfigHelper:
     @classmethod
-    def is_in_operation_hours(cls, now:datetime) -> Union[dict[str, str], None]:
+    def is_in_operation_hours(cls, now: datetime) -> Union[dict[str, str], None]:
         config = configparser.ConfigParser()
         config.read('settings.ini')
         start_hour = int(config['operation-hours']['start'])
         end_hour = int(config['operation-hours']['end'])
 
         if now.hour < start_hour:
-            return {"message": "Not excuted - to early"}
+            return {"message": "Not executed - to early"}
 
         if now.hour >= end_hour:
-            return {"message": "Not excuted - to late"}
+            return {"message": "Not executed - to late"}
         #
 
         return None
-
 
     @classmethod
     def is_disabled(cls):

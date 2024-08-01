@@ -16,7 +16,7 @@ class StravaLastActivityScene(AbstractScene):
 
     priority: int = 150
 
-    def execute(self):
+    def execute(self, vboard) -> SceneExecuteReturn:
         if StravaLastActivityScene.is_initialized() is False:
             return SceneExecuteReturn.error(self, "strava not initialized")
 

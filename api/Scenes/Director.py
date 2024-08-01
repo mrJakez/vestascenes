@@ -1,7 +1,9 @@
 import random
 from typing import List
 
-from Scenes.AbstractScene import AbstractScene, SceneType
+from vesta import ReadWriteClient
+
+from Scenes.AbstractScene import AbstractScene, SceneType, SceneExecuteReturn
 from Scenes.BirthdayScene import BirthdayScene
 from Scenes.ChatGPTScene import ChatGPTScene
 from Scenes.SnapshotScene import SnapshotScene
@@ -9,13 +11,18 @@ from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
 from Repository import Repository
 
-class Director:
 
-    def get_next_scene(self) -> AbstractScene:
+class Director:
+    vboard: ReadWriteClient
+
+    def __init__(self, vboard: ReadWriteClient):
+        self.vboard = vboard
+
+    def get_next_scene(self) -> SceneExecuteReturn:
         returns = []
         for timed_scene in self.__all_scenes(SceneType.TIMED):
 
-            execute_res = timed_scene.execute()
+            execute_res = timed_scene.execute(self.vboard)
 
             if execute_res.should_execute is True and Repository().scene_instances_with_id_exists(
                     execute_res.id) is False:
@@ -29,8 +36,9 @@ class Director:
             return returns[0]
         else:
             artwork_scene = random.choice(self.__all_scenes(SceneType.ARTWORK))
-            return artwork_scene.execute()
+            return artwork_scene.execute(self.vboard)
 
+    # noinspection PyMethodMayBeStatic
     def __all_scenes(self, scene_type=None) -> List[AbstractScene]:
 
         scenes = []  # empty array

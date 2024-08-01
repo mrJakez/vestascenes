@@ -1,7 +1,7 @@
 import datetime
 from datetime import date
 from enum import Enum
-from typing import TypedDict, List
+from typing import List
 
 import requests
 import vesta
@@ -42,17 +42,18 @@ class WasteEntry:
         dstart = component.decoded('dtstart')
         summary = component.get('summary')
 
-        type: WasteType = None
+        # noinspection PyTypeChecker
+        current_type: WasteType = None
 
         if summary == "Graue Tonne":
-            type = WasteType.GRAY
+            current_type = WasteType.GRAY
         elif summary == "Gelbe Tonne":
-            type = WasteType.YELLOW
+            current_type = WasteType.YELLOW
         elif summary == "Blaue Tonne":
-            type = WasteType.BLUE
+            current_type = WasteType.BLUE
 
         self.date = dstart
-        self.type = type
+        self.type = current_type
 
     def __str__(self):
         return f'{self.type} - {self.date_str()}'
@@ -64,7 +65,7 @@ class WasteEntry:
 class WasteCalendarScene(AbstractScene):
     priority: int = 200
 
-    def execute(self):
+    def execute(self, vboard) -> SceneExecuteReturn:
         today = datetime.datetime.now()
         calendarweek = (today + datetime.timedelta(weeks=5)).strftime("%V")
         identifier = f"{self.__class__.__name__}_{(today + datetime.timedelta(weeks=5)).strftime('%Y-cw%V')}"
@@ -112,6 +113,7 @@ class WasteCalendarScene(AbstractScene):
 
         return SceneExecuteReturn(identifier, True, self.priority, self, start_date, end_date, f"{message}", chars)
 
+    # noinspection PyMethodMayBeStatic
     def get_todo_vbml_components(self, entry: WasteEntry) -> List[Component]:
         icon_component = Component(
             template="{" + str(entry.type.get_vbml_code()) + "}",

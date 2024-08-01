@@ -4,20 +4,19 @@ from typing import List
 class RawHelper:
     @classmethod
     def get_raw_object(cls, raw_string) -> List:
-        list = []
+        res_list = []
         # raw is a list of 6 lists as string. We have to convert this one towards a List(List(Int)) object
         for item in raw_string.split('],['):
             item = item.replace('[', '').replace(']', '')
             item = item.split(',')
             item = [int(numeric_string) for numeric_string in item]
-            list.append(item)
+            res_list.append(item)
 
-        return list
+        return res_list
 
     @classmethod
     def get_raw_string(cls, raw_list):
         return str(raw_list).replace(' ', '')
-
 
     @classmethod
     def replace_umlaute(cls, raw_string):
@@ -30,7 +29,6 @@ class RawHelper:
         res = res.replace("ä", 'ae')
         res = res.replace("ß", 'ss')
         return res
-
 
     @classmethod
     def replace_characters_with_codes(cls, raw_string):

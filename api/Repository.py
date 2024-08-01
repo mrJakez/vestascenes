@@ -100,10 +100,10 @@ class Repository(metaclass=SingletonMeta):
             session.add(model)
             session.commit()
 
-    def scene_instances_with_id_exists(self, id) -> bool:
+    def scene_instances_with_id_exists(self, given_id) -> bool:
 
         with Session(self.get_engine()) as session:
-            statement = select(SceneInstanceModel).where(SceneInstanceModel.id == id)
+            statement = select(SceneInstanceModel).where(SceneInstanceModel.id == given_id)
             results = session.exec(statement)
 
             if len(results.all()) > 0:
@@ -111,7 +111,7 @@ class Repository(metaclass=SingletonMeta):
 
         return False
 
-    def get_active_scene_instance(self) -> SceneInstanceModel:
+    def get_active_scene_instance(self) -> typing.Optional[SceneInstanceModel]:
         with Session(self.get_engine()) as session:
             statement = select(SceneInstanceModel).where(SceneInstanceModel.is_active == True)
             results = session.exec(statement).all()

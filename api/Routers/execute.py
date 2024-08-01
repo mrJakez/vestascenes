@@ -12,13 +12,14 @@ from Scenes.Director import Director
 router = APIRouter()
 vboard = vesta.ReadWriteClient("3e5dc670+a418+43f0+acd5+4ff8cc5fb2fd")
 
+
 @router.get("/execute", tags=["main"],
-         description="This service is the real worker process. It determines the next candidate and"
-                     "validates the current state. If a higher priority is given by the candidate scene the vestabaord "
-                     "will be updated. Gets executed all 15 min. by dedicated runner container.")
+            description="This service is the real worker process. It determines the next candidate and"
+                        "validates the current state. If a higher priority is given by the candidate scene the vestabaord "
+                        "will be updated. Gets executed all 15 min. by dedicated runner container.")
 async def execute():
     if ConfigHelper.is_disabled() is True:
-        return {"message" : "disabled"}
+        return {"message": "disabled"}
 
     now = datetime.now()
 
@@ -26,7 +27,7 @@ async def execute():
     if not operation_hour_error is None:
         return operation_hour_error
 
-    candidate:AbstractScene = Director().get_next_scene()
+    candidate: AbstractScene = Director(vboard).get_next_scene()
     print(f"candidate: {candidate.scene_object.__class__.__name__} (ID: {candidate.id})")
     current = Repository().get_active_scene_instance()
 
@@ -55,7 +56,7 @@ async def execute():
         print("current is not valid any longer - is_active will be set to false")
         Repository().unmark_active_scene_instance()
 
-    post_execution_candidate = candidate.scene_object.post_execute()
+    post_execution_candidate = candidate.scene_object.post_execute(vboard)
     if post_execution_candidate is not None:
         print("-----------------------------------------> execute post execution candidate!")
         candidate = post_execution_candidate

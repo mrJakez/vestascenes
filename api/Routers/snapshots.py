@@ -9,7 +9,7 @@ router = APIRouter()
 vboard = vesta.ReadWriteClient("3e5dc670+a418+43f0+acd5+4ff8cc5fb2fd")
 
 
-# /storeSnapshot is storing the current vestaboard message within the snappshots database table
+# /storeSnapshot is storing the current vestaboard message within the snapshots database table
 @router.get("/storeSnapshot/{title}", tags=["snapshots"])
 async def store_snapshot(title: str):
     current_message = vboard.read_message()

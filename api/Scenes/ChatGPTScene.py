@@ -1,7 +1,7 @@
 import datetime
 import random
 import uuid
-from typing import List
+from typing import List, Optional
 
 import vesta
 from openai import OpenAI
@@ -13,28 +13,17 @@ from Models.ChatGPTHistoryModel import ChatGPTHistoryModel
 from Repository import Repository
 from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 
+# noinspection SpellCheckingInspection
 client = OpenAI(
     api_key="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"
 )
 
 
-#user key: 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
-#project key: sk-proj-fK5y2WpEgJoxll1l80yKT3BlbkFJjcB893cDos9xBInKagdv
-
-
-#Erzähle mir ein Batman Zitat in kurz ohne erklärung
-# Erzähle mir ein Bart Simpson Zitat in kurz ohne erklärung
-
-
-# Bart Simpson
-# Batman
-# Spiderman
-
 class ChatGPTScene(AbstractScene):
     priority: int = 100
     post_execution: bool = False
 
-    def execute(self) -> SceneExecuteReturn:
+    def execute(self, vboard) -> SceneExecuteReturn:
         start_date = datetime.datetime.now()
         end_date = self.get_next_full_hour()
 
@@ -54,12 +43,12 @@ class ChatGPTScene(AbstractScene):
         )
 
         message = RawHelper.replace_umlaute(completion.choices[0].message.content)
-        message = RawHelper.replace_characters_with_codes(message) # otherwise ' will be replaced with "&#39; etc"
+        message = RawHelper.replace_characters_with_codes(message)  # otherwise ' will be replaced with "&#39;"
 
         if question_model.author == "replace_twohashmarks":
             orig_message = message.split("##")
             message = orig_message[0]
-            question_model.author =orig_message[1]
+            question_model.author = orig_message[1]
 
         answer_model = ChatGPTHistoryModel(role="assistant", content=message, author=question_model.author)
         Repository().save_chatgpt_history(answer_model)
@@ -69,12 +58,14 @@ class ChatGPTScene(AbstractScene):
         return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", True, self.priority, self,
                                   start_date, end_date, f"{message} - {answer_model.author}", chars)
 
-    def post_execute(self) -> SceneExecuteReturn:
+    def post_execute(self, vboard) -> Optional[SceneExecuteReturn]:
         self.post_execution = True
-        res = self.execute()
+        res = self.execute(vboard)
         self.post_execution = False
         return res
 
+    # noinspection PyMethodMayBeStatic
+    # noinspection SpellCheckingInspection
     def get_new_question_model(self) -> ChatGPTHistoryModel:
         questions = [
             {
@@ -112,6 +103,7 @@ class ChatGPTScene(AbstractScene):
         chosen = random.choice(questions)
         return ChatGPTHistoryModel(role="user", content=chosen["question"], author=chosen["author"])
 
+    # noinspection PyMethodMayBeStatic
     def get_messages_in_chatgpt_format(self, models: List[ChatGPTHistoryModel]) -> List:
         messages = []
         for model in models:
@@ -122,6 +114,7 @@ class ChatGPTScene(AbstractScene):
 
         return messages
 
+    # noinspection PyMethodMayBeStatic
     def get_vbml(self, message, author) -> Rows:
         props = {
             "message": message,
