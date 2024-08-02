@@ -26,6 +26,7 @@ The runner is a container with one python application which is triggering the ht
 - Space Launch Alerts => Display when a SpaceX liftoff happens
 - improve chatgpt quote format
 - runner should just trigger /execute when api is initialized
+- optimize init-snapshots performance
 
 ## Cheat Sheet
 ### Debugging / deploy tips:
