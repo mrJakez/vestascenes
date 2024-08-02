@@ -42,13 +42,21 @@ class ChatGPTScene(AbstractScene):
             messages=formatted_messages
         )
 
-        message = RawHelper.replace_umlaute(completion.choices[0].message.content)
-        message = RawHelper.replace_characters_with_codes(message)  # otherwise ' will be replaced with "&#39;"
+        message = completion.choices[0].message.content
 
         if question_model.author == "replace_twohashmarks":
             orig_message = message.split("##")
             message = orig_message[0]
             question_model.author = orig_message[1]
+
+        if message.startswith("„") or  message.startswith("\""):
+            message = message[1:]
+
+        if message.endswith("“") or  message.endswith("\""):
+            message = message[:-1]
+
+        message = RawHelper.replace_umlaute(message)
+        message = RawHelper.replace_characters_with_codes(message)  # otherwise ' will be replaced with "&#39;"
 
         answer_model = ChatGPTHistoryModel(role="assistant", content=message, author=question_model.author)
         Repository().save_chatgpt_history(answer_model)
@@ -116,27 +124,29 @@ class ChatGPTScene(AbstractScene):
 
     # noinspection PyMethodMayBeStatic
     def get_vbml(self, message, author) -> Rows:
+        leftmargin = 0
+        if len(message) < 40:
+            leftmargin = 2
+        elif len(message) < 70:
+            leftmargin = 1
+
         props = {
             "message": message,
             "author": author,
         }
 
-        message_component = Component(
-            template="{{message}}",
+        component = Component(
+            template="{{message}}\n-{{author}}",
+            width=(22 - leftmargin * 2),
+            height=6,
             justify="left",
             align="center",
-            height=5,
-            width=22
-        )
-
-        author_component = Component(
-            template="{{author}}",
-            justify="right",
-            align="top",
-            height=1,
-            width=22
+            absolute_position={
+                "x": leftmargin,
+                "y": 0
+            }
         )
 
         vbml_client = vesta.VBMLClient()
-        chars = vbml_client.compose([message_component, author_component], props)
+        chars = vbml_client.compose([component], props)
         return chars
