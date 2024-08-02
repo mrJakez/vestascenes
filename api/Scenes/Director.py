@@ -42,11 +42,11 @@ class Director:
             print("Director: found a TIMED scene")
             return returns[0]
         else:
-            artwork_scene = random.choice(self.__all_scenes(SceneType.ARTWORK))
+            artwork_scene = random.choice(self.__all_scenes(SceneType.ARTWORK, weighted=True))
             return artwork_scene.execute(self.vboard)
 
     # noinspection PyMethodMayBeStatic
-    def __all_scenes(self, scene_type=None) -> List[AbstractScene]:
+    def __all_scenes(self, scene_type=None, weighted=False) -> List[AbstractScene]:
 
         scenes = []  # empty array
 
@@ -58,6 +58,14 @@ class Director:
         if scene_type is None or scene_type is SceneType.ARTWORK:
             scenes.append(SnapshotScene())
             scenes.append(ChatGPTScene())
+
+        if weighted is True:
+            weighted_scenes = []
+            for scene in scenes:
+                for num in range(0, scene.weight):
+                    weighted_scenes.append(scene)
+
+            scenes = weighted_scenes
 
         return scenes
 

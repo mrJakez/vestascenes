@@ -57,6 +57,9 @@ class AbstractScene:
     # default priority. Steers the order of scenes
     priority: int = 100
 
+    # used for artwork scenes. With the weight property specific artwork scenes can dominate others.
+    weight: int = 1
+
     def execute(self, vboard) -> SceneExecuteReturn:
         raise Exception(f"Sorry, execute() not implemented within class {self.__class__.__name__}")
 

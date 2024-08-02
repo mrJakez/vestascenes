@@ -7,6 +7,7 @@ from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 
 
 class SnapshotScene(AbstractScene):
+    weight = 3
 
     def execute(self, vboard) -> SceneExecuteReturn:
 
