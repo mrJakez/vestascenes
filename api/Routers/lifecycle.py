@@ -2,6 +2,7 @@ import os
 
 from fastapi import APIRouter
 from sqlmodel import Session, delete
+from starlette.responses import RedirectResponse
 
 from Helper.ConfigHelper import ConfigHelper
 from Models.SceneInstanceModel import SceneInstanceModel
@@ -75,3 +76,9 @@ async def reset_instances():
 async def enable_status(status):
     ConfigHelper.set_disabled(status)
     return {"message": f"set to {status}"}
+
+
+@router.get("/refresh", tags=["lifecycle"])
+async def refresh():
+    Repository().unmark_active_scene_instance()
+    return RedirectResponse("/execute")
