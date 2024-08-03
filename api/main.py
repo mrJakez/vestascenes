@@ -1,7 +1,9 @@
 import sys
 import os
 import time
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from Helper.ConfigHelper import ConfigHelper
 
 # this is required to work within the docker container
 sys.path.append('/app/api/')
@@ -27,6 +29,15 @@ requests, Strava-Stats and some other random content generating scenes.
 app = FastAPI(
     title="vestaboard-control",
     description=description)
+
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    if ConfigHelper.get_vboard_read_write_key() is None:
+        return JSONResponse(content={"message": "Missing your vestaboard API key. Please create a settings.ini file within the /config directory"})
+    else:
+        response = await call_next(request)
+        return response
 
 
 app.include_router(strava.router)

@@ -6,13 +6,14 @@ import Scenes.BirthdayScene
 import Scenes.StravaLastActivityScene
 import Scenes.Director
 from Helper.ConfigHelper import ConfigHelper
-from Helper.VboardHelper import  VboardHelper
+from Helper.VboardHelper import VboardHelper
 import importlib
 
 import subprocess
 
 router = APIRouter()
 vboard = VboardHelper().get_client()
+
 
 @router.get("/", tags=["developer support"])
 async def root_path():

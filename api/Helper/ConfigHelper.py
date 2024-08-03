@@ -26,7 +26,12 @@ class ConfigHelper:
     @classmethod
     def get_vboard_read_write_key(cls):
         config = get_config()
-        return config['main']['vboard_read_write_key']
+        key = config['main']['vboard_read_write_key']
+
+        if key is None or len(key) == 0:
+            return None
+
+        return key
 
     @classmethod
     def set_disabled(cls, new_status: bool):

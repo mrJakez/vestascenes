@@ -24,8 +24,7 @@ The runner is a container with one python application which is triggering the ht
 
 ### TODOS
 - Space Launch Alerts => Display when a SpaceX liftoff happens
-- improve chatgpt quote format
-- runner should just trigger /execute when api is initialized
+- add blacklist for birthday entries used in birthday scene
 - optimize init-snapshots performance
 - add hints towards the status service to guide users to configure the service properly 
 - https://itskmyoo.medium.com/automating-fastapi-project-build-with-github-actions-and-push-to-dockerhub-b4c6df319b2a
