@@ -48,8 +48,14 @@ async def execute():
         else:
             # noinspection PyUnboundLocalVariable
             return {
-                "identifier": current.id,
-                "scene": current.class_string,
+                "current": {
+                    "identifier": current.id,
+                    "scene": current.class_string,
+                },
+                "candidate": {
+                    "class": candidate.scene_object.__class__.__name__,
+                    "message": candidate.message
+                },
                 "message": f"candidate has lower or equal priority than current -> keep current (seconds left:{int((end_date - now).total_seconds())})",
                 "end_date": end_date
             }
