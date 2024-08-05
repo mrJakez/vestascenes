@@ -106,7 +106,7 @@ class WasteCalendarScene(AbstractScene):
         vbml_client = vesta.VBMLClient()
         chars = vbml_client.compose(all_components)
 
-        start_date = datetime.datetime.now().replace(hour=15, minute=0, second=0, microsecond=0)
+        start_date = datetime.datetime.now().replace(hour=15, minute=0, second=0, microsecond=1)
         end_date = start_date + datetime.timedelta(hours=6)  # starts 15:00. will be present till 21:00
 
         return SceneExecuteReturn(identifier, True, self.priority, self, start_date, end_date, f"{message}", chars)
