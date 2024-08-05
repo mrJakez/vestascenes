@@ -1,8 +1,9 @@
 import os
+import json
+from fastapi import APIRouter, Request
+from fastapi.testclient import TestClient
 
-from fastapi import APIRouter
 from sqlmodel import Session, delete
-from starlette.responses import RedirectResponse
 
 from Helper.ConfigHelper import ConfigHelper
 from Models.SceneInstanceModel import SceneInstanceModel
@@ -79,6 +80,9 @@ async def enable_status(status):
 
 
 @router.get("/refresh", tags=["lifecycle"])
-async def refresh():
+async def refresh(request: Request):
     Repository().unmark_active_scene_instance()
-    return RedirectResponse("/execute")
+
+    client = TestClient(request.app)
+    response = client.get("/execute?ignore_operation_hour=true")
+    return json.loads(response.text)

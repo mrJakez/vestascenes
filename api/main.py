@@ -8,11 +8,11 @@ from Helper.ConfigHelper import ConfigHelper
 # this is required to work within the docker container
 sys.path.append('/app/api/')
 
-# noinspection PyPep8
-from Routers import strava, developer, lifecycle, snapshots, execute
-
 os.environ['TZ'] = 'Europe/Berlin'
 time.tzset()
+
+# noinspection PyPep8
+from Routers import strava, developer, lifecycle, snapshots, execute
 
 description = """
 This is a vestaboard server implementation which organizes the vestaboard related content within scenes. 🚀

@@ -2,6 +2,7 @@ from datetime import datetime
 
 import vesta
 from fastapi import APIRouter
+from httpx import HTTPStatusError
 
 from Helper.ConfigHelper import ConfigHelper
 from Helper.VboardHelper import VboardHelper
@@ -18,14 +19,14 @@ vboard = VboardHelper().get_client()
             description="This service is the real worker process. It determines the next candidate and"
                         "validates the current state. If a higher priority is given by the candidate scene the vestabaord "
                         "will be updated. Gets executed all 15 min. by dedicated runner container.")
-async def execute():
+async def execute(ignore_operation_hour:bool = False):
     if ConfigHelper.is_disabled() is True:
         return {"message": "disabled"}
 
     now = datetime.now()
 
     operation_hour_error = ConfigHelper.is_in_operation_hours(now)
-    if operation_hour_error is not None:
+    if ignore_operation_hour is False and operation_hour_error is not None:
         return operation_hour_error
 
     candidate: SceneExecuteReturn = Director(vboard).get_next_scene()
@@ -34,13 +35,13 @@ async def execute():
 
     # debug
     if current is not None:
-        end_date = datetime.strptime(current.end_date, "%Y-%m-%d %H:%M:%S.%f")
+        end_date = current.get_end_date()
         print(f"now: {now} - end date: {end_date} (Difference: {(end_date - now).total_seconds()})")
     # -
 
     if current is None:
         print("current is none -> candidate will be executed")
-    elif datetime.strptime(current.end_date, "%Y-%m-%d %H:%M:%S.%f") >= now:
+    elif current.get_end_date() >= now:
         print(f"current ({current.class_string}) is still valid (end_date not reached yet)")
         if candidate.priority > current.priority:
             print("candidate has higher priority than current. Current will be replaced")
@@ -60,7 +61,7 @@ async def execute():
                 "end_date": end_date
             }
 
-    elif datetime.strptime(current.end_date, "%Y-%m-%d %H:%M:%S.%f") < now:
+    elif current.get_end_date() < now:
         print("current is not valid any longer - is_active will be set to false")
         Repository().unmark_active_scene_instance()
 
@@ -77,6 +78,9 @@ async def execute():
         # print("lala")
     except TypeError as exc:
         print(f"HTTP Exception catched {exc}")
+    except HTTPStatusError as exc:
+        if exc.response.status_code == 304:
+            print("Exception: currently displayed message is the same than new one")
 
     model = SceneInstanceModel(scene=candidate)
     Repository().save_scene_instance(model)

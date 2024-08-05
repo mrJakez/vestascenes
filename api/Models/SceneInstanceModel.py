@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import List, Any
 
 from sqlmodel import Field, SQLModel
@@ -32,3 +33,15 @@ class SceneInstanceModel(SQLModel, table=True):
 
     def get_raw_list(self) -> List:
         return RawHelper.get_raw_object(self.raw)
+
+    def get_end_date(self) -> datetime:
+        try:
+            real_date = datetime.strptime(self.end_date, "%Y-%m-%d %H:%M:%S.%f")
+            return real_date
+        except ValueError as e:
+            try:
+                real_date2 = datetime.strptime(self.end_date, "%Y-%m-%d %H:%M:%S")
+                return real_date2
+            except ValueError as e:
+                print(f"can't create datetime from date string!! {e}")
+                return None
