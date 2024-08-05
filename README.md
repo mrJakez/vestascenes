@@ -24,10 +24,13 @@ The runner is a container with one python application which is triggering the ht
 
 ### TODOS
 - Space Launch Alerts => Display when a SpaceX liftoff happens
+- Create scene which shows a countdown towards fusion or other nice events like vacations etc.
 - add blacklist for birthday entries used in birthday scene
 - optimize init-snapshots performance
 - add hints towards the status service to guide users to configure the service properly 
 - https://itskmyoo.medium.com/automating-fastapi-project-build-with-github-actions-and-push-to-dockerhub-b4c6df319b2a
+- https://storybook.vestaboard.com/?path=/docs/docs--docs I'd start with npm create vite - answer the questions regarding stack and frameworks and you have a great modern dev server setup for you already with build scripts and some demo content
+as for docker - you can either mount the built files npm run build into nginx directly (recommended) or play around with base node container (docker init ) and run npm run serve as entrypoint 
 
 ## Cheat Sheet
 ### Debugging / deploy tips:
