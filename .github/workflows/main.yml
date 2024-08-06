@@ -24,7 +24,7 @@ jobs:
         docker buildx create --use
         docker buildx build \
           --file Dockerfile \
-          --tag mrJakez/vestaboardControl:latest \
+          --tag jakez/vestascenes-api:latest \
           --push .
 
     env:
