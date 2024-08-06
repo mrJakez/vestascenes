@@ -1,0 +1,32 @@
+services:
+  api:
+    image: jakez/vestascenes-api:latest
+    environment:
+      # required to directly print() towards stdout - activates flush always
+      PYTHONUNBUFFERED: 1
+    # flask requires SIGINT to stop gracefully
+    # (default stop signal from Compose is SIGTERM)
+    stop_signal: SIGINT
+    expose:
+      - 8000
+    ports:
+      #extern:intern
+      - '8000:8000'
+    volumes:
+      - ./database:/database
+      - ./config:/config
+
+  runner:
+    image: jakez/vestascenes-runner:latest
+    depends_on:
+      - api
+    links:
+      - api
+    environment:
+      # required to directly print() towards stdout - activates flush always
+      PYTHONUNBUFFERED: 1
+    restart: on-failure
+
+networks:
+  default:
+    driver: bridge
