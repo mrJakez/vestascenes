@@ -8,7 +8,7 @@ on:
 jobs:
   build-api:
     runs-on: ubuntu-latest
-    if: "! contains(github.event.head_commit.message, 'release me')"
+    if: "contains(github.event.head_commit.message, 'release me')"
 
     steps:
     - name: Checkout code
