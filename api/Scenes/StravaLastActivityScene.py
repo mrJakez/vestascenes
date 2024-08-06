@@ -53,7 +53,7 @@ class StravaLastActivityScene(AbstractScene):
             f"{last_activity.id} - {last_activity.name} - {last_activity.type} - {last_activity.start_date} - {last_activity.start_date_local}")
 
         activity_end_date = last_activity.start_date_local + timedelta(seconds=last_activity.elapsed_time.seconds)
-        if ((datetime.now() - timedelta(hours=4)) < activity_end_date) is False:
+        if ((datetime.now() - timedelta(hours=9)) < activity_end_date) is False:
             self.store_last_executed(datetime.now())
             msg = f"last strava activity '{last_activity.name}' is to old (start_date: {last_activity.start_date_local})"
             return SceneExecuteReturn.error(self, msg)
