@@ -23,6 +23,7 @@ The runner is a container with one python application which is triggering the ht
 
 ### TODOS
 - Space Launch Alerts => Display when a SpaceX liftoff happens
+- add weekday towards waste calendar scene
 - Create scene which shows a countdown towards fusion or other nice events like vacations etc.
 - add blacklist for birthday entries used in birthday scene
 - add multiple birthday graphics
