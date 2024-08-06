@@ -21,7 +21,6 @@ Contain the business logic of vesta-control.
 The runner is a container with one python application which is triggering the http://api/execute endpoint every 15 seconds. Thanks to this the application logic resists within the api container and is triggered periodically within the given interval.
 
 
-
 ### TODOS
 - Space Launch Alerts => Display when a SpaceX liftoff happens
 - Create scene which shows a countdown towards fusion or other nice events like vacations etc.
