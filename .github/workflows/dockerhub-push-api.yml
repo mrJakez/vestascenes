@@ -1,4 +1,4 @@
-name: FastAPI Docker Build and Push
+name: Create all relevant containers (API+runner) and pushes them to docker.hub
 
 on:
   push:
@@ -6,8 +6,9 @@ on:
       - main
 
 jobs:
-  build:
+  build-api:
     runs-on: ubuntu-latest
+    if: "! contains(github.event.head_commit.message, 'release me')"
 
     steps:
     - name: Checkout code
