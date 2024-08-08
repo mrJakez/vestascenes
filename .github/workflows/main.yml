@@ -2,8 +2,9 @@ name: Env setting and getting tests
 on: push
 
 env:
-  secret: "initial_value"
-
+  secret: "initial_valuefoo"
+  sha_short: $(git rev-parse --short "$GITHUB_SHA")"
+  
 jobs:
   set-vars:
     runs-on: ubuntu-latest
