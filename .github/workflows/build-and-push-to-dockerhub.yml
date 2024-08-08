@@ -12,6 +12,7 @@ jobs:
       sha_short: ${{ steps.writestep.outputs.sha_short }}
       foo: ${{ steps.writestep.outputs.foo }}
     steps:
+      - uses: actions/checkout@v1
       - id: writestep
         name: Set enviroment
         shell: bash
