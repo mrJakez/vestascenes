@@ -9,15 +9,16 @@ jobs:
   set-vars:
     runs-on: ubuntu-latest
     outputs:
-      sha_short: ${{ steps.write-step.outputs.sha_short }}
-      foo: ${{ steps.write-step.outputs.foo }}
+      sha_short: ${{ steps.writestep.outputs.sha_short }}
+      foo: ${{ steps.writestep.outputs.foo }}
     steps:
-      - id: write-step
+      - id: writestep
       - name: Set enviroment
         shell: bash
         run: |
           echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
           echo "foo=bar" >> "$GITHUB_OUTPUT"
+      - id: readstep
       - name: Read enviroment
         shell: bash
         run: |
