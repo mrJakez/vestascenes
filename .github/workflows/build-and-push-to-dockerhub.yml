@@ -40,7 +40,8 @@ jobs:
     - name: Build and push Docker image
       run: |
         cd api
-        echo "hurra ${{ env.secret }}" > "git-version.txt"
+        echo "da ist er ${{ env.sha_short }}"
+        echo "hurra ${{ env.sha_short }}" > "git-version.txt"
         docker buildx create --use
         docker buildx build \
           --file Dockerfile \
