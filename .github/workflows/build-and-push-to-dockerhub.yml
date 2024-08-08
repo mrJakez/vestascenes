@@ -32,6 +32,7 @@ jobs:
           mysha: "${{ env.sha_short }}"
         shell: bash
         run: |
+          env
           echo "sha: ${{ env.mysha }}"
           echo "sha: ${{ env }}"
           
