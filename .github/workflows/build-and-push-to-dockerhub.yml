@@ -6,6 +6,23 @@ on:
       - main
 
 jobs:
+  set-vars:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set enviroment
+        shell: bash
+        run: |
+          echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
+          echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> "$GITHUB_ENV"
+          echo "secret=second_value" >> "$GITHUB_ENV"
+      - name: Read enviroment
+        shell: bash
+        run: |
+          echo "BRANCH: ${{ env.branch }}"
+          echo "SHA_SHORT: ${{ env.sha_short }}"
+          echo "secret: ${{ env.secret }}"
+          
   build-api:
     runs-on: ubuntu-latest
     if: "contains(github.event.head_commit.message, 'release me')"
@@ -23,6 +40,7 @@ jobs:
     - name: Build and push Docker image
       run: |
         cd api
+        echo "hurra ${{ env.secret }}" > "$destdir"
         docker buildx create --use
         docker buildx build \
           --file Dockerfile \
