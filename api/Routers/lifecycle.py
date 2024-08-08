@@ -1,5 +1,7 @@
 import os
 import json
+import time
+
 from fastapi import APIRouter, Request
 from fastapi.testclient import TestClient
 
@@ -36,9 +38,13 @@ async def init_snapshots():
     directory = os.fsencode("Initial-snapshots/")
     added_screenshots_count = 0
 
+    start_time = time.time()
+
     for file in os.listdir(directory):
         filename = os.fsdecode(file)
-        print(filename)
+
+        print(f"file.{filename}: {time.time() - start_time}")
+
         if filename.endswith(".raw"):
             file = open(f"Initial-snapshots/{filename}", 'r')
             lines = file.readlines()
@@ -57,10 +63,10 @@ async def init_snapshots():
 
                 snapshot = SnapshotModel(title=title, raw=raw)
                 if Repository().store_snapshot(snapshot):
+                    print(f"snapshot {title} addded: {time.time() - start_time}")
                     added_screenshots_count += 1
 
-                print(f"title: {title}, raw: {raw}")
-
+    print(f"total time: {time.time() - start_time}")
     return {"status": f"added {added_screenshots_count} snapshots"}
 
 
