@@ -23,8 +23,20 @@ jobs:
           echo "SHA_SHORT: ${{ env.sha_short }}"
           echo "secret: ${{ env.secret }}"
           
+read-vars-on-another-job:
+    runs-on: ubuntu-latest
+    needs: set-vars
+    steps:
+      - name: Read enviroment on another job with "env"
+        env:
+          SECRET: "${{ env.secret }}"
+        shell: bash
+        run: |
+          echo "secret: ${{ env.sha_short }} will be 'initial_value'"
+          
   build-api:
     runs-on: ubuntu-latest
+    needs: set-vars
     if: "contains(github.event.head_commit.message, 'release me')"
 
     steps:
