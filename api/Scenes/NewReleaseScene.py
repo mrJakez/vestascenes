@@ -44,7 +44,7 @@ class NewReleaseScene(AbstractScene):
 
         start_date = datetime.datetime.now()
         end_date = start_date + datetime.timedelta(minutes=5)
-        message = f"new version {current_hash} installed"
+        message = f"new version #{current_hash} installed"
         chars = vesta.encode_text(message, align="center", valign="middle")
 
         return SceneExecuteReturn(f"{self.__class__.__name__}_{current_hash}", True, self.priority, self,

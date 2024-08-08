@@ -46,7 +46,7 @@ class ConfigHelper:
 
     @classmethod
     def get_git_hash(cls) -> string:
-        git_hash = Path("git-version.txt").read_text()
+        git_hash = Path("git-version.txt").read_text().strip()
         return git_hash
 
 
