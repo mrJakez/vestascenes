@@ -13,13 +13,13 @@ jobs:
       foo: ${{ steps.writestep.outputs.foo }}
     steps:
       - id: writestep
-      - name: Set enviroment
+        name: Set enviroment
         shell: bash
         run: |
           echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
           echo "foo=bar" >> "$GITHUB_OUTPUT"
       - id: readstep
-      - name: Read enviroment
+        name: Read enviroment
         shell: bash
         run: |
           echo "BRANCH: ${{ env.branch }}"
