@@ -27,12 +27,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: set-vars
     steps:
-      - name: Read enviroment on another job with "env"
+      - name: Sample task to read vars
         env:
-          sha_short: "${{ env.sha_short }}"
+          mysha: "${{ env.sha_short }}"
         shell: bash
         run: |
-          echo "sha: ${{ env.sha_short }}"
+          echo "sha: ${{ env.mysha }}"
+          echo "sha: ${{ env }}"
           
   build-api:
     runs-on: ubuntu-latest
@@ -62,6 +63,7 @@ jobs:
 
   build-runner:
     runs-on: ubuntu-latest
+    needs: set-vars
     if: "contains(github.event.head_commit.message, 'release me')"
 
     steps:
