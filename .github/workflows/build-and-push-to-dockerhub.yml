@@ -19,9 +19,11 @@ jobs:
       - name: Read enviroment
         shell: bash
         run: |
+          echo "foobar=massupilami" >> "$GITHUB_ENV"
           echo "BRANCH: ${{ env.branch }}"
           echo "SHA_SHORT: ${{ env.sha_short }}"
           echo "secret: ${{ env.secret }}"
+          echo "foobar: ${{ env.foobar }}"
           
   read-vars-on-another-job:
     runs-on: ubuntu-latest
@@ -33,6 +35,7 @@ jobs:
         shell: bash
         run: |
           env
+          echo "foobar: ${{ env.foobar }}"
           echo "sha: ${{ env.mysha }}"
           echo "sha: ${{ env }}"
           
