@@ -29,6 +29,8 @@ jobs:
       - name: Read enviroment on another job with "env"
         env:
           SECRET: "${{ env.secret }}"
+          SHA_SHORT: "${{ env.sha_short }}"
         shell: bash
         run: |
-          echo "secret: ${{ env.SECRET }} will be 'initial_value'"
+          env
+          echo "secret: ${{ env.SECRET }} ${{ env.SHA_SHORT }} will be 'initial_value'"
