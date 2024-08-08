@@ -10,25 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       sha_short: ${{ steps.writestep.outputs.sha_short }}
-      foo: ${{ steps.writestep.outputs.foo }}
     steps:
       - uses: actions/checkout@v1
       - id: writestep
         name: Set enviroment
         shell: bash
         run: |
-          echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
-          echo "sha_short=HAHA$(git rev-parse --short "$GITHUB_SHA") --  $(GITHUB_SHA::7)" >> "$GITHUB_OUTPUT"
-          echo "foo=bar" >> "$GITHUB_OUTPUT"
-
-      - id: readstep
-        name: Read enviroment
-        shell: bash
-        run: |
-          echo "BRANCH: ${{ env.branch }}"
-          echo "SHA_SHORT: ${{ env.sha_short }}"
-          echo "secret: ${{ env.secret }}"
-          echo "foobar: ${{ env.foobar }}"
+          echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
           
   read-vars-on-another-job:
     runs-on: ubuntu-latest
@@ -37,14 +25,9 @@ jobs:
       - name: Sample task to read vars
         env:
           sha_short: ${{needs.set-vars.outputs.sha_short}}
-          foo: ${{needs.set-vars.outputs.foo}}
         shell: bash
         run: |
-          echo "$sha_short $foo"
-          echo "foobar: ${{ env.foobar }}"
-          echo "sha: ${{ env.mysha }}"
-          echo "sha: ${{ env }}"
-          env
+          echo "sha short: $sha_short"
           
   build-api:
     runs-on: ubuntu-latest
