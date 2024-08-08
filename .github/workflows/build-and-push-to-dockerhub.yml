@@ -23,7 +23,7 @@ jobs:
           echo "SHA_SHORT: ${{ env.sha_short }}"
           echo "secret: ${{ env.secret }}"
           
-read-vars-on-another-job:
+  read-vars-on-another-job:
     runs-on: ubuntu-latest
     needs: set-vars
     steps:
