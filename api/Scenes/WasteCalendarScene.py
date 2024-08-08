@@ -126,7 +126,7 @@ class WasteCalendarScene(AbstractScene):
             justify="left",
             align="top",
             height=1,
-            width=12
+            width=6
         )
 
         date_component = Component(
@@ -134,6 +134,6 @@ class WasteCalendarScene(AbstractScene):
             justify="left",
             align="top",
             height=1,
-            width=8
+            width=12
         )
         return [icon_component, label_component, date_component]
