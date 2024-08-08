@@ -13,7 +13,6 @@ jobs:
       foo: ${{ steps.write-step.outputs.foo }}
     steps:
       - id: write-step
-      - uses: actions/checkout@v1
       - name: Set enviroment
         shell: bash
         run: |
