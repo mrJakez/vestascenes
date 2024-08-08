@@ -58,8 +58,6 @@ async def priorities():
 @router.get("/status", tags=["developer support"])
 async def priorities():
 
-    git_hash = Path("git-version.txt").read_text()
-
     vboard_initialized = False
     if VboardHelper().get_client() is not None:
         vboard_initialized = True
@@ -67,7 +65,7 @@ async def priorities():
     return {
         "version-check": 18,
         "enabled": (not ConfigHelper.is_disabled()),
-        "git-hash": git_hash,
+        "git-hash": ConfigHelper.get_git_hash(),
         "strava-initialized": Scenes.StravaLastActivityScene.StravaLastActivityScene.is_initialized(),
         "vboard-initialized": vboard_initialized
     }

@@ -7,6 +7,7 @@ from vesta import ReadWriteClient
 from Scenes.AbstractScene import AbstractScene, SceneType, SceneExecuteReturn
 from Scenes.BirthdayScene import BirthdayScene
 from Scenes.ChatGPTScene import ChatGPTScene
+from Scenes.NewReleaseScene import NewReleaseScene
 from Scenes.SnapshotScene import SnapshotScene
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
@@ -51,6 +52,7 @@ class Director:
         scenes = []  # empty array
 
         if scene_type is None or scene_type is SceneType.TIMED:
+            scenes.append(NewReleaseScene())
             scenes.append(WasteCalendarScene())
             scenes.append(StravaLastActivityScene())
             scenes.append(BirthdayScene())

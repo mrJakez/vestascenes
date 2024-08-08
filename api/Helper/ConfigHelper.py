@@ -1,5 +1,7 @@
 import configparser
+import string
 from datetime import datetime
+from pathlib import Path
 from typing import Union
 
 
@@ -41,6 +43,11 @@ class ConfigHelper:
 
         with open('settings.ini', 'w') as configfile:
             config.write(configfile)
+
+    @classmethod
+    def get_git_hash(cls) -> string:
+        git_hash = Path("git-version.txt").read_text()
+        return git_hash
 
 
 def str2bool(v):
