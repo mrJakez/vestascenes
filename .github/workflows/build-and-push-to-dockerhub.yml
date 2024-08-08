@@ -32,7 +32,7 @@ jobs:
           sha_short: "${{ env.sha_short }}"
         shell: bash
         run: |
-          echo "secret: ${{ env.sha_short }} will be 'initial_value'"
+          echo "sha: ${{ env.sha_short }}"
           
   build-api:
     runs-on: ubuntu-latest
