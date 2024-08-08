@@ -1,6 +1,7 @@
 import vesta
 from fastapi import APIRouter
 from starlette.responses import RedirectResponse
+from pathlib import Path
 
 import Scenes.BirthdayScene
 import Scenes.StravaLastActivityScene
@@ -56,11 +57,8 @@ async def priorities():
 
 @router.get("/status", tags=["developer support"])
 async def priorities():
-    git_hash = '-'
-    try:
-        git_hash = subprocess.check_output(["git", "describe", "--always"]).strip().decode()
-    except Exception as e:
-        print(f"error {e}")
+
+    git_hash = Path("git-version.txt").read_text()
 
     vboard_initialized = False
     if VboardHelper().get_client() is not None:
