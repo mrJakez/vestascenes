@@ -8,15 +8,17 @@ on:
 jobs:
   set-vars:
     runs-on: ubuntu-latest
+    outputs:
+      sha_short: ${{ steps.write-step.outputs.sha_short }}
+      foo: ${{ steps.write-step.outputs.foo }}
     steps:
+      - id: write-step
       - uses: actions/checkout@v1
       - name: Set enviroment
         shell: bash
         run: |
-          echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
-          echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> "$GITHUB_ENV"
-          echo "secret=second_value" >> "$GITHUB_ENV"
-          echo "foobar=massupilami" >> "$GITHUB_ENV"
+          echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
+          echo "foo=bar" >> "$GITHUB_OUTPUT"
       - name: Read enviroment
         shell: bash
         run: |
@@ -31,13 +33,15 @@ jobs:
     steps:
       - name: Sample task to read vars
         env:
-          mysha: "${{ env.sha_short }}"
+          sha_short: ${{needs.set-vars.outputs.sha_short}}
+          foo: ${{needs.set-vars.outputs.foo}}
         shell: bash
         run: |
-          env
+          echo "$sha_short $foo"
           echo "foobar: ${{ env.foobar }}"
           echo "sha: ${{ env.mysha }}"
           echo "sha: ${{ env }}"
+          env
           
   build-api:
     runs-on: ubuntu-latest
