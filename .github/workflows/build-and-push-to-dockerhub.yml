@@ -16,7 +16,7 @@ jobs:
         name: Set enviroment
         shell: bash
         run: |
-          echo "sha_short=HAHA$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
+          echo "sha_short=HAHA${git rev-parse --short "$GITHUB_SHA"} --  ${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
           echo "foo=bar" >> "$GITHUB_OUTPUT"
       - id: readstep
         name: Read enviroment
