@@ -23,7 +23,7 @@ def store_git_hash(git_hash: str):
         config.add_section('NewReleaseScene')
 
     config['NewReleaseScene']['stored-hash'] = git_hash
-    with open('settings.ini', 'w') as configfile:
+    with open('/config/settings.ini', 'w') as configfile:
         config.write(configfile)
 
 
