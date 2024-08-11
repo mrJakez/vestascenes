@@ -39,7 +39,7 @@ class ConfigHelper:
         config = get_config()
         config['main']['disabled'] = str(new_status)
 
-        with open('settings.ini', 'w') as configfile:
+        with open('/config/settings.ini', 'w') as configfile:
             config.write(configfile)
 
 
