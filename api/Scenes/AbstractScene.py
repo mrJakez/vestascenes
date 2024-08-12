@@ -1,10 +1,13 @@
+import configparser
 from datetime import datetime, timedelta
 import string
 import uuid
 from enum import Enum
-from typing import Optional
+from typing import Optional, Dict
 
 import vesta
+
+from Helper.ConfigHelper import ConfigHelper, get_config
 
 
 # SceneType specifies if the scene is something which is time relative or just a "random" artwork
@@ -74,6 +77,35 @@ class AbstractScene:
         end_date = start_date + timedelta(minutes=60)
         end_date = end_date.replace(minute=0, second=0, microsecond=1)
         return end_date
+
+    def get_config(self, key: str = None) -> Dict[str, str]:
+        config = configparser.ConfigParser()
+        config.read(['/config/settings.ini'])
+
+        if config.has_section(self.__class__.__name__) is False:
+            if key is None:
+                return {}
+            else:
+                return None
+
+        if key is None:
+            return config[self.__class__.__name__]
+        elif key in config[self.__class__.__name__]:
+            return config[self.__class__.__name__][key]
+        else:
+            return None
+
+    def save_config(self, new_config: Dict[str, str]):
+        config = configparser.ConfigParser()
+        config.read(['/config/settings.ini'])
+
+        if config.has_section(self.__class__.__name__) is False:
+            config.add_section(self.__class__.__name__)
+
+        config[self.__class__.__name__] = new_config
+
+        with open('/config/settings.ini', 'w') as configfile:
+            config.write(configfile)
 
 
 class DemoScene(AbstractScene):
