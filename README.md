@@ -1,4 +1,4 @@
-## vesta-control 🚀
+## vestascenes 🚀
 
 This is a vestaboard server implementation which organizes the vestaboard (http://vestaboard.com) related content within scenes.
 
@@ -23,8 +23,9 @@ The runner is a container with one python application which is triggering the ht
 
 ### TODOS
 - Space Launch Alerts => Display when a SpaceX liftoff happens
+- add mermaid diagram which describes how vestascenes works
+- when a high priority scene is overruling an existing one (based on higher priority), the old one will afterwards not be displayed again. Instead a new scene is generated
 - Create scene which shows a countdown towards fusion or other nice events like vacations etc.
-- add blacklist for birthday entries used in birthday scene
 - add multiple birthday graphics
 - optimize init-snapshots performance
 - add hints towards the status service to guide users to configure the service properly

@@ -78,7 +78,7 @@ class AbstractScene:
         end_date = end_date.replace(minute=0, second=0, microsecond=1)
         return end_date
 
-    def get_config(self, key: str = None) -> Dict[str, str]:
+    def get_config(self, key: str = None):
         config = configparser.ConfigParser()
         config.read(['/config/settings.ini'])
 

@@ -4,6 +4,8 @@ import uuid
 import os.path
 import vesta
 from icalendar import Calendar
+
+from Helper.RawHelper import RawHelper
 from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 from vesta.vbml import Component
 
@@ -20,7 +22,7 @@ class BirthdayEntry:
         summary = component.get('summary')
 
         self.birthdate = birthdate
-        self.person = summary
+        self.person = RawHelper.replace_umlaute(summary)
 
     def get_days_till_birthday_this_year(self):
         birthdate_in_current_year = self.birthdate.replace(year=self.today.year)
@@ -41,6 +43,12 @@ class BirthdayEntry:
 class BirthdayScene(AbstractScene):
     priority: int = 130
 
+    def get_blacklist(self):
+        string_list = self.get_config('blacklist')
+        arr = string_list.split(',')
+        stripped = list(map(str.strip, arr))
+        return stripped
+
     def execute(self, vboard) -> SceneExecuteReturn:
         if not os.path.isfile("/config/birthdays.ics"):
             return SceneExecuteReturn.error(self, "/config/birthdays.ics does not exist")
@@ -52,6 +60,8 @@ class BirthdayScene(AbstractScene):
         # today = datetime.date.today().replace(month=7, day=21)
         # 22.2 => two person,  4.3 => three person, 3.2 => four person
 
+        blacklist = self.get_blacklist()
+        all_entries = ""
         message = []
         entries = []
         for component in gcal.walk():
@@ -59,6 +69,9 @@ class BirthdayScene(AbstractScene):
                 continue
 
             entry = BirthdayEntry(component, today)
+
+            if entry.person in blacklist:
+                continue
 
             if entry.get_days_till_birthday_this_year() < 0:
                 # birthday was already within the current year
