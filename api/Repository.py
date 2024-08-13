@@ -1,4 +1,5 @@
 import typing
+from datetime import datetime
 
 from sqlalchemy import Engine
 from sqlmodel import Session, SQLModel, create_engine, select
@@ -124,6 +125,18 @@ class Repository(metaclass=SingletonMeta):
             for model in results:
                 return model
 
+    def get_suppressed_scene_instance(self) -> typing.Optional[SceneInstanceModel]:
+        with Session(self.get_engine()) as session:
+            # noinspection PyPep8
+            statement = select(SceneInstanceModel).where(SceneInstanceModel.end_date > datetime.now()).where(SceneInstanceModel.is_active == False)
+            results = session.exec(statement).all()
+            count = len(results)
+
+            if count == 0:
+                return None
+            else:
+                return results[0]
+
     def unmark_active_scene_instance(self):
         with Session(self.get_engine()) as session:
             # noinspection PyPep8
@@ -135,3 +148,10 @@ class Repository(metaclass=SingletonMeta):
                 session.add(model)
                 session.commit()
                 session.refresh(model)
+
+    def mark_scene_instance_as_active(self, model: SceneInstanceModel):
+        with Session(self.get_engine()) as session:
+            model.is_active = True
+            session.add(model)
+            session.commit()
+            session.refresh(model)

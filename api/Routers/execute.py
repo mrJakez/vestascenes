@@ -62,8 +62,26 @@ async def execute(ignore_operation_hour:bool = False):
             }
 
     elif current.get_end_date() < now:
+
+        suppressed_scene_instance = Repository().get_suppressed_scene_instance()
         print("current is not valid any longer - is_active will be set to false")
         Repository().unmark_active_scene_instance()
+
+        # check if there is an old entry in the scene instances which is still valid but which was overruled by something with a higher priority.
+
+        if suppressed_scene_instance is not None:
+            Repository().mark_scene_instance_as_active(suppressed_scene_instance)
+            await vboard_print(suppressed_scene_instance.get_raw_list())
+            print("restore existing scene instance!")
+            return {
+                "identifier": suppressed_scene_instance.id,
+                "scene": suppressed_scene_instance.class_string,
+                "message": "replaced existing candidate",
+                "start_date": suppressed_scene_instance.start_date,
+                "end_date": suppressed_scene_instance.end_date
+            }
+
+
 
     post_execution_candidate = candidate.scene_object.post_execute(vboard)
     if post_execution_candidate is not None:
@@ -73,14 +91,7 @@ async def execute(ignore_operation_hour:bool = False):
     print(f"candidate.message: {candidate.message} - {candidate.raw}")
     vesta.pprint(candidate.raw)
 
-    try:
-        vboard.write_message(candidate.raw)
-        # print("lala")
-    except TypeError as exc:
-        print(f"HTTP Exception catched {exc}")
-    except HTTPStatusError as exc:
-        if exc.response.status_code == 304:
-            print("Exception: currently displayed message is the same than new one")
+    await vboard_print(candidate.raw)
 
     model = SceneInstanceModel(scene=candidate)
     Repository().save_scene_instance(model)
@@ -92,3 +103,14 @@ async def execute(ignore_operation_hour:bool = False):
         "start_date": candidate.start_date,
         "end_date": candidate.end_date
     }
+
+
+async def vboard_print(raw: list):
+    try:
+        vboard.write_message(raw)
+        # print("lala")
+    except TypeError as exc:
+        print(f"HTTP Exception catched {exc}")
+    except HTTPStatusError as exc:
+        if exc.response.status_code == 304:
+            print("Exception: currently displayed message is the same than new one")
