@@ -125,7 +125,7 @@ class BirthdayScene(AbstractScene):
         start_date = datetime.datetime.now().replace(hour=9, minute=0, second=0, microsecond=1)
         end_date = start_date + datetime.timedelta(hours=12)  # should be visible the whole day
 
-        return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", True, self.priority, self,
+        return SceneExecuteReturn(f"birthday_{start_date.strftime("%Y-%m-%d")}", True, self.priority, self,
                                   start_date, end_date, ", ".join(message), chars)
 
     # noinspection PyMethodMayBeStatic
