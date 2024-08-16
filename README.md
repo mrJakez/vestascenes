@@ -24,9 +24,8 @@ The runner is a container with one python application which is triggering the ht
 ### TODOS
 - Space Launch Alerts => Display when a SpaceX liftoff happens
 - add mermaid diagram which describes how vestascenes works
-- when a high priority scene is overruling an existing one (based on higher priority), the old one will afterwards not be displayed again. Instead a new scene is generated
+- strava scene: update title when scene is active -> will take normal dennis routine into account :)
 - Create scene which shows a countdown towards fusion or other nice events like vacations etc.
-- add multiple birthday graphics
 - optimize init-snapshots performance
 - add hints towards the status service to guide users to configure the service properly
 - https://storybook.vestaboard.com/?path=/docs/docs--docs I'd start with npm create vite - answer the questions regarding stack and frameworks and you have a great modern dev server setup for you already with build scripts and some demo content

@@ -1,9 +1,11 @@
 import datetime
 import string
-import uuid
 import os.path
+import random
+
 import vesta
 from icalendar import Calendar
+from vesta.chars import Rows
 
 from Helper.RawHelper import RawHelper
 from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
@@ -57,11 +59,9 @@ class BirthdayScene(AbstractScene):
         gcal = Calendar.from_ical(g.read())
         today = datetime.date.today()
 
-        # today = datetime.date.today().replace(month=7, day=21)
-        # 22.2 => two person,  4.3 => three person, 3.2 => four person
+        # today = datetime.date.today().replace(month=2, day=3)
 
         blacklist = self.get_blacklist()
-        all_entries = ""
         message = []
         entries = []
         for component in gcal.walk():
@@ -84,17 +84,113 @@ class BirthdayScene(AbstractScene):
             entries.append(entry)
             message.append(str(entry))
 
-        props = None
+        chars = None
+
         if len(entries) == 0:
             return SceneExecuteReturn.error(self, "No birthdays present today")
         elif len(entries) == 1:
-            props = {
-                "line1": f"",
-                "line2": f"Happy Birthday",
-                "line3": f"{entries[0]}",
-                "line4": f"",
-            }
-        elif len(entries) == 2:
+            chars = self.get_single_entry_chars(entries[0])
+        elif 1 < len(entries) < 5:
+            chars = self.get_multi_entry_chars(entries)
+        else:
+            return SceneExecuteReturn.error(self, f"No matching preset found ({len(entries)} birthday items)")
+
+        start_date = datetime.datetime.now().replace(hour=9, minute=0, second=0, microsecond=1)
+        end_date = start_date + datetime.timedelta(hours=12)  # should be visible the whole day
+
+        return SceneExecuteReturn(f"birthday_{start_date.strftime('%Y-%m-%d')}", True, self.priority, self,
+                                  start_date, end_date, ", ".join(message), chars)
+
+    # noinspection PyMethodMayBeStatic
+    def get_single_entry_chars(self, entry: BirthdayEntry) -> Rows:
+
+        cake = [[0, 0, 65, 0, 65, 0, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 66, 0, 67, 0, 68, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 65, 65, 65, 65, 65, 65, 65, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0],
+                [0, 64, 64, 64, 64, 64, 64, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 63, 63, 63, 63, 63, 63, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+        bow = [[0, 67, 67, 67, 0, 64, 64, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+               [0, 67, 67, 63, 63, 63, 64, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+               [0, 0, 65, 63, 63, 63, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+               [0, 0, 65, 0, 65, 0, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+               [0, 0, 0, 65, 0, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+               [0, 0, 0, 0, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+        balon = [[0, 0, 63, 63, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                 [0, 63, 63, 63, 69, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                 [0, 63, 63, 63, 63, 63, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                 [0, 0, 63, 63, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                 [0, 0, 0, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                 [0, 0, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+        gift = [[0, 65, 65, 0, 0, 0, 65, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 65, 65, 65, 0, 65, 65, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [67, 67, 67, 67, 65, 67, 67, 67, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [67, 67, 67, 67, 65, 67, 67, 67, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [67, 67, 67, 67, 65, 67, 67, 67, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [67, 67, 67, 67, 65, 67, 67, 67, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+        artwork = random.choice([cake, bow, balon, gift])
+
+        components = [
+            Component(
+                template="Happy",
+                justify="left",
+                align="top",
+                height=1,
+                width=13,
+                absolute_position={
+                    "x": 9,
+                    "y": 1
+                }
+            ),
+            Component(
+                template="Birthday,",
+                justify="left",
+                align="top",
+                height=1,
+                width=13,
+                absolute_position={
+                    "x": 9,
+                    "y": 2
+                }
+            ),
+            Component(
+                template="{{name}}",
+                justify="left",
+                align="top",
+                height=1,
+                width=13,
+                absolute_position={
+                    "x": 9,
+                    "y": 3
+                }
+            ),
+            Component(
+                template="Alter: {{age}}",
+                justify="left",
+                align="top",
+                height=1,
+                width=13,
+                absolute_position={
+                    "x": 9,
+                    "y": 4
+                }
+            ),
+            Component(
+                raw_characters=artwork
+            )
+        ]
+
+        vbml_client = vesta.VBMLClient()
+        return vbml_client.compose(components, {"name": entry.person[:13], "age": entry.get_new_age()})
+
+    # noinspection PyMethodMayBeStatic
+    def get_multi_entry_chars(self, entries: [BirthdayEntry]) -> Rows:
+        props = None
+        if len(entries) == 2:
             props = {
                 "line1": f"Happy Birthday",
                 "line2": f"{entries[0]}",
@@ -115,118 +211,61 @@ class BirthdayScene(AbstractScene):
                 "line3": f"{entries[2]}",
                 "line4": f"{entries[3]}",
             }
-
-        if 'props' not in locals():
-            return SceneExecuteReturn.error(self, f"No matching preset found ({len(entries)} birthday items)")
-
-        vbml_client = vesta.VBMLClient()
-        chars = vbml_client.compose(self.get_vbml(), props)
-
-        start_date = datetime.datetime.now().replace(hour=9, minute=0, second=0, microsecond=1)
-        end_date = start_date + datetime.timedelta(hours=12)  # should be visible the whole day
-
-        return SceneExecuteReturn(f"birthday_{start_date.strftime("%Y-%m-%d")}", True, self.priority, self,
-                                  start_date, end_date, ", ".join(message), chars)
-
-    # noinspection PyMethodMayBeStatic
-    def get_vbml(self):
-        return [
-            Component(
-                template="{63}{64}{65}{66}{67}{68}{63}{64}{65}{66}{67}{68}{63}{64}{65}{66}{67}{68}{63}{64}{65}{66}",
-                justify="center",
-                align="top",
-                height=1,
-                width=22
-            ),
-            Component(
-                template="{64}",
-                justify="center",
-                align="top",
-                height=1,
-                width=1
-            ),
+        components = [
             Component(
                 template="{{line1}}",
                 justify="center",
                 align="top",
                 height=1,
-                width=20
-            ),
-            Component(
-                template="{67}",
-                justify="center",
-                align="top",
-                height=1,
-                width=1
-            ),
-            Component(
-                template="{65}",
-                justify="center",
-                align="top",
-                height=1,
-                width=1
+                width=20,
+                absolute_position={
+                    "x": 1,
+                    "y": 1
+                }
             ),
             Component(
                 template="{{line2}}",
                 justify="center",
                 align="top",
                 height=1,
-                width=20
-            ),
-            Component(
-                template="{68}",
-                justify="center",
-                align="top",
-                height=1,
-                width=1
-            ),
-            Component(
-                template="{66}",
-                justify="center",
-                align="top",
-                height=1,
-                width=1
+                width=20,
+                absolute_position={
+                    "x": 1,
+                    "y": 2
+                }
             ),
             Component(
                 template="{{line3}}",
                 justify="center",
                 align="top",
                 height=1,
-                width=20
-            ),
-            Component(
-                template="{63}",
-                justify="center",
-                align="top",
-                height=1,
-                width=1
-            ),
-            Component(
-                template="{67}",
-                justify="center",
-                align="top",
-                height=1,
-                width=1
+                width=20,
+                absolute_position={
+                    "x": 1,
+                    "y": 3
+                }
             ),
             Component(
                 template="{{line4}}",
                 justify="center",
                 align="top",
                 height=1,
-                width=20
+                width=20,
+                absolute_position={
+                    "x": 1,
+                    "y": 4
+                }
             ),
             Component(
-                template="{64}",
-                justify="center",
-                align="top",
-                height=1,
-                width=1
-            ),
-            Component(
-                template="{68}{63}{64}{65}{66}{67}{68}{63}{64}{65}{66}{67}{68}{63}{64}{65}{66}{67}{68}{63}{64}{65}",
-                justify="center",
-                align="top",
-                height=1,
-                width=22
+                raw_characters=[
+                    [63, 64, 65, 66, 67, 68, 63, 64, 65, 66, 67, 68, 63, 64, 65, 66, 67, 68, 63, 64, 65, 66],
+                    [64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 67],
+                    [65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 68],
+                    [66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63],
+                    [67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64],
+                    [68, 63, 64, 65, 66, 67, 68, 63, 64, 65, 66, 67, 68, 63, 64, 65, 66, 67, 68, 63, 64, 65]
+                ]
             )
         ]
+        vbml_client = vesta.VBMLClient()
+        return vbml_client.compose(components, props)
