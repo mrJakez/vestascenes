@@ -7,6 +7,7 @@ import Scenes.BirthdayScene
 import Scenes.StravaLastActivityScene
 import Scenes.Director
 from Helper.ConfigHelper import ConfigHelper
+from Helper.RawHelper import RawHelper
 from Helper.VboardHelper import VboardHelper
 import importlib
 
@@ -68,4 +69,14 @@ async def priorities():
         "git-hash": ConfigHelper.get_git_hash(),
         "strava-initialized": Scenes.StravaLastActivityScene.StravaLastActivityScene.is_initialized(),
         "vboard-initialized": vboard_initialized
+    }
+
+
+@router.get("/read-current", tags=["developer support"])
+async def read_current():
+    client = VboardHelper().get_client()
+    raws = client.read_message()
+
+    return {
+        "raw": RawHelper.get_raw_string(raws)
     }
