@@ -10,35 +10,164 @@ from vesta.vbml import Component
 from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 
 
-class StravaLastActivityScene(AbstractScene):
-    client_id: int = 130077
-    client_secret: str = '6f06db47b8ba9f95ec33a68b42dcb4db32cad8e5'
+def get_components():
+    top_row = Component(
+        "{63}{63}      Strava      {63}{63}",
+        justify="center",
+        align="top",
+        height=1
+    )
+    second_row_left_icon = Component(
+        "{63}",
+        width=1,
+        height=1
+    )
+    name = Component(
+        "{{name}}",
+        justify="center",
+        width=20,
+        height=1
+    )
+    second_row_right_icon = Component(
+        "{63}",
+        width=1,
+        height=1
+    )
+    distance_label = Component(
+        template="dist",
+        justify="left",
+        height=1,
+        width=5
+    )
+    distance_value = Component(
+        template="{{dist}}",
+        justify="right",
+        height=1,
+        width=5
+    )
+    avg_label = Component(
+        template="avg",
+        justify="right",
+        height=1,
+        width=5
+    )
+    avg_value = Component(
+        template="{{avg}}",
+        justify="right",
+        height=1,
+        width=7
+    )
+    time_label = Component(
+        template="time",
+        justify="left",
+        height=1,
+        width=5
+    )
+    time_value = Component(
+        template="{{time}}",
+        justify="right",
+        height=1,
+        width=5
+    )
+    max_label = Component(
+        template="max",
+        justify="right",
+        height=1,
+        width=5
+    )
+    max_value = Component(
+        template="{{max}}",
+        justify="right",
+        height=1,
+        width=7
+    )
+    elev_label = Component(
+        template="elev",
+        justify="left",
+        height=1,
+        width=5
+    )
+    elev_value = Component(
+        template="{{elev}}",
+        justify="right",
+        height=1,
+        width=5
+    )
+    cal_label = Component(
+        template="cal",
+        justify="right",
+        height=1,
+        width=5
+    )
+    cal_value = Component(
+        template="{{cal}}",
+        justify="right",
+        height=1,
+        width=7
+    )
+    watt_label = Component(
+        template="watt",
+        justify="left",
+        height=1,
+        width=5
+    )
+    watt_value = Component(
+        template="{{watt}}",
+        justify="right",
+        height=1,
+        width=5
+    )
+    hr_label = Component(
+        template="hr",
+        justify="right",
+        height=1,
+        width=5
+    )
+    hr_value = Component(
+        template="{{hr}}",
+        justify="right",
+        height=1,
+        width=7
+    )
+    components = [
+        top_row,
+        second_row_left_icon, name, second_row_right_icon,
+        distance_label, distance_value, avg_label, avg_value,
+        time_label, time_value, max_label, max_value,
+        elev_label, elev_value, cal_label, cal_value,
+        watt_label, watt_value, hr_label, hr_value
+    ]
+    return components
 
+
+class StravaLastActivityScene(AbstractScene):
     priority: int = 150
 
     def execute(self, vboard) -> SceneExecuteReturn:
+
+        if self.get_client_id() is None:
+            return SceneExecuteReturn.error(self,
+                                            "Strava not configured. Please specify client_id and client_secret in config/settings.ini within the 'StravaLastActivityScene' section")
+
         if StravaLastActivityScene.is_initialized() is False:
-            return SceneExecuteReturn.error(self, "strava not initialized")
+            return SceneExecuteReturn.error(self, "Atrava not initialized.")
 
         last_executed = self.get_last_executed()
         if last_executed is not None and last_executed + timedelta(minutes=2) > datetime.now():
             return SceneExecuteReturn.error(self, f"strava not executed to protect rate limit ({last_executed})")
 
-        config = configparser.ConfigParser()
-        config.read('/config/strava.ini')
-        expire_at = datetime.fromtimestamp(int(config['strava']['expires_at']))
+        expire_at = datetime.fromtimestamp(int(self.get_config("expires_at")))
 
         if expire_at < datetime.now():
             refresh_client = Client()
-            token_response = refresh_client.refresh_access_token(client_id=self.client_id,
-                                                                 client_secret=self.client_secret,
+            token_response = refresh_client.refresh_access_token(client_id=self.get_client_id(),
+                                                                 client_secret=self.get_client_secret(),
                                                                  refresh_token=config['strava']['refresh_token'])
 
             StravaLastActivityScene.store_tokens(token_response['access_token'], token_response['refresh_token'],
                                                  token_response['expires_at'])
-            config.read('/config/strava.ini')
 
-        client = Client(access_token=config['strava']['access_token'])
+        client = Client(access_token=self.get_config("access_token"))
         last_activity_summary = client.get_activities(limit=1).next()
         last_activity = client.get_activity(last_activity_summary.id)
 
@@ -92,152 +221,7 @@ class StravaLastActivityScene(AbstractScene):
         else:
             props["cal"] = "-"
 
-        top_row = Component(
-            "{63}{63}      Strava      {63}{63}",
-            justify="center",
-            align="top",
-            height=1
-        )
-
-        second_row_left_icon = Component(
-            "{63}",
-            width=1,
-            height=1
-        )
-
-        name = Component(
-            "{{name}}",
-            justify="center",
-            width=20,
-            height=1
-        )
-
-        second_row_right_icon = Component(
-            "{63}",
-            width=1,
-            height=1
-        )
-
-        distance_label = Component(
-            template="dist",
-            justify="left",
-            height=1,
-            width=5
-        )
-
-        distance_value = Component(
-            template="{{dist}}",
-            justify="right",
-            height=1,
-            width=5
-        )
-
-        avg_label = Component(
-            template="avg",
-            justify="right",
-            height=1,
-            width=5
-        )
-
-        avg_value = Component(
-            template="{{avg}}",
-            justify="right",
-            height=1,
-            width=7
-        )
-
-        time_label = Component(
-            template="time",
-            justify="left",
-            height=1,
-            width=5
-        )
-
-        time_value = Component(
-            template="{{time}}",
-            justify="right",
-            height=1,
-            width=5
-        )
-
-        max_label = Component(
-            template="max",
-            justify="right",
-            height=1,
-            width=5
-        )
-
-        max_value = Component(
-            template="{{max}}",
-            justify="right",
-            height=1,
-            width=7
-        )
-
-        elev_label = Component(
-            template="elev",
-            justify="left",
-            height=1,
-            width=5
-        )
-
-        elev_value = Component(
-            template="{{elev}}",
-            justify="right",
-            height=1,
-            width=5
-        )
-
-        cal_label = Component(
-            template="cal",
-            justify="right",
-            height=1,
-            width=5
-        )
-
-        cal_value = Component(
-            template="{{cal}}",
-            justify="right",
-            height=1,
-            width=7
-        )
-
-        watt_label = Component(
-            template="watt",
-            justify="left",
-            height=1,
-            width=5
-        )
-
-        watt_value = Component(
-            template="{{watt}}",
-            justify="right",
-            height=1,
-            width=5
-        )
-
-        hr_label = Component(
-            template="hr",
-            justify="right",
-            height=1,
-            width=5
-        )
-
-        hr_value = Component(
-            template="{{hr}}",
-            justify="right",
-            height=1,
-            width=7
-        )
-
-        components = [
-            top_row,
-            second_row_left_icon, name, second_row_right_icon,
-            distance_label, distance_value, avg_label, avg_value,
-            time_label, time_value, max_label, max_value,
-            elev_label, elev_value, cal_label, cal_value,
-            watt_label, watt_value, hr_label, hr_value
-        ]
+        components = get_components()
 
         vbml_client = vesta.VBMLClient()
         chars = vbml_client.compose(components, props)
@@ -247,46 +231,35 @@ class StravaLastActivityScene(AbstractScene):
         return SceneExecuteReturn(f"{self.__class__.__name__}_{last_activity.id}", True, self.priority, self,
                                   start_date, end_date, message, chars)
 
+    def get_client_id(self):
+        return self.get_config('client_id')
+
+    def get_client_secret(self):
+        return self.get_config('client_secret')
+
     @staticmethod
     def store_tokens(access_token: str, refresh_token: str, expires_at: int):
-        config = configparser.ConfigParser()
-
-        # delete and read
-        config.write(open('/config/strava.ini', 'w'))
-        config.read('/config/strava.ini')
-
-        config.add_section("strava")
-        config['strava']['access_token'] = access_token
-        config['strava']['refresh_token'] = refresh_token
-        config['strava']['expires_at'] = str(expires_at)
-
-        with open('/config/strava.ini', 'w') as configfile:
-            config.write(configfile)
+        scene = StravaLastActivityScene()
+        scene.save_config({"access_token": access_token})
+        scene.save_config({"refresh_token": refresh_token})
+        scene.save_config({"expires_at": expires_at})
 
     @staticmethod
     def is_initialized() -> bool:
-        if not os.path.exists('/config/strava.ini'):
+        if StravaLastActivityScene().get_config("access_token") is None:
             return False
 
         return True
 
     # noinspection PyMethodMayBeStatic
     def get_last_executed(self) -> Optional[datetime]:
-        config = configparser.ConfigParser()
-        config.read('/config/strava.ini')
+        string_value = self.get_config('last_executed')
+        if string_value is None: return None
 
-        if config.has_option('strava', 'last_executed') is False:
-            return None
-
-        string_value = config.get('strava', 'last_executed')
         datetime_value = datetime.fromisoformat(string_value)
         return datetime_value
 
     # noinspection PyMethodMayBeStatic
     def store_last_executed(self, last_executed: datetime):
-        config = configparser.ConfigParser()
-        config.read('/config/strava.ini')
-        config.set('strava', 'last_executed', last_executed.now().isoformat())
+        self.save_config({"last_executed": last_executed.now().isoformat()})
 
-        with open('/config/strava.ini', 'w') as configfile:
-            config.write(configfile)

@@ -19,9 +19,8 @@ async def authorize_strava(request: Request):
         # noinspection HttpUrlsUsage
         redirect_url = f"http://{request.url.hostname}/authorize-strava-callback"
 
-    url = client.authorization_url(client_id=StravaLastActivityScene.client_id,
+    url = client.authorization_url(client_id=StravaLastActivityScene().get_client_id(),
                                    redirect_uri=redirect_url)
-
     return {"initialized": f"{StravaLastActivityScene.is_initialized()}", "url": url}
 
 
@@ -29,14 +28,16 @@ async def authorize_strava(request: Request):
                                                                              "strava authorization process. Within a success case the access and refresh tokens are provided and stored in a local configuration.")
 async def authorize_strava_callback(code: str):
     client = Client()
+    scene = StravaLastActivityScene()
 
-    token_response = client.exchange_code_for_token(client_id=StravaLastActivityScene.client_id,
-                                                    client_secret=StravaLastActivityScene.client_secret,
+    token_response = client.exchange_code_for_token(client_id=scene.get_client_id(),
+                                                    client_secret=scene.get_client_secret(),
                                                     code=code)
 
     access_token = token_response['access_token']
-    refresh_token = token_response['refresh_token']  # You'll need this in 6 hours
+    refresh_token = token_response['refresh_token']
     expires_at = token_response['expires_at']
 
-    StravaLastActivityScene.store_tokens(access_token, refresh_token, expires_at)
+    scene.store_tokens(access_token, refresh_token, expires_at)
+
     return {"status": f"access_token: {access_token} refresh_token: {refresh_token} expires_at: {expires_at}"}
