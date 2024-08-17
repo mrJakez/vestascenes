@@ -102,7 +102,10 @@ class AbstractScene:
         if config.has_section(self.__class__.__name__) is False:
             config.add_section(self.__class__.__name__)
 
-        config[self.__class__.__name__] = new_config
+        old = dict(config.items(self.__class__.__name__))
+        merged = old | new_config
+
+        config[self.__class__.__name__] = merged
 
         with open('/config/settings.ini', 'w') as configfile:
             config.write(configfile)
