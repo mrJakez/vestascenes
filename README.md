@@ -1,38 +1,108 @@
 ## vestascenes 🚀
 
-This is a vestaboard server implementation which organizes the vestaboard (http://vestaboard.com) related content within scenes.
+This vestaboard server implementation organizes your content related to the vestaboard (http://vestaboard.com) within scenes.
 
-This helps to prioritize the content which you are interested in. The implementation contains scenes for ChatGPT
-requests, Strava-Stats and some other random content generating scenes.
+This helps you prioritize the content you are interested in. The implementation contains scenes for ChatGPT requests, Strava statistics and some other random content-generating scenes. As soon as a specific event occurs within a scene, the "time-based content" will be displayed. Otherwise, random content will be displayed.
 
 
 ### Key concept
-The key concept behind the app are scenes which are executed by a Director on a regular basis. Each scene announces with its priority response how important the current scene content is.
-This information will be taken by the Director into account to calculate which scene is next.
+The key concept behind the app is a Director who determines and executes the next best scene on a regular basis. Each scene announces with its priority how important the current scene content is. The Director will consider this information to calculate which scene is next. The main logical flow is described within the following diagram:
 
+```mermaid
+stateDiagram-v2
+    classDef displayEvent fill:#f80,color:white
 
+    state runner {
+
+        direction TB
+        [*] --> main
+        note left of main
+            Executes every 15 seconds per deault
+            triggered via run loop 
+            .
+        end note
+        main --> execute
+        main --> main
+        
+    }
+    state api {
+        direction TB
+
+        selectCurrent: Select current active scene
+        selectCandidate: Fetch new scene candidate scene
+        
+        [*] --> execute
+        execute --> Director
+        Director --> selectCandidate
+        note left of selectCandidate
+            Selects new scene candidate based on scene.priority
+        end note
+        execute --> selectCurrent
+        note left of selectCurrent
+            based on a database isActive=True lookup
+        end note
+        
+        state combine <<join>>
+        selectCurrent --> combine
+        selectCandidate --> combine
+        
+        state "Check if the candidate has higher priority" as candidate_prio_check
+
+        state "Check if a scene was suppressed by the old current scene" as suppressed_check
+        
+        
+        state "Current is still valid" as current_is_valid
+        state "Replace current scene with candidate" as replace_with_candidate
+        state "Display suppressed scene again" as replace_with_suppressed
+               
+        combine --> current_is_valid: current is available
+        note left of current_is_valid
+            Because endDate of current has is not reached yet
+        end note
+        combine --> replace_with_candidate: current is not available
+        current_is_valid --> candidate_prio_check: Yes
+        current_is_valid --> suppressed_check: No
+        suppressed_check --> replace_with_suppressed: Yes
+        suppressed_check --> replace_with_candidate: No
+        
+        candidate_prio_check --> [*]: No
+        candidate_prio_check --> replace_with_candidate: Yes
+        
+        
+
+        
+    }
+    
+    class replace_with_candidate displayEvent
+    class replace_with_suppressed displayEvent
+
+```
 
 
 ### Container Setup
-The application is orchestrated by docker compose and is currently organized in two main applications:
+The application is orchestrated by docker-compose and is currently organized into two main applications:
 #### API
-Contain the business logic of vesta-control.
+Contain the business logic of vesta-control. The API is implemented with FastAPI and contains multiple endpoints. check: http://127.0.0.1:8000/docs for detailed service descriptions
+
+ 
 #### Runner
 The runner is a container with one python application which is triggering the http://api/execute endpoint every 15 seconds. Thanks to this the application logic resists within the api container and is triggered periodically within the given interval.
 
 
-### TODOS
-- Space Launch Alerts => Display when a SpaceX liftoff happens
-- add mermaid diagram which describes how vestascenes works
-- strava scene: update title when scene is active -> will take normal dennis routine into account :)
-- Create scene which shows a countdown towards fusion or other nice events like vacations etc.
+#### Web
+This is still TODO. The idea is to create a little web frontend for the API to provide manual messages. I'd start with npm create vite - you can either mount the built files npm run build into nginx directly (recommended) or play around with base node container (docker init ) and run npm run serve as entry point 
+Include official components https://storybook.vestaboard.com/?path=/docs/docs--docs
+
+### Known Issues / Todos
+- Create a Scene to display Space Launch Alerts (display when a SpaceX liftoff happens)
+- StravaLastActivityScene: update activity title even when the scene is active -> will take normal dennis routine into account :)
+- Create scene which shows a countdown towards specific events (example festival countdown, vacations etc.)
 - optimize init-snapshots performance
-- add hints towards the status service to guide users to configure the service properly
-- https://storybook.vestaboard.com/?path=/docs/docs--docs I'd start with npm create vite - answer the questions regarding stack and frameworks and you have a great modern dev server setup for you already with build scripts and some demo content
-as for docker - you can either mount the built files npm run build into nginx directly (recommended) or play around with base node container (docker init ) and run npm run serve as entrypoint 
+- create web frontend
 
 ## Cheat Sheet
 ### Debugging / deploy tips:
+If you take synology package manager into account the following commands will rebuild the container:
 ```bash
 # Manual start on Mac:
 sudo docker-compose up --build -d
@@ -65,63 +135,3 @@ sudo docker-compose build --no-cache api
 
 ### Character Codes
 https://docs.vestaboard.com/docs/characterCodes
-
-### Vestaboard Markup Language Example
-```json
-{
-  "props": {
-    "title": "ruhrtour 2019",
-    "distance": "182km",
-    "avg": "25kmh"
-  },
-  "components": [
-    {
-      "template": "{63}{63}      Strava      {63}{63}",
-      "style": {
-        "height": 1,
-        "justify": "center"
-      }
-    },
-    {
-      "template": "{63}",
-      "style": {
-        "height": 1,
-        "width": 1,
-        "justify": "left"
-      }
-    },
-    {
-      "template": "{{title}}",
-      "style": {
-        "height": 1,
-        "width": 20,
-        "justify": "center"
-      }
-    },
-    {
-      "template": "{63}",
-      "style": {
-        "height": 1,
-        "width": 1,
-        "justify": "left"
-      }
-    },
-    {
-      "template": "dist ",
-      "style": {
-        "height": 1,
-        "width": 5,
-        "justify": "left"
-      }
-    },
-    {
-      "template": "{{distance}}",
-      "style": {
-        "height": 1,
-        "width": 5,
-        "justify": "left"
-      }
-    }
-  ]
-}
-```
