@@ -3,7 +3,7 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.9 (vesta-control)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Remote Python 3.12.4 Docker Compose (runner)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Remote Python 3.12.4 Docker Compose (api)" project-jdk-type="Python SDK" />
   <component name="PythonCompatibilityInspectionAdvertiser">
     <option name="version" value="3" />
   </component>

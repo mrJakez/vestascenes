@@ -1,5 +1,3 @@
-import configparser
-import os
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -162,7 +160,7 @@ class StravaLastActivityScene(AbstractScene):
             refresh_client = Client()
             token_response = refresh_client.refresh_access_token(client_id=self.get_client_id(),
                                                                  client_secret=self.get_client_secret(),
-                                                                 refresh_token=config['strava']['refresh_token'])
+                                                                 refresh_token=self.get_config('refresh_token'))
 
             StravaLastActivityScene.store_tokens(token_response['access_token'], token_response['refresh_token'],
                                                  token_response['expires_at'])
@@ -171,12 +169,12 @@ class StravaLastActivityScene(AbstractScene):
         last_activity_summary = client.get_activities(limit=1).next()
         last_activity = client.get_activity(last_activity_summary.id)
 
-        #last_activity = client.get_activity(8132100578)
-        #ruhrtour2024 11371875821
-        #kurze tour 11638289067
-        #geisterclam 11621150796
-        #schwimmen 11574662901
-        #gewichtstraining 8132100578
+        # last_activity = client.get_activity(8132100578)
+        # ruhrtour2024 11371875821
+        # kurze tour 11638289067
+        # geisterclam 11621150796
+        # schwimmen 11574662901
+        # gewichtstraining 8132100578
 
         print(
             f"{last_activity.id} - {last_activity.name} - {last_activity.type} - {last_activity.start_date} - {last_activity.start_date_local}")
@@ -242,7 +240,7 @@ class StravaLastActivityScene(AbstractScene):
         scene = StravaLastActivityScene()
         scene.save_config({"access_token": access_token})
         scene.save_config({"refresh_token": refresh_token})
-        scene.save_config({"expires_at": expires_at})
+        scene.save_config({"expires_at": str(expires_at)})
 
     @staticmethod
     def is_initialized() -> bool:
@@ -254,7 +252,8 @@ class StravaLastActivityScene(AbstractScene):
     # noinspection PyMethodMayBeStatic
     def get_last_executed(self) -> Optional[datetime]:
         string_value = self.get_config('last_executed')
-        if string_value is None: return None
+        if string_value is None:
+            return None
 
         datetime_value = datetime.fromisoformat(string_value)
         return datetime_value
@@ -262,4 +261,3 @@ class StravaLastActivityScene(AbstractScene):
     # noinspection PyMethodMayBeStatic
     def store_last_executed(self, last_executed: datetime):
         self.save_config({"last_executed": last_executed.now().isoformat()})
-
