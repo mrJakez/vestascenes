@@ -13,11 +13,6 @@ from Models.ChatGPTHistoryModel import ChatGPTHistoryModel
 from Repository import Repository
 from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 
-# noinspection SpellCheckingInspection
-client = OpenAI(
-    api_key="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"
-)
-
 
 class ChatGPTScene(AbstractScene):
     priority: int = 100
@@ -36,6 +31,8 @@ class ChatGPTScene(AbstractScene):
 
         message_history = Repository().get_chatgpt_history()
         formatted_messages = self.get_messages_in_chatgpt_format(message_history)
+
+        client = OpenAI(api_key= self.get_config("openai_key"))
 
         completion = client.chat.completions.create(
             model="gpt-4o",
