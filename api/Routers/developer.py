@@ -11,8 +11,6 @@ from Helper.RawHelper import RawHelper
 from Helper.VboardHelper import VboardHelper
 import importlib
 
-import subprocess
-
 router = APIRouter()
 vboard = VboardHelper().get_client()
 
