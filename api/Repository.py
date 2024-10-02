@@ -70,7 +70,7 @@ class Repository(metaclass=SingletonMeta):
 
     def get_chatgpt_history(self):
         with Session(self.get_engine()) as session:
-            statement = select(ChatGPTHistoryModel)
+            statement = select(ChatGPTHistoryModel).limit(200)
             results = session.exec(statement)
             models = []
 
