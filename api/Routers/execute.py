@@ -47,7 +47,7 @@ async def execute(ignore_operation_hour:bool = False):
     if current is None:
         print("current is none -> candidate will be executed")
     elif current.get_end_date() >= now:
-        logger.info(f"current ({current.class_string}) is still valid (end_date not reached yet)")
+        logger.info(f"current ({current.class_string} - {current.id}) is still valid (difference: {(end_date - now).total_seconds()})")
         if candidate.priority > current.priority:
             logger.info("candidate has higher priority than current. Current will be replaced")
             Repository().unmark_active_scene_instance()
