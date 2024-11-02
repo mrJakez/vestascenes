@@ -53,6 +53,7 @@ stateDiagram-v2
         
         state "Current is still valid" as current_is_valid
         state "Replace current scene with candidate" as replace_with_candidate
+        state "Update current scene" as update_current
         state "Display suppressed scene again" as replace_with_suppressed
                
         combine --> current_is_valid: current is available
@@ -67,6 +68,8 @@ stateDiagram-v2
         
         candidate_prio_check --> [*]: No
         candidate_prio_check --> replace_with_candidate: Yes
+        candidate_prio_check --> update_current: candidate=current & candidate.overwriteable=true
+
         
         
 
@@ -74,8 +77,8 @@ stateDiagram-v2
     }
     
     class replace_with_candidate displayEvent
-    class replace_with_suppressed displayEvent
-
+    class replace_with_suppressed displayEvent    
+    class update_current displayEvent
 ```
 
 
