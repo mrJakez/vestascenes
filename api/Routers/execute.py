@@ -51,6 +51,17 @@ async def execute(ignore_operation_hour:bool = False):
         if candidate.priority > current.priority:
             logger.info("candidate has higher priority than current. Current will be replaced")
             Repository().unmark_active_scene_instance()
+        elif candidate.scene_object.__class__.__name__ == current.class_string and candidate.scene_object.overwritable == True:
+            logger.info(f"current scene is update")
+            vesta.pprint(candidate.raw)
+            await vboard_print(candidate.raw)
+            return {
+                "message": "current scene is updated",
+                "current": {
+                    "identifier": current.id,
+                    "scene": current.class_string,
+                }
+            }
         else:
             logger.info('candidate has lower or equal priority than current -> keep current')
             # noinspection PyUnboundLocalVariable

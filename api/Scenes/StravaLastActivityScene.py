@@ -140,6 +140,7 @@ def get_components():
 
 class StravaLastActivityScene(AbstractScene):
     priority: int = 150
+    overwritable = True
 
     def execute(self, vboard) -> SceneExecuteReturn:
 
@@ -169,15 +170,14 @@ class StravaLastActivityScene(AbstractScene):
         last_activity_summary = client.get_activities(limit=1).next()
         last_activity = client.get_activity(last_activity_summary.id)
 
-        # last_activity = client.get_activity(8132100578)
+        # last_activity = client.get_activity(11371875821)
         # ruhrtour2024 11371875821
         # kurze tour 11638289067
         # geisterclam 11621150796
         # schwimmen 11574662901
         # gewichtstraining 8132100578
 
-        print(
-            f"{last_activity.id} - {last_activity.name} - {last_activity.type} - {last_activity.start_date} - {last_activity.start_date_local}")
+        print(f"{last_activity.id} - {last_activity.name} - {last_activity.type} - {last_activity.start_date} - {last_activity.start_date_local}")
 
         activity_end_date = last_activity.start_date_local + timedelta(seconds=last_activity.elapsed_time.seconds)
         if ((datetime.now() - timedelta(hours=24)) < activity_end_date) is False:
@@ -198,9 +198,9 @@ class StravaLastActivityScene(AbstractScene):
         props = {
             "name": last_activity.name,
             "dist": f"{int(unithelper.kilometer(last_activity.distance))}km",
-            "avg": f"{int(unithelper.kilometers_per_hour(last_activity.average_speed))}kmh",
+            "avg": f"{round(float(unithelper.kilometers_per_hour(last_activity.average_speed)), 1)}kmh",
             "time": f"{hours}h{minutes}m",
-            "max": f"{int(unithelper.kilometers_per_hour(last_activity.max_speed))}kmh",
+            "max": f"{round(float(unithelper.kilometers_per_hour(last_activity.max_speed)), 1)}kmh",
             "elev": f"{int(unithelper.meter(last_activity.total_elevation_gain))}m",
         }
 
