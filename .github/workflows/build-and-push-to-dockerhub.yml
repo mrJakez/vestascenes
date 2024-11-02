@@ -75,6 +75,7 @@ jobs:
     - name: Build and push Docker image
       run: |
         cd runner
+        pip install -e .
         docker buildx create --use
         docker buildx --debug build \
           --file Dockerfile \
