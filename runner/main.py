@@ -1,6 +1,5 @@
 import sys
 import time
-
 import requests
 
 print("runner started. Python version: " + sys.version)
