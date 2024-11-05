@@ -65,7 +65,8 @@ class AbstractScene:
 
     # some scenes may collect new content during their run. For example the strava scene -> when the title is updated or
     # a clock scene. In these cases the scene can be flagged as overwritable -> which does mean the new content of the
-    # new run will be taken and will replace the existing one.
+    # new run will be taken and will replace the existing one. Please remember that the uniqueId of the corresponding
+    # SceneExecuteReturn object also needs to be updated/changed. Otherwise the scene will not be refreshed.
     overwritable: bool = False
 
     def execute(self, vboard) -> SceneExecuteReturn:

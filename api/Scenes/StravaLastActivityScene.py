@@ -226,7 +226,7 @@ class StravaLastActivityScene(AbstractScene):
         vesta.pprint(chars)
 
         self.store_last_executed(datetime.now())
-        return SceneExecuteReturn(f"{self.__class__.__name__}_{last_activity.id}", True, self.priority, self,
+        return SceneExecuteReturn(f"{self.__class__.__name__}_{last_activity.id}_{last_activity.name}", True, self.priority, self,
                                   start_date, end_date, message, chars)
 
     def get_client_id(self):
