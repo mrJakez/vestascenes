@@ -1,0 +1,34 @@
+name: Testworkflow
+
+on:
+  push:
+    branches:
+      - releases
+
+jobs:
+  set-vars:
+    runs-on: ubuntu-latest
+    outputs:
+      sha_short: ${{ steps.writestep.outputs.sha_short }}
+    steps:
+      - uses: actions/checkout@v1
+      - id: writestep
+        name: Set enviroment
+        shell: bash
+        run: |
+          echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
+          
+  read-vars-on-another-job:
+    runs-on: ubuntu-latest
+    needs: set-vars
+    steps:
+      - name: Sample task to read vars
+        env:
+          sha_short: ${{needs.set-vars.outputs.sha_short}}
+        shell: bash
+        run: |
+          echo "sha short: $sha_short"
+          
+    env:
+      DOCKER_CLI_EXPERIMENTAL: enabled
+      DOCKER_BUILDKIT: 1
