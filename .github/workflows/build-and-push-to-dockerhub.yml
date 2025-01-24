@@ -16,9 +16,7 @@ jobs:
         name: Set enviroment
         shell: bash
         run: |
-          echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_ENV
-        env:
-          GITHUB_ENV: $GITHUB_ENV
+          echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
           
   read-vars-on-another-job:
     runs-on: ubuntu-latest
