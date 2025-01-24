@@ -60,10 +60,6 @@ async def priorities():
 
 @router.get("/status", tags=["developer support"])
 async def status():
-    logger.debug("demo debug log from statusYES")
-    logger.info("demo INFO log from status")
-    logger.error("demo ERROR log from status")
-
     vboard_initialized = False
     if VboardHelper().get_client() is not None:
         vboard_initialized = True
