@@ -1,6 +1,7 @@
 import sys
 import os
 import time
+import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from Helper.ConfigHelper import ConfigHelper
@@ -29,6 +30,39 @@ requests, Strava-Stats and some other random content generating scenes.
 app = FastAPI(
     title="vestaboard-control",
     description=description)
+
+
+# FastAPI Logging anpassen
+logging_config = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "default": {
+            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        },
+    },
+    "handlers": {
+        "default": {
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",
+            "formatter": "default",
+        },
+    },
+    "loggers": {
+        "uvicorn": {
+            "handlers": ["default"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "uvicorn.access": {
+            "handlers": ["default"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
+
+logging.config.dictConfig(logging_config)
 
 
 @app.middleware("http")

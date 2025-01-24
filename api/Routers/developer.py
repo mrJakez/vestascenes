@@ -9,10 +9,14 @@ import Scenes.Director
 from Helper.ConfigHelper import ConfigHelper
 from Helper.RawHelper import RawHelper
 from Helper.VboardHelper import VboardHelper
+from Helper.Logger import setup_custom_logger
+
 import importlib
 
 router = APIRouter()
 vboard = VboardHelper().get_client()
+
+logger = setup_custom_logger(__file__)
 
 
 @router.get("/", tags=["developer support"])
@@ -22,7 +26,7 @@ async def root_path():
 
 @router.get("/test-scene/{scene_class_string}/{send_to_board}", tags=["developer support"])
 async def test_scene(scene_class_string: str = None, send_to_board: bool = False):
-    print(f"send_to_board {send_to_board}")
+    logger.info(f"send_to_board: {send_to_board}")
 
     if scene_class_string is None:
         return {"message": "please define a scene class name which you want to test"}
@@ -38,7 +42,7 @@ async def test_scene(scene_class_string: str = None, send_to_board: bool = False
             try:
                 vboard.write_message(res.raw)
             except Exception as exc:
-                print(f"HTTP Exception catched {exc}")
+                logger.error(f"HTTP Exception catched {exc}")
 
     return {
         "should_execute": res.should_execute,
@@ -55,7 +59,10 @@ async def priorities():
 
 
 @router.get("/status", tags=["developer support"])
-async def priorities():
+async def status():
+    logger.debug("demo debug log from statusYES")
+    logger.info("demo INFO log from status")
+    logger.error("demo ERROR log from status")
 
     vboard_initialized = False
     if VboardHelper().get_client() is not None:

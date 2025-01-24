@@ -9,6 +9,8 @@ import vesta
 
 from Helper.ConfigHelper import ConfigHelper, get_config
 
+from Helper.Logger import setup_custom_logger
+logger = setup_custom_logger(__file__)
 
 # SceneType specifies if the scene is something which is time relative or just a "random" artwork
 class SceneType(Enum):
@@ -51,6 +53,7 @@ class SceneExecuteReturn:
     @classmethod
     def error(cls, scene: object, message: string):
         res = SceneExecuteReturn(f"error_{str(uuid.uuid4())}", False, 0, scene_object=scene, message=message)
+        logger.error(f"scene: {scene.__class__.__name__} message: {message}")
         return res
 
 

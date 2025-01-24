@@ -5,6 +5,8 @@ import uuid
 from Repository import Repository
 from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 
+from Helper.Logger import setup_custom_logger
+logger = setup_custom_logger(__file__)
 
 class SnapshotScene(AbstractScene):
     weight = 3
@@ -20,7 +22,7 @@ class SnapshotScene(AbstractScene):
         snapshot_model = entries[random_index]
 
         if vboard.read_message() == snapshot_model.get_raw_list() and len(entries) > 1:
-            print(f">>>>>>>>>>>>>>>>> Already displaying {snapshot_model.title} -> Iterate once more <<<<<<<<<<<<<<<<<<<<<<")
+            logger.info(f">>>>>>>>>>>>>>>>> Already displaying {snapshot_model.title} -> Iterate once more <<<<<<<<<<<<<<<<<<<<<<")
             return self.execute(vboard)
 
         start_date = datetime.datetime.now()

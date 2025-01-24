@@ -13,6 +13,8 @@ from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
 from Repository import Repository
 
+from Helper.Logger import setup_custom_logger
+logger = setup_custom_logger(__file__)
 
 class Director:
     vboard: ReadWriteClient
@@ -40,7 +42,7 @@ class Director:
         returns.sort(key=lambda x: x.priority, reverse=True)
 
         if len(returns) > 0:
-            print("Director: found a TIMED scene")
+            logger.info("Found a TIMED scene")
             return returns[0]
         else:
             artwork_scene = random.choice(self.__all_scenes(SceneType.ARTWORK, weighted=True))

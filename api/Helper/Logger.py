@@ -1,16 +1,21 @@
 import logging
+import os
 import sys
 
 
-def setup_custom_logger(name):
-    formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s',
-                                  datefmt='%Y-%m-%d %H:%M:%S')
-    handler = logging.FileHandler('log.txt', mode='w')
-    handler.setFormatter(formatter)
-    screen_handler = logging.StreamHandler(stream=sys.stdout)
-    screen_handler.setFormatter(formatter)
-    logger = logging.getLogger(name)
+def setup_custom_logger(file):
+    logger = logging.getLogger(os.path.splitext(os.path.basename(file))[0])
     logger.setLevel(logging.DEBUG)
-    logger.addHandler(handler)
-    logger.addHandler(screen_handler)
+
+    # Entferne alte Handler, um doppelte Logs zu vermeiden
+    if logger.hasHandlers():
+        logger.handlers.clear()
+
+    # Hinzufügen des Console Handlers
+    console_handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+
     return logger
+

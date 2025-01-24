@@ -8,6 +8,8 @@ from Models.ChatGPTHistoryModel import ChatGPTHistoryModel
 from Models.SceneInstanceModel import SceneInstanceModel
 from Models.SnapshotModel import SnapshotModel
 
+from Helper.Logger import setup_custom_logger
+logger = setup_custom_logger(__file__)
 
 class SingletonMeta(type):
     """
@@ -37,7 +39,7 @@ class Repository(metaclass=SingletonMeta):
 
     def get_engine(self):
         if self._engine is None:
-            print("engine will be initialized")
+            logger.info("engine will be initialized")
             sqlite_file_name = "/database/vbcontrol.db"
             sqlite_url = f"sqlite:///{sqlite_file_name}"
             self._engine = create_engine(sqlite_url, echo=False)
@@ -61,7 +63,7 @@ class Repository(metaclass=SingletonMeta):
             results = session.exec(statement)
 
             if len(results.all()) > 0:
-                print(f"snapshot '{snapshot.title}' already exists")
+                logger.info(f"snapshot '{snapshot.title}' already exists")
                 return False
             else:
                 session.add(snapshot)

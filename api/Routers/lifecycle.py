@@ -14,15 +14,17 @@ from Repository import Repository
 
 router = APIRouter()
 
+from Helper.Logger import setup_custom_logger
+logger = setup_custom_logger(__file__)
 
 @router.get("/init/", tags=["lifecycle"], description="Initializes the vestaboard config and database")
 async def init():
     if os.path.exists("/database/vbcontrol.db"):
-        print("old database existed - removed right now")
+        logger.info("old database existed - removed right now")
         os.remove("/database/vbcontrol.db")
 
     if os.path.exists("/config/strava.ini"):
-        print("old strava config existed - removed right now")
+        logger.info("old strava config existed - removed right now")
         os.remove("/config/strava.ini")
 
     Repository()._engine = None
@@ -43,7 +45,7 @@ async def init_snapshots():
     for file in os.listdir(directory):
         filename = os.fsdecode(file)
 
-        print(f"file.{filename}: {time.time() - start_time}")
+        logger.info(f"file.{filename}: {time.time() - start_time}")
 
         if filename.endswith(".raw"):
             file = open(f"Initial-snapshots/{filename}", 'r')
@@ -63,10 +65,10 @@ async def init_snapshots():
 
                 snapshot = SnapshotModel(title=title, raw=raw)
                 if Repository().store_snapshot(snapshot):
-                    print(f"snapshot {title} addded: {time.time() - start_time}")
+                    logger.info(f"snapshot {title} addded: {time.time() - start_time}")
                     added_screenshots_count += 1
 
-    print(f"total time: {time.time() - start_time}")
+    logger.info(f"total time: {time.time() - start_time}")
     return {"status": f"added {added_screenshots_count} snapshots"}
 
 

@@ -15,7 +15,7 @@ from Helper.Logger import setup_custom_logger
 router = APIRouter()
 vboard = VboardHelper().get_client()
 
-logger = setup_custom_logger('vestaboard')
+logger = setup_custom_logger(__file__)
 
 @router.get("/execute", tags=["main"],
             description="This service is the real worker process. It determines the next candidate and"
@@ -35,17 +35,17 @@ async def execute(ignore_operation_hour:bool = False):
         return operation_hour_error
 
     candidate: SceneExecuteReturn = Director(vboard).get_next_scene()
-    print(f"candidate: {candidate.scene_object.__class__.__name__} (ID: {candidate.id})")
+    logger.info(f"candidate: {candidate.scene_object.__class__.__name__} (ID: {candidate.id})")
     current = Repository().get_active_scene_instance()
 
     # debug
     if current is not None:
         end_date = current.get_end_date()
-        print(f"now: {now} - end date: {end_date} (Difference: {(end_date - now).total_seconds()})")
+        logger.debug(f"now: {now} - end date: {end_date} (Difference: {(end_date - now).total_seconds()})")
     # -
 
     if current is None:
-        print("current is none -> candidate will be executed")
+        logger.info("current is none -> candidate will be executed")
     elif current.get_end_date() >= now:
         logger.info(f"current ({current.class_string} - {current.id}) is still valid (difference: {(end_date - now).total_seconds()})")
         if candidate.priority > current.priority:
@@ -125,9 +125,8 @@ async def execute(ignore_operation_hour:bool = False):
 async def vboard_print(raw: list):
     try:
         vboard.write_message(raw)
-        # print("lala")
     except TypeError as exc:
-        print(f"HTTP Exception catched {exc}")
+        logger.error(f"HTTP Exception catched {exc}")
     except HTTPStatusError as exc:
         if exc.response.status_code == 304:
-            print("Exception: currently displayed message is the same than new one")
+            logger.erro("Exception: currently displayed message is the same than new one")

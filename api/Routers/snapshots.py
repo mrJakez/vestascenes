@@ -1,3 +1,5 @@
+import logging
+
 import vesta
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
@@ -16,7 +18,7 @@ async def store_snapshot(title: str):
     current_message = vboard.read_message()
     current_message_string = str(current_message).replace(' ', '')
 
-    print("current_message:")
+    logging.info("current_message:")
     vesta.pprint(current_message)
 
     snapshot = SnapshotModel(title=title, raw=current_message_string)

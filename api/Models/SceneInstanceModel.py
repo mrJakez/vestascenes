@@ -9,6 +9,8 @@ from Helper.RawHelper import RawHelper
 # from api.Scenes import AbstractScene
 from Scenes import AbstractScene
 
+from Helper.Logger import setup_custom_logger
+logger = setup_custom_logger(__file__)
 
 class SceneInstanceModel(SQLModel, table=True):
     __tablename__ = "scene_instances"
@@ -43,5 +45,5 @@ class SceneInstanceModel(SQLModel, table=True):
                 real_date2 = datetime.strptime(self.end_date, "%Y-%m-%d %H:%M:%S")
                 return real_date2
             except ValueError as e:
-                print(f"can't create datetime from date string!! {e}")
+                logger.error(f"can't create datetime from date string!! {e}")
                 return None

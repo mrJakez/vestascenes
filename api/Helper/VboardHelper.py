@@ -8,7 +8,6 @@ class VboardHelper(metaclass=SingletonMeta):
 
     def get_client(self):
         if self._client is None:
-            print("vboard will be initialized")
 
             key = ConfigHelper.get_vboard_read_write_key()
             if key is not None and len(key) > 0 and key != "please_specify":

@@ -7,6 +7,8 @@ from vesta.vbml import Component
 
 from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 
+from Helper.Logger import setup_custom_logger
+logger = setup_custom_logger(__file__)
 
 def get_components():
     top_row = Component(
@@ -177,7 +179,7 @@ class StravaLastActivityScene(AbstractScene):
         # schwimmen 11574662901
         # gewichtstraining 8132100578
 
-        print(f"{last_activity.id} - {last_activity.name} - {last_activity.type} - {last_activity.start_date} - {last_activity.start_date_local}")
+        logger.info(f"id: {last_activity.id} - name: {last_activity.name} - type: {last_activity.type} - start_date: {last_activity.start_date} - start_date_local: {last_activity.start_date_local}")
 
         activity_end_date = last_activity.start_date_local + timedelta(seconds=last_activity.elapsed_time.seconds)
         if ((datetime.now() - timedelta(hours=24)) < activity_end_date) is False:
@@ -190,7 +192,7 @@ class StravaLastActivityScene(AbstractScene):
         end_date = end_date.replace(minute=0, second=0, microsecond=1)
 
         message = f"Strava: {last_activity.name} - {last_activity.type}"
-        print(message)
+        logger.info(message)
 
         td = last_activity.moving_time
         days, hours, minutes = td.days, td.seconds // 3600, td.seconds // 60 % 60
