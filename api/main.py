@@ -64,14 +64,26 @@ logging_config = {
 
 logging.config.dictConfig(logging_config)
 
-
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
-    if ConfigHelper.get_vboard_read_write_key() is None:
-        return JSONResponse(content={"message": "Missing your vestaboard API key. Please create a settings.ini file within the /config directory"})
-    else:
+    try:
+        if ConfigHelper.get_vboard_read_write_key() is None:
+            return JSONResponse(
+                content={
+                    "message": "Missing your Vestaboard API key. Please create a settings.ini file within the /config directory"},
+                status_code=400
+            )
+
         response = await call_next(request)
         return response
+
+    except Exception as e:
+        logger.error(f"Fehler in Middleware: {e}")
+        traceback.print_exc()
+        return JSONResponse(
+            content={"message": "Internal Server Error"},
+            status_code=500
+        )
 
 
 app.include_router(strava.router)

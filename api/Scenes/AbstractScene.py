@@ -53,7 +53,7 @@ class SceneExecuteReturn:
     @classmethod
     def error(cls, scene: object, message: string):
         res = SceneExecuteReturn(f"error_{str(uuid.uuid4())}", False, 0, scene_object=scene, message=message)
-        logger.error(f"scene: {scene.__class__.__name__} message: {message}")
+        logger.debug(f"scene: {scene.__class__.__name__} message: {message}")
         return res
 
 
