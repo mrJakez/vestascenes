@@ -5,6 +5,7 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from Helper.ConfigHelper import ConfigHelper
+from Helper.Logger import setup_custom_logger
 
 # this is required to work within the docker container
 sys.path.append('/app/api/')
@@ -64,6 +65,8 @@ logging_config = {
 
 logging.config.dictConfig(logging_config)
 
+logger = setup_custom_logger(__file__)
+
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
     try:
@@ -79,7 +82,6 @@ async def add_process_time_header(request: Request, call_next):
 
     except Exception as e:
         logger.error(f"Fehler in Middleware: {e}")
-        traceback.print_exc()
         return JSONResponse(
             content={"message": "Internal Server Error"},
             status_code=500
