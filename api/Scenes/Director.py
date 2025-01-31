@@ -11,6 +11,7 @@ from Scenes.NewReleaseScene import NewReleaseScene
 from Scenes.SnapshotScene import SnapshotScene
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
+from Scenes.ClockScene import ClockScene
 from Repository import Repository
 
 from Helper.Logger import setup_custom_logger
@@ -23,6 +24,7 @@ class Director:
         self.vboard = vboard
 
     def get_next_scene(self) -> SceneExecuteReturn:
+
         returns = []
         for timed_scene in self.__all_scenes(SceneType.TIMED):
             execute_res = timed_scene.execute(self.vboard)
@@ -62,6 +64,7 @@ class Director:
         if scene_type is None or scene_type is SceneType.ARTWORK:
             scenes.append(SnapshotScene())
             scenes.append(ChatGPTScene())
+            scenes.append(ClockScene())
 
         if weighted is True:
             weighted_scenes = []
@@ -79,3 +82,7 @@ class Director:
         for scene in scenes:
             res.append({"scene": scene.__class__.__name__, "priority": scene.priority})
         return res
+
+    def get_scene(self, scene_name) -> AbstractScene:
+        scene = globals()[scene_name]()
+        return scene

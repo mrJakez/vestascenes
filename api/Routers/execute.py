@@ -34,9 +34,12 @@ async def execute(ignore_operation_hour:bool = False):
     if ignore_operation_hour is False and operation_hour_error is not None:
         return operation_hour_error
 
-    candidate: SceneExecuteReturn = Director(vboard).get_next_scene()
+    director = Director(vboard)
+    candidate: SceneExecuteReturn = director.get_next_scene()
     logger.info(f"candidate: {candidate.scene_object.__class__.__name__} (ID: {candidate.id})")
+
     current = Repository().get_active_scene_instance()
+    equal_scene_to_current = director.get_scene(current.class_string)
 
     # debug
     if current is not None:
@@ -51,10 +54,11 @@ async def execute(ignore_operation_hour:bool = False):
         if candidate.priority > current.priority:
             logger.info("candidate has higher priority than current. Current will be replaced")
             Repository().unmark_active_scene_instance()
-        elif candidate.scene_object.__class__.__name__ == current.class_string and candidate.scene_object.overwritable == True:
-            logger.info(f"current scene is update")
-            vesta.pprint(candidate.raw)
-            await vboard_print(candidate.raw)
+        elif equal_scene_to_current.overwritable:
+            logger.info(f"current scene is overwritable - let's overwrite it")
+            res = equal_scene_to_current.execute(vboard)
+            vesta.pprint(res.raw)
+            await vboard_print(res.raw)
             return {
                 "message": "current scene is updated",
                 "current": {
