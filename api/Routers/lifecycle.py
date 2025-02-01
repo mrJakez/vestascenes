@@ -23,16 +23,19 @@ async def init():
         logger.info("old database existed - removed right now")
         os.remove("/database/vbcontrol.db")
 
-    if os.path.exists("/config/strava.ini"):
-        logger.info("old strava config existed - removed right now")
-        os.remove("/config/strava.ini")
-
     Repository()._engine = None
     Repository().create_tables()
 
     await init_snapshots()
     return {"status": "initialization done successfully"}
 
+@router.get("/init-strava/", tags=["lifecycle"], description="Reset the strava configuration")
+async def init_strava():
+    if os.path.exists("/config/strava.ini"):
+        logger.info("old strava config existed - removed right now")
+        os.remove("/config/strava.ini")
+
+    return {"status": "strava init successfully"}
 
 @router.get("/init-snapshots/", tags=["lifecycle"],
             description="Adds all snapshots which are stored within the Initial-Snapshots/ folder into the database")

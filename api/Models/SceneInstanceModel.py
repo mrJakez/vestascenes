@@ -19,6 +19,7 @@ class SceneInstanceModel(SQLModel, table=True):
     class_string: str
     start_date: str
     end_date: str
+    overwritable: bool
     raw: str
     priority: int
     is_active: bool
@@ -29,6 +30,7 @@ class SceneInstanceModel(SQLModel, table=True):
         self.class_string = scene.scene_object.__class__.__name__
         self.raw = RawHelper.get_raw_string(scene.raw)
         self.start_date = scene.start_date
+        self.overwritable = scene.scene_object.overwritable
         self.end_date = scene.end_date
         self.priority = scene.priority
         self.is_active = True

@@ -39,7 +39,6 @@ async def execute(ignore_operation_hour:bool = False):
     logger.info(f"candidate: {candidate.scene_object.__class__.__name__} (ID: {candidate.id})")
 
     current = Repository().get_active_scene_instance()
-    equal_scene_to_current = director.get_scene(current.class_string)
 
     # debug
     if current is not None:
@@ -54,13 +53,21 @@ async def execute(ignore_operation_hour:bool = False):
         if candidate.priority > current.priority:
             logger.info("candidate has higher priority than current. Current will be replaced")
             Repository().unmark_active_scene_instance()
-        elif equal_scene_to_current.overwritable:
+        elif current.overwritable:
             logger.info(f"current scene is overwritable - let's overwrite it")
-            res = equal_scene_to_current.execute(vboard)
-            vesta.pprint(res.raw)
-            await vboard_print(res.raw)
+
+            new_return = director.get_last_return(current.class_string)
+
+            if new_return is not None:
+                message = "overwritten"
+                vesta.pprint(candidate.raw)
+                await vboard_print(candidate.raw)
+            else:
+                message = f"Scene is overwritable but new run did not delivered content -> not overwritten"
+
+            logger.debug(message)
             return {
-                "message": "current scene is updated",
+                "message": message,
                 "current": {
                     "identifier": current.id,
                     "scene": current.class_string,
@@ -133,4 +140,4 @@ async def vboard_print(raw: list):
         logger.error(f"HTTP Exception catched {exc}")
     except HTTPStatusError as exc:
         if exc.response.status_code == 304:
-            logger.erro("Exception: currently displayed message is the same than new one")
+            logger.error("currently displayed message is the same than new one")
