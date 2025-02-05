@@ -60,8 +60,8 @@ async def execute(ignore_operation_hour:bool = False):
 
             if new_return is not None:
                 message = "overwritten"
-                vesta.pprint(candidate.raw)
-                await vboard_print(candidate.raw)
+                vesta.pprint(new_return.raw)
+                await vboard_print(new_return.raw)
             else:
                 message = f"Scene is overwritable but new run did not delivered content -> not overwritten"
 
