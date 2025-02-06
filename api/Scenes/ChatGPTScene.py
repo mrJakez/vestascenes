@@ -18,7 +18,7 @@ class ChatGPTScene(AbstractScene):
     priority: int = 100
     post_execution: bool = False
 
-    def execute(self, vboard) -> SceneExecuteReturn:
+    def execute(self, vboard, previous_identifier: str = None) -> SceneExecuteReturn:
         start_date = datetime.datetime.now()
         end_date = self.get_next_full_hour()
 

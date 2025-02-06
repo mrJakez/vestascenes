@@ -12,7 +12,7 @@ from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 class NewReleaseScene(AbstractScene):
     priority = 300
 
-    def execute(self, vboard) -> SceneExecuteReturn:
+    def execute(self, vboard, previous_identifier: str = None) -> SceneExecuteReturn:
         # fetch prev version
         prev_hash = self.get_config('stored-hash')
         # fetch current version

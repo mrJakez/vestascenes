@@ -9,6 +9,7 @@ from Scenes.BirthdayScene import BirthdayScene
 from Scenes.ChatGPTScene import ChatGPTScene
 from Scenes.NewReleaseScene import NewReleaseScene
 from Scenes.SnapshotScene import SnapshotScene
+from Scenes.CountdownScene import CountdownScene
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
 from Scenes.ClockScene import ClockScene
@@ -48,13 +49,6 @@ class Director:
             logger.info("Found a TIMED scene")
             return self.last_returns[0]
         else:
-            # some artwork scenes are also overwriteable.Therefore they have to be added
-            # to the last_returns stack as well
-            for artwork_scene in self.__all_scenes(SceneType.ARTWORK):
-                if artwork_scene.overwritable:
-                    self.last_returns.append(artwork_scene.execute(self.vboard))
-            # -
-
             artwork_scene = random.choice(self.__all_scenes(SceneType.ARTWORK, weighted=True))
             artwork_res = artwork_scene.execute(self.vboard)
             return artwork_res
@@ -74,6 +68,7 @@ class Director:
             scenes.append(SnapshotScene())
             scenes.append(ChatGPTScene())
             scenes.append(ClockScene())
+            # scenes.append(CountdownScene())
 
         if weighted is True:
             weighted_scenes = []
@@ -96,8 +91,13 @@ class Director:
         scene = globals()[scene_name]()
         return scene
 
-    def get_last_return(self, scene_name) -> SceneExecuteReturn:
+    def get_last_return(self, scene_name, prev_identifier) -> SceneExecuteReturn:
         for return_scene in self.last_returns:
             if return_scene.scene_object.__class__.__name__ == scene_name:
                 return return_scene
 
+        scene = globals()[scene_name]()
+        if scene.type != SceneType.ARTWORK:
+            logger.error("Director initiated a non artwork scene within get_last_return. This schouldn't be possible.")
+
+        return scene.execute(self.vboard, prev_identifier)

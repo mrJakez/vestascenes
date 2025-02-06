@@ -11,7 +11,7 @@ logger = setup_custom_logger(__file__)
 class SnapshotScene(AbstractScene):
     weight = 3
 
-    def execute(self, vboard) -> SceneExecuteReturn:
+    def execute(self, vboard, previous_identifier: str = None) -> SceneExecuteReturn:
 
         entries = Repository().get_snapshots()
 

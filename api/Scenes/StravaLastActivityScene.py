@@ -144,7 +144,7 @@ class StravaLastActivityScene(AbstractScene):
     priority: int = 150
     overwritable = True
 
-    def execute(self, vboard) -> SceneExecuteReturn:
+    def execute(self, vboard, previous_identifier: str = None) -> SceneExecuteReturn:
 
         if self.get_client_id() is None:
             return SceneExecuteReturn.error(self,

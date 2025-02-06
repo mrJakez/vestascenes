@@ -65,7 +65,7 @@ class WasteEntry:
 class WasteCalendarScene(AbstractScene):
     priority: int = 200
 
-    def execute(self, vboard) -> SceneExecuteReturn:
+    def execute(self, vboard, previous_identifier: str = None) -> SceneExecuteReturn:
         today = datetime.datetime.now()
         calendarweek = (today + datetime.timedelta(weeks=5)).strftime("%V")
         identifier = f"{self.__class__.__name__}_{(today + datetime.timedelta(weeks=5)).strftime('%Y-cw%V')}"

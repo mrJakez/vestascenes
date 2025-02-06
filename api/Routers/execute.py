@@ -56,21 +56,25 @@ async def execute(ignore_operation_hour:bool = False):
         elif current.overwritable:
             logger.info(f"current scene is overwritable - let's overwrite it")
 
-            new_return = director.get_last_return(current.class_string)
+            new_return = director.get_last_return(current.class_string, current.id)
 
             if new_return is not None:
                 message = "overwritten"
+                current_message = new_return.message
                 vesta.pprint(new_return.raw)
                 await vboard_print(new_return.raw)
             else:
                 message = f"Scene is overwritable but new run did not delivered content -> not overwritten"
+                current_message = "-"
 
-            logger.debug(message)
+            logger.debug(f"{message} (current scene message: '{current_message}')")
+
             return {
                 "message": message,
                 "current": {
                     "identifier": current.id,
                     "scene": current.class_string,
+                    "message": current_message
                 }
             }
         else:

@@ -51,7 +51,7 @@ class BirthdayScene(AbstractScene):
         stripped = list(map(str.strip, arr))
         return stripped
 
-    def execute(self, vboard) -> SceneExecuteReturn:
+    def execute(self, vboard, previous_identifier: str = None) -> SceneExecuteReturn:
         if not os.path.isfile("/config/birthdays.ics"):
             return SceneExecuteReturn.error(self, "/config/birthdays.ics does not exist")
 

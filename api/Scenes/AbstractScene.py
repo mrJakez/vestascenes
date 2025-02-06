@@ -72,7 +72,13 @@ class AbstractScene:
     # SceneExecuteReturn object also needs to be updated/changed. Otherwise the scene will not be refreshed.
     overwritable: bool = False
 
-    def execute(self, vboard) -> SceneExecuteReturn:
+    # The previous_identifier was optionally introduced that a scene which has an overwritable feature has a chance to
+    # react on the configuration of the initial scene. This requires a well defined identifier which helps to provide
+    # all required information towards the overwritable execute() call. This currently just works for artwork scenes!
+
+    # This was introduced on behalve of the countdown scene, as the updates should take into account the current
+    # countdown item.
+    def execute(self, vboard, previous_identifier: str = None) -> SceneExecuteReturn:
         raise Exception(f"Sorry, execute() not implemented within class {self.__class__.__name__}")
 
     # invented to save money for the chatgpt execution. Thanks to this the chatgpt scene (when chosen as candidate)
@@ -118,13 +124,3 @@ class AbstractScene:
 
         with open('/config/settings.ini', 'w') as configfile:
             config.write(configfile)
-
-
-class DemoScene(AbstractScene):
-    def execute(self, vboard):
-        message = "Hello, World"
-        raw = vesta.encode_text(message)
-        start_date = datetime.now()
-        end_date = start_date + timedelta(minutes=1)
-        return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", True, self.priority, self,
-                                  start_date, end_date, message, raw)
