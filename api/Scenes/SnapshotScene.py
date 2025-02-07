@@ -27,5 +27,6 @@ class SnapshotScene(AbstractScene):
 
         start_date = datetime.datetime.now()
         end_date = self.get_next_full_hour()
-    
-        return SceneExecuteReturn(f"{self.__class__.__name__}_{str(uuid.uuid4())}", True, self.priority, self, start_date, end_date, f"displaying {snapshot_model.title}", snapshot_model.get_raw_list())
+
+        title_for_id = snapshot_model.title.replace(" ", "").replace("_", "-")
+        return SceneExecuteReturn(f"{self.__class__.__name__}_{title_for_id}_{str(uuid.uuid4())}", True, self.priority, self, start_date, end_date, f"displaying {snapshot_model.title}", snapshot_model.get_raw_list())

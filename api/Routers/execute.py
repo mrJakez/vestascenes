@@ -86,6 +86,7 @@ async def execute(ignore_operation_hour:bool = False):
                     "scene": current.class_string,
                 },
                 "candidate": {
+                    "identifier": candidate.id,
                     "scene": candidate.scene_object.__class__.__name__,
                     "message": candidate.message
                 },
