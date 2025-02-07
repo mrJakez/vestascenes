@@ -10,6 +10,8 @@ from Helper.RawHelper import RawHelper
 from Scenes import AbstractScene
 
 from Helper.Logger import setup_custom_logger
+from Scenes.AbstractScene import SceneExecuteReturn
+
 logger = setup_custom_logger(__file__)
 
 class SceneInstanceModel(SQLModel, table=True):
@@ -24,15 +26,15 @@ class SceneInstanceModel(SQLModel, table=True):
     priority: int
     is_active: bool
 
-    def __init__(self, scene: AbstractScene, **data: Any):
+    def __init__(self, scene_exec_return: SceneExecuteReturn, **data: Any):
         super().__init__(**data)
-        self.id = scene.id
-        self.class_string = scene.scene_object.__class__.__name__
-        self.raw = RawHelper.get_raw_string(scene.raw)
-        self.start_date = scene.start_date
-        self.overwritable = scene.scene_object.overwritable
-        self.end_date = scene.end_date
-        self.priority = scene.priority
+        self.id = scene_exec_return.id
+        self.class_string = scene_exec_return.scene_object.__class__.__name__
+        self.raw = RawHelper.get_raw_string(scene_exec_return.raw)
+        self.start_date = scene_exec_return.start_date
+        self.overwritable = scene_exec_return.scene_object.overwritable
+        self.end_date = scene_exec_return.end_date
+        self.priority = scene_exec_return.priority
         self.is_active = True
 
     def get_raw_list(self) -> List:

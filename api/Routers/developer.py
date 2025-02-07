@@ -5,13 +5,16 @@ from pathlib import Path
 
 import Scenes.BirthdayScene
 import Scenes.StravaLastActivityScene
-import Scenes.Director
+from Models.SceneInstanceModel import SceneInstanceModel
+from Scenes.Director import Director
 from Helper.ConfigHelper import ConfigHelper
 from Helper.RawHelper import RawHelper
 from Helper.VboardHelper import VboardHelper
 from Helper.Logger import setup_custom_logger
 
 import importlib
+
+from Repository import Repository
 
 router = APIRouter()
 vboard = VboardHelper().get_client()
@@ -31,18 +34,25 @@ async def test_scene(scene_class_string: str = None, send_to_board: bool = False
     if scene_class_string is None:
         return {"message": "please define a scene class name which you want to test"}
 
-    my_class = getattr(importlib.import_module(f"Scenes.{scene_class_string}"), scene_class_string)
-    scene = my_class()
+    director = Director(vboard)
+    scene = director.get_scene(scene_class_string)
     scene.post_execution = True
+
     res = scene.execute(vboard)
 
     if res.raw is not None:
         vesta.pprint(res.raw)
         if send_to_board:
             try:
+                Repository().unmark_active_scene_instance()
+                model = SceneInstanceModel(scene_exec_return=res)
+                Repository().save_scene_instance(model)
+
                 vboard.write_message(res.raw)
             except Exception as exc:
                 logger.error(f"HTTP Exception catched {exc}")
+
+    logger.info(f"/test-scene executed:{res.message}")
 
     return {
         "should_execute": res.should_execute,

@@ -125,7 +125,7 @@ async def execute(ignore_operation_hour:bool = False):
 
     await vboard_print(candidate.raw)
 
-    model = SceneInstanceModel(scene=candidate)
+    model = SceneInstanceModel(scene_exec_return=candidate)
     Repository().save_scene_instance(model)
 
     logger.debug('end execute')
