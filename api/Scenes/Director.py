@@ -68,7 +68,7 @@ class Director:
             scenes.append(SnapshotScene())
             scenes.append(ChatGPTScene())
             scenes.append(ClockScene())
-            # scenes.append(CountdownScene())
+            scenes.append(CountdownScene())
 
         if weighted is True:
             weighted_scenes = []
