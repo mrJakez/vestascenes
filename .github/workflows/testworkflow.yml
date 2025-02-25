@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       sha_short: ${{ steps.writestep.outputs.sha_short }}
+      foo: ${{ steps.writestep.outputs.foo }}
     steps:
       - uses: actions/checkout@v1
       - id: writestep
