@@ -17,6 +17,7 @@ jobs:
         shell: bash
         run: |
           echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
+          echo "foo=baaaaaaar" >> "$GITHUB_OUTPUT"
           
   read-vars-on-another-job:
     runs-on: ubuntu-latest
@@ -25,9 +26,11 @@ jobs:
       - name: Sample task to read vars
         env:
           sha_short: ${{needs.set-vars.outputs.sha_short}}
+          foo: ${{needs.set-vars.outputs.foo}}
         shell: bash
         run: |
           echo "sha short: $sha_short"
+          echo "foo: $foo"
           
     env:
       DOCKER_CLI_EXPERIMENTAL: enabled
