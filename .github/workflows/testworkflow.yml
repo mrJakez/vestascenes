@@ -40,10 +40,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+      uses: docker/setup-buildx-action@v3
 
     - name: Login to Docker Hub
       run: echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
@@ -56,10 +56,8 @@ jobs:
         echo "da ist er $sha_short"
         echo "$sha_short" > "git-version.txt"
         docker buildx create --use
-        docker buildx build \
-          --file Dockerfile \
-          --tag jakez/vestascenes-api:latest 
-        
+
+
     env:
       DOCKER_CLI_EXPERIMENTAL: enabled
       DOCKER_BUILDKIT: 1
