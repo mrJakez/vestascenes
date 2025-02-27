@@ -2,6 +2,7 @@ import vesta
 from fastapi import APIRouter
 from starlette.responses import RedirectResponse
 from pathlib import Path
+from datetime import datetime
 
 import Scenes.BirthdayScene
 import Scenes.StravaLastActivityScene
@@ -76,6 +77,7 @@ async def status():
 
     return {
         "enabled": (not ConfigHelper.is_disabled()),
+        "in-working-hours": ConfigHelper.is_in_operation_hours(datetime.now()),
         "git-hash": ConfigHelper.get_git_hash(),
         "strava-initialized": Scenes.StravaLastActivityScene.StravaLastActivityScene.is_initialized(),
         "vboard-initialized": vboard_initialized
