@@ -10,13 +10,13 @@ class ConfigHelper:
     def is_in_operation_hours(cls, now: datetime) -> Union[dict[str, str], None]:
         config = get_config()
 
-        # Unterscheidung zwischen Wochentagen und Wochenenden
-        if now.weekday() < 5:  # Montag bis Freitag (0 = Montag, ..., 4 = Freitag)
-            start_hour = int(config['operation-hours']['weekday_start'])
-            end_hour = int(config['operation-hours']['weekday_end'])
-        else:  # Samstag und Sonntag (5 = Samstag, 6 = Sonntag)
+        # Friday and Saturday
+        if now.weekday() == 4 or now.weekday() == 5:
             start_hour = int(config['operation-hours']['weekend_start'])
             end_hour = int(config['operation-hours']['weekend_end'])
+        else: # within week
+            start_hour = int(config['operation-hours']['weekday_start'])
+            end_hour = int(config['operation-hours']['weekday_end'])
 
         if now.hour < start_hour:
             return {"message": "Not executed - too early"}
