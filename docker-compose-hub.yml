@@ -26,7 +26,7 @@ services:
     # (default stop signal from Compose is SIGTERM)
     stop_signal: SIGINT
     expose:
-      - 8000
+      - 80
     volumes:
 #      - ./database:/database
       - /volumeUSB1/usbshare/vestaboard-database:/database

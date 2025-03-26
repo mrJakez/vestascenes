@@ -10,10 +10,10 @@ services:
     # (default stop signal from Compose is SIGTERM)
     stop_signal: SIGINT
     expose:
-      - 8000
+      - 80
     # for direct debudding and deploy via pycharm
     ports:
-      - "8001:8000"
+      - "8001:80"
     volumes:
       - ./database:/database
       - ./config:/config
