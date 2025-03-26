@@ -11,12 +11,29 @@ services:
     stop_signal: SIGINT
     expose:
       - 8000
+    # for direct debudding and deploy via pycharm
     ports:
-      #extern:intern
-      - '8000:8000'
+      - "8001:8000"
     volumes:
       - ./database:/database
       - ./config:/config
+
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    expose:
+      - 80
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+      - frontend
 
   runner:
     depends_on:

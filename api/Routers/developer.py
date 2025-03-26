@@ -14,7 +14,8 @@ from Helper.VboardHelper import VboardHelper
 from Helper.Logger import setup_custom_logger
 
 import importlib
-
+from fastapi import Request
+from fastapi.responses import RedirectResponse
 from Repository import Repository
 
 router = APIRouter()
@@ -24,8 +25,15 @@ logger = setup_custom_logger(__file__)
 
 
 @router.get("/", tags=["developer support"])
-async def root_path():
-    return RedirectResponse("/status")
+async def root_path(request: Request):
+
+    mainpath = str(request.url)
+    if request.headers.get("nginx-active") == "true":
+        print(request.url)
+        print(request.headers)
+        mainpath = "http://" + request.headers.get("x-original-host") + request.headers.get("x-original-uri")
+
+    return RedirectResponse(mainpath + "status")
 
 
 @router.get("/test-scene/{scene_class_string}/{send_to_board}", tags=["developer support"])
