@@ -1,6 +1,10 @@
 services:
   nginx:
     image: nginx:latest
+    container_name: vestascenes-nginx
+    labels:
+      logging: "vestascenes-nginx"
+      logging_jobname: "containerlogs"
     ports:
       - "8000:80"
     volumes:
@@ -11,6 +15,10 @@ services:
 
   api:
     image: jakez/vestascenes-api:latest
+    container_name: vestascenes-api
+    labels:
+      logging: "vestascenes-api"
+      logging_jobname: "containerlogs"
     environment:
       # required to directly print() towards stdout - activates flush always
       PYTHONUNBUFFERED: 1
@@ -20,18 +28,27 @@ services:
     expose:
       - 8000
     volumes:
-      - ./database:/database
+#      - ./database:/database
+      - /volumeUSB1/usbshare/vestaboard-database:/database
       - ./config:/config
 
   frontend:
     build:
       context: frontend
       dockerfile: Dockerfile
+    container_name: vestascenes-frontend
+    labels:
+      logging: "vestascenes-frontend"
+      logging_jobname: "containerlogs"
     expose:
       - 80
 
   runner:
     image: jakez/vestascenes-runner:latest
+    container_name: vestascenes-runner
+    labels:
+      logging: "vestascenes-runner"
+      logging_jobname: "containerlogs"
     depends_on:
       - api
     links:
@@ -40,6 +57,7 @@ services:
       # required to directly print() towards stdout - activates flush always
       PYTHONUNBUFFERED: 1
     restart: on-failure
+
   watchtower:
     container_name: watchtower
     image: containrrr/watchtower
