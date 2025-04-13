@@ -5,6 +5,7 @@ import time
 import requests
 
 
+
 def setup_custom_logger(file):
     logger = logging.getLogger(os.path.splitext(os.path.basename(file))[0])
     logger.setLevel(logging.DEBUG)
