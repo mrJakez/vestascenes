@@ -4,6 +4,8 @@ import time
 import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+
 from Helper.ConfigHelper import ConfigHelper
 from Helper.Logger import setup_custom_logger
 
@@ -14,7 +16,7 @@ os.environ['TZ'] = 'Europe/Berlin'
 time.tzset()
 
 # noinspection PyPep8
-from Routers import strava, developer, lifecycle, snapshots, execute
+from Routers import strava, developer, lifecycle, snapshots, execute, frontend
 
 description = """
 This is a vestaboard server implementation which organizes the vestaboard related content within scenes. 🚀
@@ -87,11 +89,16 @@ async def add_process_time_header(request: Request, call_next):
             status_code=500
         )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"]
+)
 
 app.include_router(strava.router)
 app.include_router(developer.router)
 app.include_router(lifecycle.router)
 app.include_router(snapshots.router)
 app.include_router(execute.router)
+app.include_router(frontend.router)
 
 

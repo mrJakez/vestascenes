@@ -14,3 +14,9 @@ class SnapshotModel(UUIDSQLModel, table=True):
 
     def get_raw_list(self) -> List:
         return RawHelper.get_raw_object(self.raw)
+
+    def get_filename(self) -> str:
+        return self.title.split(" - ")[0]
+
+    def get_title(self) -> str:
+        return self.title.split(" - ")[1]

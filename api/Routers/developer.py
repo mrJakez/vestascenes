@@ -68,7 +68,8 @@ async def test_scene(scene_class_string: str = None, send_to_board: bool = False
         "message": res.message,
         "start_date": res.start_date,
         "end_date": res.end_date,
-        "priority": res.priority
+        "priority": res.priority,
+        "raw": res.raw,
     }
 
 

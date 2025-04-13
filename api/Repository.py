@@ -1,7 +1,7 @@
 import typing
 from datetime import datetime
 
-from sqlalchemy import Engine
+from sqlalchemy import Engine, desc
 from sqlmodel import Session, SQLModel, create_engine, select
 
 from Models.ChatGPTHistoryModel import ChatGPTHistoryModel
@@ -46,14 +46,15 @@ class Repository(metaclass=SingletonMeta):
 
         return self._engine
 
-    def get_snapshots(self) -> typing.List[SnapshotModel]:
+    def get_snapshots(self, filename: typing.Union[str, None] = None) -> typing.List[SnapshotModel]:
         with Session(self.get_engine()) as session:
             statement = select(SnapshotModel)
             results = session.exec(statement)
             snapshots = []
 
             for snapshot in results:
-                snapshots.append(snapshot)
+                if filename is None or snapshot.get_filename() == filename:
+                    snapshots.append(snapshot)
 
         return snapshots
 
@@ -87,16 +88,16 @@ class Repository(metaclass=SingletonMeta):
             session.commit()
             session.refresh(model)
 
-    def get_scene_instances(self):
+    def get_scene_instances(self) -> typing.List[SceneInstanceModel]:
         with Session(self.get_engine()) as session:
-            statement = select(SceneInstanceModel)
+            statement = select(SceneInstanceModel).order_by(desc(SceneInstanceModel.start_date))
             results = session.exec(statement)
             scene_instances = []
 
             for scene_instance in results:
                 scene_instances.append(scene_instance)
 
-        return scene_instance
+        return scene_instances
 
     def save_scene_instance(self, model: SceneInstanceModel):
         with Session(self.get_engine()) as session:
