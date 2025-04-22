@@ -24,13 +24,13 @@ export function ScenesContainer() {
   useEffect(() => {
     const fetchScenes = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/scenes`);
+        const res = await fetch(`${process.env.FALLBACK_BACKEND_URL}/scenes`);
         const data: ApiResponse = await res.json();
 
         const scenesWithRaw = await Promise.all(
           data.content.map(async (scene) => {
             try {
-              const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/scene/${scene.scene}`);
+              const res = await fetch(`${process.env.FALLBACK_BACKEND_URL}/scene/${scene.scene}`);
               const extra = await res.json();
               console.log("RAW:", extra.raw)
               return { ...scene, raw: extra.raw };

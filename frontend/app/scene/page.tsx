@@ -28,7 +28,7 @@ function SnapshotSceneDetailList({
   useEffect(() => {
     const fetchFilenames = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/snapshot-filenames`);
+        const res = await fetch(`${process.env.FALLBACK_BACKEND_URL}/snapshot-filenames`);
         const data = await res.json();
         setFilenames(data.content);
       } catch (err) {
@@ -46,7 +46,7 @@ function SnapshotSceneDetailList({
       if (!selectedFilename) return;
       setLoading(true);
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/snapshots/?filename=${selectedFilename}`);
+        const res = await fetch(`${process.env.FALLBACK_BACKEND_URL}/snapshots/?filename=${selectedFilename}`);
         const data = await res.json();
         const withFilename = data.content.map((s: Snapshot) => ({ ...s, filename: selectedFilename }));
         setSnapshots(withFilename);

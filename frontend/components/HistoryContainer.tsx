@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {BoardPreview, LinearProgress} from "@vestaboard/installables";
 import { formatDistanceToNow } from "date-fns";
 import { de } from "date-fns/locale";
+import { getRuntimeConfig } from "../utils/runtime-config"; // Pfad anpassen
 
 export interface SceneInstance {
   id: string;
@@ -29,7 +30,10 @@ export function HistoryContainer() {
   useEffect(() => {
     const fetchScenes = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/history`);
+        const config = await getRuntimeConfig();
+
+
+        const res = await fetch(`${config.apiUrl}/history`);
         const data: ApiResponse = await res.json();
         setHistory(data.content);
 
