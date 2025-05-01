@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import Editor from "@/components/BoardEditor";
-import invariant from "tiny-invariant";
 import {HistoryContainer} from "@/components/HistoryContainer"
 import {ScenesContainer} from "@/components/ScenesContainer"
 import { getRuntimeConfig } from "../utils/runtime-config"; // Pfad anpassen
@@ -43,7 +42,7 @@ export default function TabBarClientContainer() {
               <ScenesContainer />
           </div>}
           {tabIndex === 2 && <div>
-              <Editor backendUrl={apiUrl} />
+              <Editor backendUrl={apiUrl ?? ""} />
           </div>}
 	  </div>
 	</div>
