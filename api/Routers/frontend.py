@@ -7,6 +7,7 @@ from httpx import HTTPStatusError
 
 from Helper.ConfigHelper import ConfigHelper
 from Helper.VboardHelper import VboardHelper
+from Helper.RawHelper import RawHelper
 from Models.SceneInstanceModel import SceneInstanceModel
 from Repository import Repository
 from Scenes.AbstractScene import SceneExecuteReturn
@@ -34,6 +35,7 @@ async def test_scene(scene_class_string: str = None):
 
     director = Director(vboard)
     scene = director.get_scene(scene_class_string)
+    scene.force_positive_rendering = True
     scene.post_execution = True
     res = scene.execute(vboard)
 
@@ -85,4 +87,17 @@ async def history():
     return {
         "meta": {},
         "content": res
+    }
+
+
+
+@router.get("/frontend/write/", tags=["frontend support"])
+async def write(raw: Union[str, None] = None):
+    logger.info(f"frontend -> write")
+
+    vboard.write_message(RawHelper.get_raw_object(raw))
+
+    return {
+        "meta": {},
+        "content": f"Empfangen: {raw}"
     }

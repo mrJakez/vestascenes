@@ -154,7 +154,7 @@ class StravaLastActivityScene(AbstractScene):
             return SceneExecuteReturn.error(self, "Atrava not initialized.")
 
         last_executed = self.get_last_executed()
-        if last_executed is not None and last_executed + timedelta(minutes=2) > datetime.now():
+        if self.force_positive_rendering is False and last_executed is not None and last_executed + timedelta(minutes=2) > datetime.now():
             return SceneExecuteReturn.error(self, f"strava not executed to protect rate limit ({last_executed})")
 
         expire_at = datetime.fromtimestamp(int(self.get_config("expires_at")))
@@ -182,7 +182,7 @@ class StravaLastActivityScene(AbstractScene):
         logger.info(f"id: {last_activity.id} - name: {last_activity.name} - type: {last_activity.type} - start_date: {last_activity.start_date} - start_date_local: {last_activity.start_date_local}")
 
         activity_end_date = last_activity.start_date_local + timedelta(seconds=last_activity.elapsed_time.seconds)
-        if ((datetime.now() - timedelta(hours=24)) < activity_end_date) is False:
+        if self.force_positive_rendering == False and ((datetime.now() - timedelta(hours=24)) < activity_end_date) is False:
             self.store_last_executed(datetime.now())
             msg = f"last strava activity '{last_activity.name}' is to old (start_date: {last_activity.start_date_local})"
             return SceneExecuteReturn.error(self, msg)

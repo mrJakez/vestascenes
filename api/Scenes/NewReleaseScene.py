@@ -18,7 +18,7 @@ class NewReleaseScene(AbstractScene):
         # fetch current version
         current_hash = ConfigHelper.get_git_hash()
 
-        if prev_hash == current_hash:
+        if self.force_positive_rendering is False and prev_hash == current_hash:
             return SceneExecuteReturn.error(self, "no new version")
 
         self.save_config({'stored-hash': current_hash})

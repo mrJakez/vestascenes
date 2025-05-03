@@ -66,6 +66,9 @@ class AbstractScene:
     # used for artwork scenes. With the weight property specific artwork scenes can dominate others.
     weight: int = 1
 
+    # used for some frontend cases. In previews I would like to render some content anyways
+    force_positive_rendering: bool = False
+
     # some scenes may collect new content during their run. For example the strava scene -> when the title is updated or
     # a clock scene. In these cases the scene can be flagged as overwritable -> which does mean the new content of the
     # new run will be taken and will replace the existing one. Please remember that the uniqueId of the corresponding

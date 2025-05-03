@@ -1,10 +1,9 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
-import { BoardPreview } from "@vestaboard/installables";
-import {getRuntimeConfig} from "@/utils/runtime-config";
+import { BoardPreview, Toast } from "@vestaboard/installables";
+import { getRuntimeConfig } from "@/utils/runtime-config";
 
 interface Snapshot {
   id: string;
@@ -25,13 +24,15 @@ function SnapshotSceneDetailList({
   const [filenames, setFilenames] = useState<string[]>([]);
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
   const [loading, setLoading] = useState(true);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState<"success" | "error">("success");
 
   useEffect(() => {
     const fetchFilenames = async () => {
       try {
         const config = await getRuntimeConfig();
         const res = await fetch(`${config.apiUrl}/snapshot-filenames`);
-
         const data = await res.json();
         setFilenames(data.content);
       } catch (err) {
@@ -51,9 +52,11 @@ function SnapshotSceneDetailList({
       try {
         const config = await getRuntimeConfig();
         const res = await fetch(`${config.apiUrl}/snapshots/?filename=${selectedFilename}`);
-
         const data = await res.json();
-        const withFilename = data.content.map((s: Snapshot) => ({ ...s, filename: selectedFilename }));
+        const withFilename = data.content.map((s: Snapshot) => ({
+          ...s,
+          filename: selectedFilename,
+        }));
         setSnapshots(withFilename);
       } catch (err) {
         console.error("Fehler beim Laden der Snapshots:", err);
@@ -65,6 +68,30 @@ function SnapshotSceneDetailList({
     if (selectedFilename) loadSnapshots();
   }, [selectedFilename]);
 
+  async function handleBoardClick(snap: Snapshot) {
+    try {
+      const config = await getRuntimeConfig();
+      const res = await fetch(`${config.apiUrl}/write/?raw=${snap.raw}`);
+
+      if (!res.ok) {
+        throw new Error(`Fehler: ${res.status}`);
+      }
+
+      const data = await res.json();
+      console.log("Antwort vom Server:", data);
+
+      // Erfolgs-Toast
+      setToastMessage(`Snapshot ${snap.title} erfolgreich gesendet!`);
+      setToastSeverity("success");
+      setToastOpen(true);
+    } catch (err) {
+      console.error("Fehler beim AJAX-Request:", err);
+      setToastMessage(`Fehler beim Senden von ${snap.title}`);
+      setToastSeverity("error");
+      setToastOpen(true);
+    }
+  }
+
   if (loading) return <div>Lade...</div>;
 
   if (selectedFilename) {
@@ -73,12 +100,22 @@ function SnapshotSceneDetailList({
         <ul style={{ listStyle: "none", padding: 0 }}>
           {snapshots.map((snap) => (
             <li key={snap.id} style={{ marginBottom: "2rem" }}>
-              <BoardPreview characters={JSON.parse(snap.raw)}>
-                {snap.title}
-              </BoardPreview>
+              <div onClick={() => handleBoardClick(snap)} style={{ cursor: "pointer" }}>
+                <BoardPreview characters={JSON.parse(snap.raw)}>
+                  {snap.title}
+                </BoardPreview>
+              </div>
             </li>
           ))}
         </ul>
+
+        {/* Toast-Komponente */}
+        <Toast
+          severity={toastSeverity}
+          message={toastMessage}
+          open={toastOpen}
+          onClose={() => setToastOpen(false)}
+        />
       </div>
     );
   }
@@ -122,7 +159,14 @@ function PageInner() {
 
   return (
     <div style={{ padding: "2rem" }}>
-      <div style={{ display: "flex", alignItems: "center", marginBottom: "1.5rem", gap: "1rem" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          marginBottom: "1.5rem",
+          gap: "1rem",
+        }}
+      >
         <button
           onClick={handleBack}
           style={{

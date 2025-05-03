@@ -70,7 +70,7 @@ class WasteCalendarScene(AbstractScene):
         calendarweek = (today + datetime.timedelta(weeks=5)).strftime("%V")
         identifier = f"{self.__class__.__name__}_{(today + datetime.timedelta(weeks=5)).strftime('%Y-cw%V')}"
 
-        if today.weekday() != 6:
+        if self.force_positive_rendering == False and today.weekday() != 6:
             return SceneExecuteReturn.error(self, "Will just check waste calendar on Sunday")
 
         url = "https://gelsendienste.abisapp.de/abfuhrkalender?format=ical&street=0E1F25F8&number=21"
