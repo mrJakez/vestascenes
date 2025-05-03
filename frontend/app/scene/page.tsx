@@ -32,7 +32,7 @@ function SnapshotSceneDetailList({
     const fetchFilenames = async () => {
       try {
         const config = await getRuntimeConfig();
-        const res = await fetch(`${config.apiUrl}/snapshot-filenames`);
+        const res = await fetch(`${config.apiUrl}/snapshot-filenames/`);
         const data = await res.json();
         setFilenames(data.content);
       } catch (err) {
