@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BoardPreview, LinearProgress, IBoard } from "@vestaboard/installables";
 import { encodeBoardCharacters } from "@vestaboard/installables/lib/utils/encodeBoardCharacters";
+import {getRuntimeConfig} from "@/utils/runtime-config";
 
 export interface Scene {
   scene: string;
@@ -24,13 +25,14 @@ export function ScenesContainer() {
   useEffect(() => {
     const fetchScenes = async () => {
       try {
-        const res = await fetch(`${process.env.FALLBACK_BACKEND_URL}/scenes`);
+        const config = await getRuntimeConfig();
+        const res = await fetch(`${config.apiUrl}/scenes`);
         const data: ApiResponse = await res.json();
 
         const scenesWithRaw = await Promise.all(
           data.content.map(async (scene) => {
             try {
-              const res = await fetch(`${process.env.FALLBACK_BACKEND_URL}/scene/${scene.scene}`);
+              const res = await fetch(`${config.apiUrl}/scene/${scene.scene}`);
               const extra = await res.json();
               console.log("RAW:", extra.raw)
               return { ...scene, raw: extra.raw };

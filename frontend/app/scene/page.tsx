@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import { BoardPreview } from "@vestaboard/installables";
+import {getRuntimeConfig} from "@/utils/runtime-config";
 
 interface Snapshot {
   id: string;
@@ -28,7 +29,9 @@ function SnapshotSceneDetailList({
   useEffect(() => {
     const fetchFilenames = async () => {
       try {
-        const res = await fetch(`${process.env.FALLBACK_BACKEND_URL}/snapshot-filenames`);
+        const config = await getRuntimeConfig();
+        const res = await fetch(`${config.apiUrl}/snapshot-filenames`);
+
         const data = await res.json();
         setFilenames(data.content);
       } catch (err) {
@@ -46,7 +49,9 @@ function SnapshotSceneDetailList({
       if (!selectedFilename) return;
       setLoading(true);
       try {
-        const res = await fetch(`${process.env.FALLBACK_BACKEND_URL}/snapshots/?filename=${selectedFilename}`);
+        const config = await getRuntimeConfig();
+        const res = await fetch(`${config.apiUrl}/snapshots/?filename=${selectedFilename}`);
+
         const data = await res.json();
         const withFilename = data.content.map((s: Snapshot) => ({ ...s, filename: selectedFilename }));
         setSnapshots(withFilename);
