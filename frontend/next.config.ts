@@ -15,13 +15,19 @@ const nextConfig: NextConfig = {
 
     if (imageRule) {
       // exclude SVGs from the default Next.js image loader
-      imageRule.exclude = /\.svg$/;
+      imageRule.exclude = [/\.svg$/, /\.png$/];
     }
 
-    config.module.rules.push({
-      test: /\.svg$/,
-      type: "asset/resource",
-    });
+    config.module.rules.push(
+      {
+        test: /\.svg$/,
+        type: "asset/resource",
+      },
+      {
+        test: /\.png$/,
+        type: "asset/resource",
+      }
+    );
 
     return config;
   },

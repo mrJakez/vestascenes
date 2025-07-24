@@ -12,13 +12,20 @@ const config: StorybookConfig = {
       rule?.test?.test && rule.test.test(".svg")
     );
     if (fileLoaderRule) {
-      fileLoaderRule.exclude = /\.svg$/;
+      fileLoaderRule.exclude = [/\.svg$/, /\.png$/];
     }
-    config.module?.rules?.push({
-      test: /\.svg$/,
-      issuer: /\.[jt]sx?$/,
-      type: "asset/resource",
-    });
+    config.module?.rules?.push(
+      {
+        test: /\.svg$/,
+        issuer: /\.[jt]sx?$/,
+        type: "asset/resource",
+      },
+      {
+        test: /\.png$/,
+        issuer: /\.[jt]sx?$/,
+        type: "asset/resource",
+      }
+    );
     return config;
   },
 };
