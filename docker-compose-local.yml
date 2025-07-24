@@ -23,7 +23,11 @@ services:
       context: frontend
       dockerfile: Dockerfile
     expose:
-      - 80
+      - 3000
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=http://vestaboard.imount.de/api/frontend
 
   nginx:
     image: nginx:latest
