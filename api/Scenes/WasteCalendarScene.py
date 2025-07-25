@@ -76,6 +76,8 @@ class WasteCalendarScene(AbstractScene):
             return SceneExecuteReturn.error(self, "Will just check waste calendar on Sunday")
 
         url = "https://gelsendienste.abisapp.de/abfuhrkalender?format=ical&street=0E1F25F8&number=21"
+        logger.info(f"Daten werden gelesen")
+
         file = requests.get(url).text
         logger.info(f"Daten gelesen")
 
