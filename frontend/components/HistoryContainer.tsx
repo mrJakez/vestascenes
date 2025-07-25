@@ -50,7 +50,7 @@ export function HistoryContainer() {
   return (
     <div>
         {history.map((scene) => (
-          <div key={scene.id}>
+          <div key={scene.id} className="preview">
             <BoardPreview characters={JSON.parse(scene.raw)}>
               {scene.class_string}
               {formatDistanceToNow(new Date(scene.start_date), {

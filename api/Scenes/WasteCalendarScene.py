@@ -10,6 +10,8 @@ from vesta.vbml import Component
 
 from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 
+from Helper.Logger import setup_custom_logger
+logger = setup_custom_logger(__file__)
 
 # class syntax
 class WasteType(Enum):
@@ -75,7 +77,10 @@ class WasteCalendarScene(AbstractScene):
 
         url = "https://gelsendienste.abisapp.de/abfuhrkalender?format=ical&street=0E1F25F8&number=21"
         file = requests.get(url).text
+        logger.info(f"Daten gelesen")
+
         gcal = Calendar.from_ical(file)
+        logger.info(f"Calender geladen")
 
         friday_next_week: date = today.date() + datetime.timedelta(days=5)
         todos: List[WasteEntry] = []
