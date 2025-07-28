@@ -3,6 +3,7 @@ from typing import Optional
 
 import vesta
 from stravalib import Client, unithelper
+from stravalib.exc import RateLimitExceeded, Fault
 from vesta.vbml import Component
 
 from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
@@ -151,7 +152,7 @@ class StravaLastActivityScene(AbstractScene):
                                             "Strava not configured. Please specify client_id and client_secret in config/settings.ini within the 'StravaLastActivityScene' section")
 
         if StravaLastActivityScene.is_initialized() is False:
-            return SceneExecuteReturn.error(self, "Atrava not initialized.")
+            return SceneExecuteReturn.error(self, "Strava not initialized.")
 
         last_executed = self.get_last_executed()
         if self.force_positive_rendering is False and last_executed is not None and last_executed + timedelta(minutes=2) > datetime.now():
@@ -168,9 +169,14 @@ class StravaLastActivityScene(AbstractScene):
             StravaLastActivityScene.store_tokens(token_response['access_token'], token_response['refresh_token'],
                                                  token_response['expires_at'])
 
-        client = Client(access_token=self.get_config("access_token"))
-        last_activity_summary = client.get_activities(limit=1).next()
-        last_activity = client.get_activity(last_activity_summary.id)
+        try:
+            client = Client(access_token=self.get_config("access_token"), rate_limit_requests=False)
+            last_activity_summary = client.get_activities(limit=1).next()
+            last_activity = client.get_activity(last_activity_summary.id)
+        except Fault as e:
+            return SceneExecuteReturn.error(self, "Rate Limits exceeded")
+        except Exception as e:
+            return SceneExecuteReturn.error(self, f"Some unknown stravalib Exception was raised {e}")
 
         # last_activity = client.get_activity(11371875821)
         # ruhrtour2024 11371875821
