@@ -61,7 +61,9 @@ class WasteEntry:
         return f'{self.type} - {self.date_str()}'
 
     def date_str(self):
-        return self.date.strftime('%d.%m (%a)')
+        weekdays_short_de = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
+        weekday = self.date.weekday()  # 0 = Montag
+        return self.date.strftime('%d.%m') + f" ({weekdays_short_de[weekday]})"
 
 
 class WasteCalendarScene(AbstractScene):
