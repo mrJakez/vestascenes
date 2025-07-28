@@ -48,9 +48,9 @@ export function HistoryContainer() {
   if (loading) return <LinearProgress />;
 
   return (
-    <div>
+    <div className="board-list">
         {history.map((scene) => (
-          <div key={scene.id} className="preview">
+          <div key={scene.id} className="board-container">
             <BoardPreview characters={JSON.parse(scene.raw)}>
               {scene.class_string}
               {formatDistanceToNow(new Date(scene.start_date), {

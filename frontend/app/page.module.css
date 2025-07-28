@@ -23,14 +23,3 @@
   grid-row-start: 2;
   width: 100%;
 }
-
-@media (min-width: 1000px) {
-  .page {
-    padding: 32px;
-    padding-bottom: 80px;
-  }
-
-  .main {
-    align-items: center;
-  }
-}

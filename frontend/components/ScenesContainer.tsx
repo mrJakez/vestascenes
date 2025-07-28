@@ -58,12 +58,13 @@ export function ScenesContainer() {
   if (loading) return <LinearProgress />;
 
   return (
-    <div>
+    <div className="board-list">
         {scenes.map((scene) => (
           <div
             key={scene.scene}
             onClick={() => router.push(`/scene/?scene=${scene.scene}`)}
             style={{ cursor: "pointer" }}
+            className="board-container"
           >
             {scene.raw ? (
               <BoardPreview characters={scene.raw}>
