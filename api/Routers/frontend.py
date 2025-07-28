@@ -14,6 +14,8 @@ from Scenes.AbstractScene import SceneExecuteReturn
 from Scenes.Director import Director
 from Helper.Logger import setup_custom_logger
 from itertools import islice
+from pydantic import BaseModel
+from typing import List
 
 router = APIRouter()
 vboard = VboardHelper().get_client()
@@ -90,14 +92,20 @@ async def history():
     }
 
 
+class BoardWriteRequest(BaseModel):
+    mode: str
+    boardValue: List
 
-@router.get("/frontend/write/", tags=["frontend support"])
-async def write(raw: Union[str, None] = None):
+@router.post("/frontend/write", tags=["frontend support"])
+async def write(request: BoardWriteRequest):
     logger.info(f"frontend -> write")
+    mode = request.mode
+    board = request.boardValue
 
-    vboard.write_message(RawHelper.get_raw_object(raw))
+    vboard.write_message(board)
 
     return {
         "meta": {},
-        "content": f"Empfangen: {raw}"
+        "content": f"{board}",
+        "mode": f"{mode}"
     }

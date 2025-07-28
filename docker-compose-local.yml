@@ -27,6 +27,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+#      - API_URL=http://localhost:8000/api/frontend
       - API_URL=http://vestaboard.imount.de/api/frontend
 
   nginx:

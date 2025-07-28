@@ -15,7 +15,10 @@ export const post = ({
 }) =>
   fetch(url, {
     method: "POST",
-    mode: "no-cors",
+    // mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(body),
   })
     .then((res) => {

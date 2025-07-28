@@ -25,7 +25,7 @@ function Editor({ backendUrl }: BoardEditorProps) {
         setBoardValue={setBoardValue}
         onSend={() =>
           post({
-            url: backendUrl,
+            url: backendUrl + "/write",
             body: { mode: "set", boardValue },
             addToast,
             successMessage: "Board updated!",
