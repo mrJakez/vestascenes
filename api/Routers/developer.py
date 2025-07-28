@@ -45,6 +45,7 @@ async def test_scene(scene_class_string: str = None, send_to_board: bool = False
 
     director = Director(vboard)
     scene = director.get_scene(scene_class_string)
+    scene.force_positive_rendering = True
     scene.post_execution = True
 
     res = scene.execute(vboard)
