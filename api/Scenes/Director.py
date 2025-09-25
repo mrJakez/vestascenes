@@ -13,6 +13,7 @@ from Scenes.CountdownScene import CountdownScene
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
 from Scenes.ClockScene import ClockScene
+from Scenes.MercedesMeScene import MercedesMeScene
 from Repository import Repository
 
 from Helper.Logger import setup_custom_logger
@@ -69,6 +70,7 @@ class Director:
             scenes.append(ChatGPTScene())
             scenes.append(ClockScene())
             scenes.append(CountdownScene())
+            scenes.append(MercedesMeScene())
 
         if weighted is True:
             weighted_scenes = []
