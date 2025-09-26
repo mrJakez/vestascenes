@@ -12,6 +12,9 @@ from Helper.RawHelper import RawHelper
 from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 from vesta.vbml import Component
 
+from Helper.Logger import setup_custom_logger
+logger = setup_custom_logger(__file__)
+
 
 class MercedesMeScene(AbstractScene):
     weight = 3
@@ -31,42 +34,11 @@ class MercedesMeScene(AbstractScene):
         start_date = datetime.datetime.now()
         end_date = self.get_next_full_hour()
 
-        # ---- Odometer aus Home Assistant holen ----
-        headers = {
-            "Authorization": f"Bearer {self.hass_token}",
-            "Content-Type": "application/json",
-        }
+        odometer_km = self._get_odo()
+        state_of_charge = self._get_state_of_charge()
 
-        r_odo = requests.get(f"{self.hass_url}/api/states/sensor.d_cc209e_odometer", headers=headers, timeout=10)
-        r_odo.raise_for_status()
-        data_odo = r_odo.json()
-
-        r_state_of_charge = requests.get(f"{self.hass_url}/api/states/sensor.d_cc209e_state_of_charge", headers=headers, timeout=10)
-        r_state_of_charge.raise_for_status()
-        data_state_of_charge = r_state_of_charge.json()
-
-
-        r_odo = requests.get(f"{self.hass_url}/api/states/sensor.d_cc209e_odometer", headers=headers, timeout=10)
-        r_odo.raise_for_status()
-        data_odo = r_odo.json()
-
-        # State kann string sein -> in float wandeln
-        try:
-            odometer_km = float(str(data_odo["state"]).replace(",", "."))
-        except (ValueError, KeyError) as e:
-            # Fallback: Nachricht mit Fehler anzeigen
-            message = "ODO: N/A\nAPI-Fehler"
-            chars = vesta.encode_text(message, align="center", valign="middle")
-            return SceneExecuteReturn(
-                f"{self.__class__.__name__}_{start_date.strftime('%Y-%m-%d-%H:%M')}",
-                False,
-                self.priority,
-                self,
-                start_date,
-                end_date,
-                message,
-                chars,
-            )
+        if odometer_km == -1:
+            return SceneExecuteReturn.error(self, f"We had problems to fetch the current km from mercedes-me)")
 
         # ---- Soll/Ist berechnen ----
         res = self._km_delta_vs_allowance(
@@ -84,7 +56,7 @@ class MercedesMeScene(AbstractScene):
 
         message = (
             "Sternchen Status\n\n"
-            f"Energie: {data_state_of_charge['state']}%\n"
+            f"Energie: {state_of_charge}%\n"
             f"ODO: {int(odometer_km):,}km\n\n"
             f"{sign}{over_under}km vs Soll"
         )
@@ -107,6 +79,32 @@ class MercedesMeScene(AbstractScene):
 
 
     # ---- intern: Berechnung Soll/Ist ----
+    def _get_state_of_charge(self) -> string:
+        headers = {
+            "Authorization": f"Bearer {self.hass_token}",
+            "Content-Type": "application/json",
+        }
+        r_state_of_charge = requests.get(f"{self.hass_url}/api/states/sensor.d_cc209e_state_of_charge", headers=headers, timeout=10)
+        r_state_of_charge.raise_for_status()
+        return r_state_of_charge.json()['state']
+
+    def _get_odo(self) -> float:
+        headers = {
+            "Authorization": f"Bearer {self.hass_token}",
+            "Content-Type": "application/json",
+        }
+
+        r_odo = requests.get(f"{self.hass_url}/api/states/sensor.d_cc209e_odometer", headers=headers, timeout=10)
+        r_odo.raise_for_status()
+        data_odo = r_odo.json()
+
+        # State kann string sein -> in float wandeln
+        try:
+            return float(str(data_odo["state"]).replace(",", "."))
+        except (ValueError, KeyError) as e:
+            logger.error(f"ODO API-error for value: {data_odo["state"]}")
+            return -1
+
     @staticmethod
     def _add_years(d: datetime.date, years: int) -> datetime.date:
         try:
