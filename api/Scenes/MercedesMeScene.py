@@ -34,7 +34,7 @@ class MercedesMeScene(AbstractScene):
 
         # Werte runden/aufbereiten
         over_under = self._get_over_under()
-        sign = "+" if over_under > 0 else ""
+        sign = "+" if float(over_under) > 0 else ""
 
         message = (
             "- Sternchen Status -\n\n"
