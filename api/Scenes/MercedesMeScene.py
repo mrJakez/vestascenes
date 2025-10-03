@@ -94,7 +94,7 @@ class MercedesMeScene(AbstractScene):
             "Content-Type": "application/json",
         }
 
-        r_odo = requests.get(f"{self.hass_url}/api/states/sensor.d_cc209e_odometer", headers=headers, timeout=10)
+        r_odo = requests.get(f"{self.hass_url}/api/states/sensor.sternchen_odometer", headers=headers, timeout=10)
         r_odo.raise_for_status()
         data_odo = r_odo.json()
 
