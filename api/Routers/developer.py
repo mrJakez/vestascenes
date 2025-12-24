@@ -82,6 +82,10 @@ async def priorities():
 @router.get("/status", tags=["developer support"])
 async def status():
     vboard_initialized = False
+
+    # local_client = vesta.LocalClient()
+    # local_api_key = local_client.enable(ENABLEMENT_TOKEN)
+    # print(f"AAAAAAA: {local_client} key: {local_api_key}")
     if VboardHelper().get_client() is not None:
         vboard_initialized = True
 
