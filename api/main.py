@@ -83,7 +83,9 @@ async def add_process_time_header(request: Request, call_next):
         return response
 
     except Exception as e:
-        logger.error(f"Fehler in Middleware: {e}")
+        logger.error(f"Exception occurred: {e}")
+        logger.exception(e)
+
         return JSONResponse(
             content={"message": "Internal Server Error"},
             status_code=500

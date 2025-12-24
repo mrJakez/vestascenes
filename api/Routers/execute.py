@@ -58,7 +58,8 @@ async def execute(ignore_operation_hour:bool = False):
 
             new_return = director.get_last_return(current.class_string, current.id)
 
-            if new_return is not None:
+            if new_return is not None and new_return.raw is not None:
+                logger.info(f"new_return.message: {new_return.message} new_return.raw: {new_return.raw}")
                 message = "overwritten"
                 current_message = new_return.message
                 vesta.pprint(new_return.raw)
