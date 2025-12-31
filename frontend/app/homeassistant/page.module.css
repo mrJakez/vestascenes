@@ -1,0 +1,27 @@
+.page {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background-color: #111111;
+  color: #ededed;
+  color-scheme: dark;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.main {
+  max-width: 720px;
+  width: 100%;
+  text-align: center;
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+@media (prefers-color-scheme: light) {
+  .page {
+    background-color: #fafafa;
+    color: #0f0f0f;
+    color-scheme: light;
+  }
+}
