@@ -19,7 +19,7 @@ logger = setup_custom_logger(__file__)
 class MercedesMeScene(AbstractScene):
     weight = 3
 
-    hass_url = "http://home.imount.de"
+    hass_url = "https://home.imount.de"
     hass_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI5ZGQ0NjUyYjI1YzU0MDQ5YTBmOTliZTQ4MTc4NTMzMiIsImlhdCI6MTc1ODgyODA1NywiZXhwIjoyMDc0MTg4MDU3fQ.oDdC3gNKm2_33DFij5AXddrKfWf03sm7_iHh0YiN4CY"
 
     def execute(self, vboard, previous_identifier: str = None) -> SceneExecuteReturn:
