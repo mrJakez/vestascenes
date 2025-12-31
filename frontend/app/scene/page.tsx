@@ -69,9 +69,20 @@ function SnapshotSceneDetailList({
   }, [selectedFilename]);
 
   async function handleBoardClick(snap: Snapshot) {
+    const boardValue = JSON.parse(snap.raw);
+
     try {
       const config = await getRuntimeConfig();
-      const res = await fetch(`${config.apiUrl}/write/?raw=${snap.raw}`);
+      const res = await fetch(`${config.apiUrl}/write`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          mode: "set",
+          boardValue,
+        }),
+      });
 
       if (!res.ok) {
         throw new Error(`Fehler: ${res.status}`);
