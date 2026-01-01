@@ -59,4 +59,27 @@ a {
   }
 }
 
+@media (prefers-color-scheme: light) {
+  .MuiTabs-root button {
+    background-color: #fafafa;
+    color: #0f0f0f !important;
+    color-scheme: light;
+  }
 
+  .MuiTabs-root .MuiTabs-indicator {
+    background-color: #0f0f0f !important;
+  }
+
+  .MuiLinearProgress-root {
+    background-color: #0f0f0f !important;
+  }
+
+  .board-editor {
+    background-color: #111;
+  }
+
+  :root {
+    --background: #fafafa;
+    --foreground: #0f0f0f;
+  }
+}

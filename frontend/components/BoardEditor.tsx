@@ -57,8 +57,10 @@ function Editor({ backendUrl }: BoardEditorProps) {
 
 export default function EditorWrapper(props: BoardEditorProps) {
   return (
-    <ToastProvider>
-      <Editor {...props} />
-    </ToastProvider>
+    <div className="board-editor">
+        <ToastProvider>
+            <Editor {...props} />
+        </ToastProvider>
+    </div>
   );
 }
