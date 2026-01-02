@@ -49,18 +49,7 @@ async def test_scene(scene_class_string: str = None, send_to_board: bool = False
     scene.post_execution = True
 
     res = scene.execute(vboard)
-
-    if res.raw is not None:
-        vesta.pprint(res.raw)
-        if send_to_board:
-            try:
-                Repository().unmark_active_scene_instance()
-                model = SceneInstanceModel(scene_exec_return=res)
-                Repository().save_scene_instance(model)
-
-                vboard.write_message(res.raw)
-            except Exception as exc:
-                logger.error(f"HTTP Exception catched {exc}")
+    VboardHelper().print(res, send_to_board)
 
     logger.info(f"/test-scene executed:{res.message}")
 

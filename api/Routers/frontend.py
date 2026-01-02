@@ -17,6 +17,8 @@ from itertools import islice
 from pydantic import BaseModel
 from typing import List
 
+from Scenes.TextScene import TextScene
+
 router = APIRouter()
 vboard = VboardHelper().get_client()
 
@@ -100,12 +102,16 @@ class BoardWriteRequest(BaseModel):
 async def write(request: BoardWriteRequest):
     logger.info(f"frontend -> write")
     mode = request.mode
-    board = request.boardValue
 
-    vboard.write_message(board)
+    director = Director(vboard)
+    scene = TextScene()
+    scene.raw = request.boardValue
+
+    res = scene.execute(vboard)
+    VboardHelper().print(res)
 
     return {
         "meta": {},
-        "content": f"{board}",
+        "content": f"{res.message}",
         "mode": f"{mode}"
     }
