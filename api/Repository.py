@@ -131,14 +131,22 @@ class Repository(metaclass=SingletonMeta):
     def get_suppressed_scene_instance(self) -> typing.Optional[SceneInstanceModel]:
         with Session(self.get_engine()) as session:
             # noinspection PyPep8
-            statement = select(SceneInstanceModel).where(SceneInstanceModel.end_date > datetime.now()).where(SceneInstanceModel.is_active == False)
+            statement = (
+                select(SceneInstanceModel)
+                .where(SceneInstanceModel.end_date > datetime.now())
+                .where(SceneInstanceModel.is_active == False)
+                .order_by(desc(SceneInstanceModel.priority))
+                .limit(1)
+            )
             results = session.exec(statement).all()
-            count = len(results)
-
-            if count == 0:
+    
+            if len(results) == 0:
                 return None
-            else:
-                return results[0]
+    
+            chosen = results[0]
+            if len(results) > 1:
+                logger.info(f"Found multiple suppressed scene instances: {[r.class_string for r in results]}")
+            return chosen
 
     def unmark_active_scene_instance(self):
         with Session(self.get_engine()) as session:

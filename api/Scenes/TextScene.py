@@ -13,7 +13,7 @@ from Helper.Logger import setup_custom_logger
 logger = setup_custom_logger(__file__)
 
 class TextScene(AbstractScene):
-    priority = 100
+    priority = 180
     text: str = None
     raw: List = None
 

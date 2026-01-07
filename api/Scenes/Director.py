@@ -11,10 +11,12 @@ from Scenes.NewReleaseScene import NewReleaseScene
 from Scenes.SnapshotScene import SnapshotScene
 from Scenes.CountdownScene import CountdownScene
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
+from Scenes.TextScene import TextScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
 from Scenes.ClockScene import ClockScene
 from Scenes.MercedesMeScene import MercedesMeScene
 from Repository import Repository
+from Scenes.TimerScene import TimerScene
 
 from Helper.Logger import setup_custom_logger
 logger = setup_custom_logger(__file__)
@@ -84,9 +86,19 @@ class Director:
 
     def get_priorities(self):
         scenes = self.__all_scenes()
+
+        # add scenes which never will be executed by Director - they will just be triggered by dedicated API calls
+        scenes.append(TimerScene())
+        scenes.append(TextScene())
+
         res = []
         for scene in scenes:
             res.append({"scene": scene.__class__.__name__, "priority": scene.priority})
+
+        # Sort scenes by priority descending
+        res.sort(key=lambda x: x['priority'], reverse=True)
+
+
         return res
 
     def get_scene(self, scene_name) -> AbstractScene:

@@ -51,15 +51,16 @@ async def create_timer(payload: dict = Body(...)):
 
     director = Director(vboard)
     scene = TimerScene()
+    scene.timer_id = payload["id"]
     scene.title = payload["title"]
     scene.run_duration_seconds = payload["run_duration_seconds"]
-    # scene.raw = request.boardValue
-    #
-    # res = scene.execute(vboard)
-    # VboardHelper().print(res)
+
+    res = scene.execute(vboard)
+    VboardHelper().print(res)
 
     return {
-        "meta": {}
+        "meta": {},
+        "content": f"{res.message}",
     }
 
 
