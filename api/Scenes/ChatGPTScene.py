@@ -100,8 +100,8 @@ class ChatGPTScene(AbstractScene):
             },
             {
                 "type": "quote",
-                "question": "Erzähle mir ein zufälliges marvel Zitat ohne Erklärung. Schreib den Autor nach zwei Rautenzeichen als Trennzeichen dahinter",
-                "author": "replace_twohashmarks"
+                "question": "Erzähle mir ein zufälliges Chuck Norris Zitat ohne Erklärung.",
+                "author": "Chuck Norris"
             }
         ]
 
