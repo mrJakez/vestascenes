@@ -86,7 +86,7 @@ async def reset_instances():
 
 @router.get("/disable/{status}", tags=["lifecycle"])
 async def enable_status(status):
-    ConfigHelper.set_disabled(status)
+    ConfigHelper.set_auto_execute_disabled(status)
     return {"message": f"set to {status}"}
 
 
