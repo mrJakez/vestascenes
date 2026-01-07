@@ -31,7 +31,7 @@ export function HistoryContainer() {
     const fetchScenes = async () => {
       try {
         const config = await getRuntimeConfig();
-        const res = await fetch(`${config.apiUrl}/history`);
+        const res = await fetch(`${config.apiUrl}/frontend/history`);
         const data: ApiResponse = await res.json();
         setHistory(data.content);
 

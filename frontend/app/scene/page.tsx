@@ -32,7 +32,7 @@ function SnapshotSceneDetailList({
     const fetchFilenames = async () => {
       try {
         const config = await getRuntimeConfig();
-        const res = await fetch(`${config.apiUrl}/snapshot-filenames/`);
+        const res = await fetch(`${config.apiUrl}/frontend/snapshot-filenames/`);
         const data = await res.json();
         setFilenames(data.content);
       } catch (err) {
@@ -51,7 +51,7 @@ function SnapshotSceneDetailList({
       setLoading(true);
       try {
         const config = await getRuntimeConfig();
-        const res = await fetch(`${config.apiUrl}/snapshots/?filename=${selectedFilename}`);
+        const res = await fetch(`${config.apiUrl}/frontend/snapshots/?filename=${selectedFilename}`);
         const data = await res.json();
         const withFilename = data.content.map((s: Snapshot) => ({
           ...s,
@@ -73,7 +73,7 @@ function SnapshotSceneDetailList({
 
     try {
       const config = await getRuntimeConfig();
-      const res = await fetch(`${config.apiUrl}/write`, {
+      const res = await fetch(`${config.apiUrl}/text`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

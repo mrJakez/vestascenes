@@ -14,10 +14,7 @@ from Scenes.AbstractScene import SceneExecuteReturn
 from Scenes.Director import Director
 from Helper.Logger import setup_custom_logger
 from itertools import islice
-from pydantic import BaseModel
-from typing import List
 
-from Scenes.TextScene import TextScene
 
 router = APIRouter()
 vboard = VboardHelper().get_client()
@@ -77,9 +74,6 @@ async def snapshots(filename: Union[str, None] = None):
     }
 
 
-
-
-
 @router.get("/frontend/history", tags=["frontend support"])
 async def history():
     logger.info(f"frontend -> get history")
@@ -91,27 +85,4 @@ async def history():
     return {
         "meta": {},
         "content": res
-    }
-
-
-class BoardWriteRequest(BaseModel):
-    mode: str
-    boardValue: List
-
-@router.post("/frontend/write", tags=["frontend support"])
-async def write(request: BoardWriteRequest):
-    logger.info(f"frontend -> write")
-    mode = request.mode
-
-    director = Director(vboard)
-    scene = TextScene()
-    scene.raw = request.boardValue
-
-    res = scene.execute(vboard)
-    VboardHelper().print(res)
-
-    return {
-        "meta": {},
-        "content": f"{res.message}",
-        "mode": f"{mode}"
     }

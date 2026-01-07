@@ -20,7 +20,7 @@ os.environ['TZ'] = 'Europe/Berlin'
 time.tzset()
 
 # noinspection PyPep8
-from Routers import strava, developer, lifecycle, snapshots, execute, frontend
+from Routers import strava, developer, lifecycle, snapshots, execute, frontend, scenes
 
 description = """
 This is a vestaboard server implementation which organizes the vestaboard related content within scenes. 🚀
@@ -109,6 +109,7 @@ app.include_router(lifecycle.router)
 app.include_router(snapshots.router)
 app.include_router(execute.router)
 app.include_router(frontend.router)
+app.include_router(scenes.router)
 
 # APScheduler: Aufruf von execute alle 5 Sekunden
 scheduler = AsyncIOScheduler()

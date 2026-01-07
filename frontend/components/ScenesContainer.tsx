@@ -26,13 +26,13 @@ export function ScenesContainer() {
     const fetchScenes = async () => {
       try {
         const config = await getRuntimeConfig();
-        const res = await fetch(`${config.apiUrl}/scenes`);
+        const res = await fetch(`${config.apiUrl}/frontend/scenes`);
         const data: ApiResponse = await res.json();
 
         const scenesWithRaw = await Promise.all(
           data.content.map(async (scene) => {
             try {
-              const res = await fetch(`${config.apiUrl}/scene/${scene.scene}`);
+              const res = await fetch(`${config.apiUrl}/frontend/scene/${scene.scene}`);
               const extra = await res.json();
               console.log("RAW:", extra.raw)
               return { ...scene, raw: extra.raw };
