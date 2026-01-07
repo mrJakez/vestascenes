@@ -23,9 +23,6 @@ logger = setup_custom_logger(__file__)
                         "will be updated. Gets executed all 15 min. by dedicated runner container.")
 async def execute(ignore_operation_hour:bool = False):
 
-    if ConfigHelper.is_disabled() is True:
-        return {"message": "disabled"}
-
     logger.debug('start execute')
 
     now = datetime.now()

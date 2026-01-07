@@ -43,30 +43,6 @@ services:
     expose:
       - 80
 
-  runner:
-    image: jakez/vestascenes-runner:latest
-    container_name: vestascenes-runner
-    labels:
-      logging: "vestascenes-runner"
-      logging_jobname: "containerlogs"
-    depends_on:
-      - api
-    links:
-      - api
-    environment:
-      # required to directly print() towards stdout - activates flush always
-      PYTHONUNBUFFERED: 1
-    restart: on-failure
-
-  watchtower:
-    container_name: watchtower
-    image: containrrr/watchtower
-    environment:
-      - WATCHTOWER_CLEANUP=true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: --interval 60
-
 networks:
   default:
     driver: bridge

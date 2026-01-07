@@ -1,5 +1,4 @@
 import configparser
-import string
 from datetime import datetime
 from pathlib import Path
 from typing import Union
@@ -8,7 +7,15 @@ from typing import Union
 class ConfigHelper:
     @classmethod
     def is_in_operation_hours(cls, now: datetime) -> Union[dict[str, str], None]:
+        """
+        Checks whether the current time is within the configured operating hours.
+        Returns None if execution is permitted (within the hours),
+        otherwise a dictionary with an error message.
+        """
         config = get_config()
+
+        if not str2bool(config['operation-hours']['enabled']):
+            return None
 
         # Friday and Saturday
         if now.weekday() == 4 or now.weekday() == 5:
@@ -27,9 +34,17 @@ class ConfigHelper:
         return None
 
     @classmethod
-    def is_disabled(cls):
+    def is_auto_execute_disabled(cls) -> bool:
+        """Return whether auto execution is disabled.
+
+        This reads the new key 'auto_execute_disabled'. For backward compatibility,
+        if that key is not present it falls back to the old 'disabled' key.
+        """
         config = get_config()
-        return str2bool(config['main']['disabled'])
+        # Prefer the new name but support the old one if present
+        if 'auto_execute_disabled' in config['main']:
+            return str2bool(config['main']['auto_execute_disabled'])
+        return False
 
     @classmethod
     def get_vboard_read_write_key(cls):
@@ -42,18 +57,19 @@ class ConfigHelper:
         return key
 
     @classmethod
-    def set_disabled(cls, new_status: bool):
+    def set_auto_execute_disabled(cls, new_status: bool):
 
         config = get_config()
-        config['main']['disabled'] = str(new_status)
+        config['main']['auto_execute_disabled'] = str(new_status)
 
         with open('/config/settings.ini', 'w') as configfile:
             config.write(configfile)
 
     @classmethod
-    def get_git_hash(cls) -> string:
+    def get_git_hash(cls) -> str:
         git_hash = Path("git-version.txt").read_text().strip()
         return git_hash
+
 
 
 def str2bool(v):

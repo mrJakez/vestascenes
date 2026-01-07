@@ -27,8 +27,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-#      - API_URL=http://localhost:8000/api/frontend
-      - API_URL=http://vestaboard.imount.de/api/frontend
+      - API_URL=http://localhost:8000/api/frontend
+     # - API_URL=http://vestaboard.imount.de/api/frontend
 
   nginx:
     image: nginx:latest
@@ -40,18 +40,6 @@ services:
       - api
       - frontend
 
-  runner:
-    depends_on:
-      - api
-    links:
-      - api
-    environment:
-      # required to directly print() towards stdout - activates flush always
-      PYTHONUNBUFFERED: 1
-    build:
-      context: runner
-      dockerfile: Dockerfile
-    restart: on-failure
 
 networks:
   default:

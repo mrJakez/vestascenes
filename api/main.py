@@ -1,10 +1,14 @@
+# python
 import sys
 import os
 import time
 import logging
+import asyncio
+from datetime import datetime
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from Helper.ConfigHelper import ConfigHelper
 from Helper.Logger import setup_custom_logger
@@ -106,4 +110,26 @@ app.include_router(snapshots.router)
 app.include_router(execute.router)
 app.include_router(frontend.router)
 
+# APScheduler: Aufruf von execute alle 5 Sekunden
+scheduler = AsyncIOScheduler()
 
+async def _scheduled_execute():
+    try:
+        # execute wird direkt aufgerufen (kein HTTP-Request)
+        if ConfigHelper.is_auto_execute_disabled() is False:
+            await execute.execute()
+    except Exception:
+        logger.exception("Fehler beim geplanten Aufruf von execute")
+
+@app.on_event("startup")
+async def startup_event():
+    # APScheduler AsyncIOScheduler kann direkt mit async Funktionen umgehen.
+    # Kein lambda oder asyncio.create_task nötig.
+    scheduler.add_job(_scheduled_execute, "interval", seconds=5, next_run_time=datetime.now())
+    scheduler.start()
+    logger.info("Scheduler gestartet (Aufruf von execute alle 5 Sekunden)")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    scheduler.shutdown(wait=False)
+    logger.info("Scheduler gestoppt")

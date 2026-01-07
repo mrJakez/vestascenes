@@ -80,7 +80,7 @@ async def status():
         vboard_initialized = True
 
     return {
-        "enabled": (not ConfigHelper.is_disabled()),
+        "enabled": (not ConfigHelper.is_auto_execute_disabled()),
         "in-working-hours": ConfigHelper.is_in_operation_hours(datetime.now()),
         "git-hash": ConfigHelper.get_git_hash(),
         "strava-initialized": Scenes.StravaLastActivityScene.StravaLastActivityScene.is_initialized(),
