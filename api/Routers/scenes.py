@@ -41,7 +41,7 @@ async def write(request: BoardWriteRequest):
         "mode": f"{mode}"
     }
 
-@router.post("/timer/", tags=["scenes"])
+@router.post("/timer", tags=["scenes"])
 async def create_timer(payload: dict = Body(...)):
     """
     Payload Beispiel: {'id': 'timer_1', 'title': 'Staubsauger Timer', 'run_duration_seconds': 300}
