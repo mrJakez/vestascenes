@@ -4,6 +4,7 @@ import vesta
 from fastapi import APIRouter
 from httpx import HTTPStatusError
 
+from Helper.RawHelper import RawHelper
 from Helper.ConfigHelper import ConfigHelper
 from Helper.VboardHelper import VboardHelper
 from Models.SceneInstanceModel import SceneInstanceModel
@@ -56,7 +57,8 @@ async def execute(ignore_operation_hour:bool = False):
             new_return = director.get_last_return(current.class_string, current.id)
 
             if new_return is not None and new_return.raw is not None:
-                logger.info(f"new_return.message: {new_return.message} new_return.raw: {new_return.raw}")
+                logger.info(f"new_return.message: {new_return.message}")
+                Repository().update_scene_instance_raw(current, RawHelper.get_raw_string(new_return.raw))
                 message = "overwritten"
                 current_message = new_return.message
                 vesta.pprint(new_return.raw)
@@ -65,7 +67,7 @@ async def execute(ignore_operation_hour:bool = False):
                 message = f"Scene is overwritable but new run did not delivered content -> not overwritten"
                 current_message = "-"
 
-            logger.debug(f"{message} (current scene message: '{current_message}')")
+            logger.debug(f"{message} (current scene message: '{current_message} - {current}')")
 
             return {
                 "message": message,
@@ -103,7 +105,7 @@ async def execute(ignore_operation_hour:bool = False):
         if suppressed_scene_instance is not None:
             Repository().mark_scene_instance_as_active(suppressed_scene_instance)
             await vboard_print(suppressed_scene_instance.get_raw_list())
-            logger.debug("restore existing scene instance!")
+            logger.debug(f"restore existing scene instance ({suppressed_scene_instance.id})!")
             return {
                 "identifier": suppressed_scene_instance.id,
                 "scene": suppressed_scene_instance.class_string,
