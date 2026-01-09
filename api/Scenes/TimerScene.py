@@ -68,7 +68,7 @@ class TimerScene(AbstractScene):
         now = datetime.datetime.now()
         item = self.get_item(previous_identifier)
 
-        chars = vesta.encode_text(f"{item.title} -- {item.get_duration_in_min_and_seconds()}", align="center", valign="middle")
+        chars = vesta.encode_text(f"{item.title}\n\n{item.get_duration_in_min_and_seconds()}", align="center", valign="middle")
 
         return SceneExecuteReturn(
             item.get_scene_identifier(),
