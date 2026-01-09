@@ -63,4 +63,12 @@ async def create_timer(payload: dict = Body(...)):
         "content": f"{res.message}",
     }
 
+@router.get("/delete-timer/{timerid}", tags=["scenes"])
+async def delete_timer(timerid):
+    scene = Repository().get_active_scene_instance()
+    if scene is not None and scene.class_string == 'TimerScene':
+        if scene.id.startswith(f"Timer_{timerid}_"):
+            Repository().unmark_active_scene_instance()
+            return {"message": f"deleted {timerid}"}
 
+    return {"message": f"No current TimerScene with ID {timerid} found."}
