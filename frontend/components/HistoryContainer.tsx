@@ -47,11 +47,16 @@ export function HistoryContainer() {
 
   if (loading) return <LinearProgress />;
 
+
   return (
     <div className="board-list">
         {history.map((scene) => (
           <div key={scene.id} className="board-container">
-            <BoardPreview characters={JSON.parse(scene.raw)}>
+            <BoardPreview
+              characters={JSON.parse(scene.raw)}
+              handleFavorite={() => {}}
+              isFavorite={scene.is_active}
+            >
               {scene.class_string}
               {formatDistanceToNow(new Date(scene.start_date), {
               addSuffix: true,
