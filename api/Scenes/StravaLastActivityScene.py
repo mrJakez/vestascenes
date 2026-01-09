@@ -178,12 +178,14 @@ class StravaLastActivityScene(AbstractScene):
         except Exception as e:
             return SceneExecuteReturn.error(self, f"Some unknown stravalib Exception was raised {e}")
 
-        # last_activity = client.get_activity(11371875821)
+        # last_activity = client.get_activity(15880995968)
+        
         # ruhrtour2024 11371875821
         # kurze tour 11638289067
         # geisterclam 11621150796
         # schwimmen 11574662901
         # gewichtstraining 8132100578
+        # ebikefahrt 15880995968
 
         logger.info(f"id: {last_activity.id} - name: {last_activity.name} - type: {last_activity.type} - start_date: {last_activity.start_date} - start_date_local: {last_activity.start_date_local}")
 
@@ -203,8 +205,13 @@ class StravaLastActivityScene(AbstractScene):
         td = last_activity.moving_time
         days, hours, minutes = td.days, td.seconds // 3600, td.seconds // 60 % 60
 
+        if last_activity.type == "EBikeRide":
+            name = f"{last_activity.name} {{67}}"
+        else:
+            name = last_activity.name
+
         props = {
-            "name": last_activity.name,
+            "name": name,
             "dist": f"{int(unithelper.kilometer(last_activity.distance))}km",
             "avg": f"{round(float(unithelper.kilometers_per_hour(last_activity.average_speed)), 1)}kmh",
             "time": f"{hours}h{minutes}m",
