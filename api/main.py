@@ -73,27 +73,27 @@ logging.config.dictConfig(logging_config)
 
 logger = setup_custom_logger(__file__)
 
-@app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
-    try:
-        if ConfigHelper.get_vboard_read_write_key() is None:
-            return JSONResponse(
-                content={
-                    "message": "Missing your Vestaboard API key. Please create a settings.ini file within the /config directory"},
-                status_code=400
-            )
-
-        response = await call_next(request)
-        return response
-
-    except Exception as e:
-        logger.error(f"Exception occurred: {e}")
-        logger.exception(e)
-
-        return JSONResponse(
-            content={"message": "Internal Server Error"},
-            status_code=500
-        )
+# @app.middleware("http")
+# async def add_process_time_header(request: Request, call_next):
+#     try:
+#         if ConfigHelper.get_vboard_read_write_key() is None:
+#             return JSONResponse(
+#                 content={
+#                     "message": "Missing your Vestaboard API key. Please create a settings.ini file within the /config directory"},
+#                 status_code=400
+#             )
+#
+#         response = await call_next(request)
+#         return response
+#
+#     except Exception as e:
+#         logger.error(f"Exception occurred: {e}")
+#         logger.exception(e)
+#
+#         return JSONResponse(
+#             content={"message": "Internal Server Error"},
+#             status_code=500
+#         )
 
 app.add_middleware(
     CORSMiddleware,

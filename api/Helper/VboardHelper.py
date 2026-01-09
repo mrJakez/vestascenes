@@ -10,21 +10,35 @@ logger = setup_custom_logger(__file__)
 
 class VboardHelper(metaclass=SingletonMeta):
     _client: vesta.ReadWriteClient = None
+    _local_client: vesta.LocalClient = None
 
     def get_client(self):
-        if self._client is None:
+        if ConfigHelper.get_vboard_read_write_key() is not None:
+            if self._client is None:
+                key = ConfigHelper.get_vboard_read_write_key()
+                if key is not None and len(key) > 0 and key != "please_specify":
+                    self._client = vesta.ReadWriteClient(key)
 
-            key = ConfigHelper.get_vboard_read_write_key()
-            if key is not None and len(key) > 0 and key != "please_specify":
-                self._client = vesta.ReadWriteClient(key)
+            return self._client
+        elif ConfigHelper.get_vboard_local_api_key() is not None and ConfigHelper.get_vboard_local_url() is not None:
+            if self._local_client is None:
+                api_key = ConfigHelper.get_vboard_local_api_key()
+                url = ConfigHelper.get_vboard_local_url()
 
-        return self._client
+                self._local_client = vesta.LocalClient(local_api_key=api_key, base_url=url)
+
+            return self._local_client
+
+        logger.error(f"No valid vesta configuration found.")
+        return None
 
     def is_initialized(self):
-        return self.get_client() is not None
+        if self._client is not None or self._local_client is not None:
+            return True
+        return False
 
     def print(self, res: SceneExecuteReturn, send_to_board: bool = True):
-        vboard = VboardHelper().get_client()
+        vboard = self.get_client()
 
         if res.raw is None:
             logger.debug("empty raw")

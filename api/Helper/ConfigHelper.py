@@ -57,6 +57,22 @@ class ConfigHelper:
         return key
 
     @classmethod
+    def get_vboard_local_api_key(cls):
+        config = get_config()
+        key = config['main']['vboard_local_api_key']
+        if key is None or len(key) == 0:
+            return None
+        return key
+
+    @classmethod
+    def get_vboard_local_url(cls):
+        config = get_config()
+        key = config['main']['vboard_local_url']
+        if key is None or len(key) == 0:
+            return None
+        return key
+
+    @classmethod
     def set_auto_execute_disabled(cls, new_status: bool):
 
         config = get_config()
