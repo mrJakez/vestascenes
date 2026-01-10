@@ -106,8 +106,12 @@ class Repository(metaclass=SingletonMeta):
 
     def update_scene_instance_raw(self, model: SceneInstanceModel, raw_list: str):
         with Session(self.get_engine()) as session:
-            model.raw = raw_list
+            db_model = session.get(SceneInstanceModel, model.id)
+            if db_model is None:
+                raise ValueError(f"update_scene_instance_raw -> SceneInstanceModel id={model.id} not found")
+            db_model.raw = raw_list
             session.commit()
+
 
     def scene_instances_with_id_exists(self, given_id) -> bool:
 
