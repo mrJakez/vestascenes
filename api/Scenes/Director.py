@@ -15,6 +15,7 @@ from Scenes.TextScene import TextScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
 from Scenes.ClockScene import ClockScene
 from Scenes.MercedesMeScene import MercedesMeScene
+from Scenes.TrackLabsStatisticsScene import TrackLabsStatisticsScene
 from Repository import Repository
 from Scenes.TimerScene import TimerScene
 
@@ -73,6 +74,7 @@ class Director:
             scenes.append(ClockScene())
             scenes.append(CountdownScene())
             scenes.append(MercedesMeScene())
+            scenes.append(TrackLabsStatisticsScene())
 
         if weighted is True:
             weighted_scenes = []
