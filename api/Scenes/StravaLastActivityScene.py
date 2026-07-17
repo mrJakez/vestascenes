@@ -2,15 +2,15 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 import vesta
-from stravalib import Client, unithelper
+from stravalib import Client, unit_helper
 from stravalib.exc import RateLimitExceeded, Fault
+from importlib.metadata import version
 from vesta.vbml import Component
 
 from Scenes.AbstractScene import AbstractScene, SceneExecuteReturn
 
 from Helper.Logger import setup_custom_logger
 logger = setup_custom_logger(__file__)
-
 def get_components():
     top_row = Component(
         "{63}{63}      Strava      {63}{63}",
@@ -146,7 +146,7 @@ class StravaLastActivityScene(AbstractScene):
     overwritable = True
 
     def execute(self, vboard, previous_identifier: str = None) -> SceneExecuteReturn:
-
+        logger.info("Stravalib Version: %s", version("stravalib"))
         if self.get_client_id() is None:
             return SceneExecuteReturn.error(self,
                                             "Strava not configured. Please specify client_id and client_secret in config/settings.ini within the 'StravaLastActivityScene' section")
@@ -189,7 +189,7 @@ class StravaLastActivityScene(AbstractScene):
 
         logger.info(f"id: {last_activity.id} - name: {last_activity.name} - type: {last_activity.type} - start_date: {last_activity.start_date} - start_date_local: {last_activity.start_date_local}")
 
-        activity_end_date = last_activity.start_date_local + timedelta(seconds=last_activity.elapsed_time.seconds)
+        activity_end_date = last_activity.start_date_local + timedelta(seconds=last_activity.elapsed_time)
         if self.force_positive_rendering == False and ((datetime.now() - timedelta(hours=24)) < activity_end_date) is False:
             self.store_last_executed(datetime.now())
             msg = f"last strava activity '{last_activity.name}' is to old (start_date: {last_activity.start_date_local})"
@@ -202,8 +202,10 @@ class StravaLastActivityScene(AbstractScene):
         message = f"Strava: {last_activity.name} - {last_activity.type}"
         logger.info(message)
 
-        td = last_activity.moving_time
-        days, hours, minutes = td.days, td.seconds // 3600, td.seconds // 60 % 60
+        total_seconds = last_activity.moving_time
+        days, remainder = divmod(total_seconds, 86400)
+        hours, remainder = divmod(remainder, 3600)
+        minutes, seconds = divmod(remainder, 60)
 
         if last_activity.type == "EBikeRide":
             name = f"{last_activity.name} {{67}}"
@@ -212,11 +214,11 @@ class StravaLastActivityScene(AbstractScene):
 
         props = {
             "name": name,
-            "dist": f"{int(unithelper.kilometer(last_activity.distance))}km",
-            "avg": f"{round(float(unithelper.kilometers_per_hour(last_activity.average_speed)), 1)}kmh",
+            "dist": f"{int(last_activity.distance / 1000)}km",
+            "avg": f"{(last_activity.average_speed or 0) * 3.6:.1f} km/h",
             "time": f"{hours}h{minutes}m",
-            "max": f"{round(float(unithelper.kilometers_per_hour(last_activity.max_speed)), 1)}kmh",
-            "elev": f"{int(unithelper.meter(last_activity.total_elevation_gain))}m",
+            "max": f"{(last_activity.max_speed or 0) * 3.6:.1f} km/h",
+            "elev": f"{int(last_activity.total_elevation_gain or 0)}m",
         }
 
         if last_activity.average_heartrate is not None:
