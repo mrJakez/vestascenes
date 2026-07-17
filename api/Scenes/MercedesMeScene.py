@@ -34,7 +34,11 @@ class MercedesMeScene(AbstractScene):
 
         # Werte runden/aufbereiten
         over_under = self._get_over_under()
-        sign = "+" if float(over_under) > 0 else ""
+        try:
+            over_under_value = float(over_under)
+        except (TypeError, ValueError):
+            over_under_value = 0.0
+        sign = "+" if over_under_value > 0 else ""
 
         message = (
             "- Sternchen Status -\n\n"
@@ -91,7 +95,8 @@ class MercedesMeScene(AbstractScene):
 
         # State kann string sein -> in float wandeln
         try:
-            return float(str(data_odo["state"]).replace(",", "."))
+            val = float(str(data_odo["state"]).replace(",", "."))
+            return val
         except (ValueError, KeyError) as e:
             logger.error(f"ODO API-error for value: {data_odo["state"]}")
             return -1

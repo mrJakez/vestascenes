@@ -95,16 +95,51 @@ def download_daily_summary_report(
         "filter[reportType]": "SALES",
         "filter[reportSubType]": "SUMMARY",
         "filter[vendorNumber]": vendor_number,
-        "filter[reportDate]": report_date.isoformat(),  # YYYY-MM-DD
+        "filter[reportDate]": report_date.isoformat(),
     }
-    headers = {"Authorization": f"Bearer {token}"}
 
-    r = client.get(SALES_REPORTS_ENDPOINT, params=params, headers=headers, timeout=30.0)
-    if r.status_code in (204, 404):
-        # 204: kein Content; 404: Report (noch) nicht vorhanden
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/a-gzip",
+    }
+
+    try:
+        response = client.get(
+            SALES_REPORTS_ENDPOINT,
+            params=params,
+            headers=headers,
+            timeout=30.0,
+        )
+
+        if response.status_code in (204, 404):
+            return None
+
+        if response.status_code == 403:
+            print(
+                f"Apple Sales Report forbidden for {report_date}: "
+                f"{response.text}",
+                file=sys.stderr,
+            )
+            return None
+
+        response.raise_for_status()
+        return response.content
+
+    except httpx.HTTPStatusError as exc:
+        print(
+            f"Apple Sales Report error for {report_date}: "
+            f"HTTP {exc.response.status_code}, "
+            f"response={exc.response.text}",
+            file=sys.stderr,
+        )
         return None
-    r.raise_for_status()
-    return r.content  # gzip-komprimierter TSV-Report
+
+    except httpx.RequestError as exc:
+        print(
+            f"Apple Sales Report request failed for {report_date}: {exc}",
+            file=sys.stderr,
+        )
+        return None
 
 
 def parse_summary_sales_tsv_gz(gz_bytes: bytes) -> List[Dict[str, str]]:
