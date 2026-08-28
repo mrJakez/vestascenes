@@ -6,6 +6,7 @@ from datetime import datetime
 
 import Scenes.BirthdayScene
 import Scenes.StravaLastActivityScene
+import Scenes.StravaProxyLastActivityScene
 from Models.SceneInstanceModel import SceneInstanceModel
 from Scenes.Director import Director
 from Helper.ConfigHelper import ConfigHelper
@@ -84,6 +85,7 @@ async def status():
         "in-working-hours": ConfigHelper.is_in_operation_hours(datetime.now()),
         "git-hash": ConfigHelper.get_git_hash(),
         "strava-initialized": Scenes.StravaLastActivityScene.StravaLastActivityScene.is_initialized(),
+        "strava-proxy-initialized": Scenes.StravaProxyLastActivityScene.StravaProxyLastActivityScene.is_initialized(),
         "vboard-initialized": vboard_initialized
     }
 

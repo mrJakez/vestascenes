@@ -11,6 +11,7 @@ from Scenes.NewReleaseScene import NewReleaseScene
 from Scenes.SnapshotScene import SnapshotScene
 from Scenes.CountdownScene import CountdownScene
 from Scenes.StravaLastActivityScene import StravaLastActivityScene
+from Scenes.StravaProxyLastActivityScene import StravaProxyLastActivityScene
 from Scenes.TextScene import TextScene
 from Scenes.WasteCalendarScene import WasteCalendarScene
 from Scenes.ClockScene import ClockScene
@@ -65,7 +66,9 @@ class Director:
         if scene_type is None or scene_type is SceneType.TIMED:
             scenes.append(NewReleaseScene())
             scenes.append(WasteCalendarScene())
-            scenes.append(StravaLastActivityScene())
+            # The legacy direct-Strava scene remains available as a file-backed backup.
+            # New scheduled activity cards use the central local proxy instead.
+            scenes.append(StravaProxyLastActivityScene())
             scenes.append(BirthdayScene())
 
         if scene_type is None or scene_type is SceneType.ARTWORK:
