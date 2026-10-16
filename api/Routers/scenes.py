@@ -48,10 +48,9 @@ async def create_timer(payload: dict = Body(...)):
     """
     logger.info(f"timer -> create {dict(payload)}")
 
-
     director = Director(vboard)
     scene = TimerScene()
-    scene.timer_id = payload["id"]
+    scene.timer_id = payload["id"].replace("-", "").replace("_", "").replace(" ", "")
     scene.title = payload["title"]
     scene.run_duration_seconds = payload["run_duration_seconds"]
 
@@ -60,6 +59,7 @@ async def create_timer(payload: dict = Body(...)):
 
     return {
         "meta": {},
+        "timer_id": f"{scene.timer_id}",
         "content": f"{res.message}",
     }
 
@@ -70,5 +70,15 @@ async def delete_timer(timerid):
         if scene.id.startswith(f"Timer_{timerid}_"):
             Repository().unmark_active_scene_instance()
             return {"message": f"deleted {timerid}"}
+
+    return {"message": f"No current TimerScene with ID {timerid} found."}
+
+
+@router.get("/delete-all-timer/", tags=["scenes"])
+async def delete_all_timer():
+    scene = Repository().get_active_scene_instance()
+    if scene is not None and scene.class_string == 'TimerScene':
+        Repository().unmark_active_scene_instance()
+        return {"message": f"deleted {scene.id}"}
 
     return {"message": f"No current TimerScene with ID {timerid} found."}
