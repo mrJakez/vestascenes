@@ -2,12 +2,19 @@
 
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
-import Editor from "@/components/BoardEditor";
-import {HistoryContainer} from "@/components/HistoryContainer"
-import {ScenesContainer} from "@/components/ScenesContainer"
 import { getRuntimeConfig } from "../utils/runtime-config"; // Pfad anpassen
 
 // Dynamisch laden
+// Vestaboard components access window when their modules are loaded.
+const Editor = dynamic(() => import("./BoardEditor"), { ssr: false });
+const HistoryContainer = dynamic(
+  () => import("./HistoryContainer").then((module) => module.HistoryContainer),
+  { ssr: false },
+);
+const ScenesContainer = dynamic(
+  () => import("./ScenesContainer").then((module) => module.ScenesContainer),
+  { ssr: false },
+);
 const TabBarWrapper = dynamic(() => import("./TabBarWrapper"), {
   ssr: false,
 });

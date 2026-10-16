@@ -6,20 +6,28 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "overrides": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "fast-uri": "^3.1.8",
+    "postcss": "^8.5.10",
+    "nanoid": "^3.3.11",
+    "lodash": "^4.17.23",
+    "js-yaml": "^4.1.1",
+    "browserslist": "^4.26.3",
+    "@vestaboard/installables": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    }
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^5.17.1",
     "@mui/material": "^5.17.1",
-    "@vestaboard/installables": "^4.1.28",
+    "@vestaboard/installables": "^4.5.0",
     "date-fns": "^4.1.0",
-    "next": "^15.5.9",
+    "next": "15.5.28",
     "next-query-params": "^5.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -33,7 +41,7 @@
     "@types/react-dom": "^19",
     "@types/webpack": "^5",
     "eslint": "^9",
-    "eslint-config-next": "15.1.7",
+    "eslint-config-next": "15.5.28",
     "typescript": "^5"
   }
 }
