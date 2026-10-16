@@ -16,6 +16,17 @@ services:
 
 ## How to contribute
 
+Security dependency updates are recorded in `package-lock.json`. Run
+`npm audit` after updating and `node --test test/*.test.cjs` to check the
+CommonJS compatibility copy of the upstream URI decoder security fix.
+See `vendor/decode-uri-component/README.md` for its source and removal criteria.
+
+Known remaining advisory: GHSA-vfj7-8cjw-p6xm (`braces`), pulled in by
+`eslint-config-next -> @next/eslint-plugin-next -> fast-glob -> micromatch`.
+As of 2026-10-16, no patched `braces` release exists and the latest Next.js
+ESLint plugin still uses this dependency. npm reports five affected packages
+for this one development dependency issue. Recheck upstream before removing it.
+
 The App Router uses React 19. `@vestaboard/installables` still declares React 18
 peer dependencies, so `package.json` overrides those peers with the app's React
 and React DOM versions. Keep this targeted override until the library supports
